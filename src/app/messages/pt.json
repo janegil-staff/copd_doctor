@@ -26,6 +26,7 @@
   "noData": "Sem dados registados para este dia.",
   "loading": "A carregar...",
   "noEntries": "Sem entradas este mês.",
+  "weeksRecorded": "Semanas registadas",
   "entries": "entradas",
   "scoreLabel": "* Pontuação = (leve × 1) + (moderado × 2) + (grave × 3)",
   "avgSymptoms": "Média sintomas",

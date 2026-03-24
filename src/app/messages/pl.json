@@ -25,6 +25,7 @@
   "exacerbation": "Zaostrzenie",
   "noData": "Brak danych dla tego dnia.",
   "loading": "Ładowanie...",
+  "weeksRecorded": "Zarejestrowane tygodnie",
   "noEntries": "Brak wpisów w tym miesiącu.",
   "entries": "wpisy",
   "scoreLabel": "* Wynik = (łagodny × 1) + (umiarkowany × 2) + (ciężki × 3)",
