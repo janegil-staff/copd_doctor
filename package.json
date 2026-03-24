@@ -1,0 +1,28 @@
+{
+  "name": "copd-data",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed:symptoms": "node --experimental-vm-modules scripts/seedSymptoms.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "jspdf": "^4.2.1",
+    "knex": "^3.1.0",
+    "mongoose": "^9.3.1",
+    "mysql2": "^3.20.0",
+    "next": "16.2.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.0",
+    "tailwindcss": "^4"
+  }
+}
