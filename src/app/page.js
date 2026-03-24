@@ -22,6 +22,21 @@ import pt from "./messages/pt.json";
 
 const translations = { no, en, nl, fr, de, it, sv, da, fi, es, pl, pt };
 
+const COUNTRIES = [
+  { code: "no", label: "Norway", flag: "🇳🇴" },
+  { code: "en", label: "UK", flag: "🇬🇧" },
+  { code: "nl", label: "Netherlands", flag: "🇳🇱" },
+  { code: "fr", label: "France", flag: "🇫🇷" },
+  { code: "de", label: "Germany", flag: "🇩🇪" },
+  { code: "it", label: "Italy", flag: "🇮🇹" },
+  { code: "sv", label: "Sweden", flag: "🇸🇪" },
+  { code: "da", label: "Denmark", flag: "🇩🇰" },
+  { code: "fi", label: "Finland", flag: "🇫🇮" },
+  { code: "es", label: "Spain", flag: "🇪🇸" },
+  { code: "pl", label: "Poland", flag: "🇵🇱" },
+  { code: "pt", label: "Portugal", flag: "🇵🇹" },
+];
+
 export default function Home() {
   const { lang, setLang } = useLang();
   const router = useRouter();
@@ -38,7 +53,6 @@ export default function Home() {
     });
     const data = await res.json();
     if (data.valid) {
-      // Store patient data for the dashboard to consume
       sessionStorage.setItem("patientData", JSON.stringify(data.patient));
       router.push("/dashboard");
     } else {
@@ -46,9 +60,11 @@ export default function Home() {
       setTimeout(() => setError(false), 2000);
     }
   };
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       <main className="flex-1 flex flex-col min-[900px]:flex-row items-center min-[900px]:items-start justify-center gap-6 px-6 min-[900px]:px-12 pt-12 pb-6 relative z-10">
+        {/* Left column */}
         <div className="flex flex-col gap-6 flex-1 min-[900px]:min-w-[300px] min-[900px]:max-w-[580px] w-full order-1 min-[900px]:order-1">
           <Headline t={t} />
           <div className="hidden min-[900px]:block">
@@ -56,7 +72,37 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2">
+        {/* Right column — dropdown + ImportCard share the same width */}
+        <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3">
+          {/* Country dropdown */}
+          <div className="relative w-full max-w-[400px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0">
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-700 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
           <ImportCard
             t={t}
             code={code}
@@ -67,6 +113,7 @@ export default function Home() {
           />
         </div>
 
+        {/* Phone showcase mobile */}
         <div className="block min-[900px]:hidden w-full order-3">
           <PhoneShowcase t={t} />
         </div>
