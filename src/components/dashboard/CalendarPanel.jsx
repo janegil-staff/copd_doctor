@@ -130,26 +130,14 @@ export default function CalendarPanel({
     } else setViewMonth((m) => m + 1);
   };
 
-  // Build monthRecords from weekMap — same logic as calendar rows
+  // FIX: strict date filter — matches exactly what SummaryPage uses
+  // Previously used weekMap which pulled in records from adjacent months
   const monthRecords = useMemo(() => {
-    const seen = new Set();
-    const result = [];
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(viewYear, viewMonth, d);
-      const dow = (date.getDay() + 6) % 7;
-      const mon = new Date(viewYear, viewMonth, d - dow);
-      const monKey = `${mon.getFullYear()}-${String(mon.getMonth() + 1).padStart(2, "0")}-${String(mon.getDate()).padStart(2, "0")}`;
-      const record = weekMap[monKey];
-      if (record && !seen.has(record.date)) {
-        seen.add(record.date);
-        result.push(record);
-      }
-    }
-    return result;
-  }, [viewYear, viewMonth, weekMap]);
+    const monthKey = `${viewYear}-${pad(viewMonth + 1)}`;
+    return (records || []).filter((r) => r.date.startsWith(monthKey));
+  }, [viewYear, viewMonth, records]);
 
-  // FIX: only average records that actually have a cat8 value — skip nulls
+  // Only average records that actually have a cat8 value — skip nulls
   const catRecords = monthRecords.filter((r) => r.cat8 != null);
   const avgCat = catRecords.length
     ? Math.round(catRecords.reduce((s, r) => s + r.cat8, 0) / catRecords.length)
@@ -403,7 +391,6 @@ export default function CalendarPanel({
         {[
           {
             icon: "⬤",
-            // FIX: use avgCatRaw (not ?? 0) for color threshold too
             iconColor:
               avgCatRaw == null
                 ? "#a0b8b6"
@@ -415,7 +402,6 @@ export default function CalendarPanel({
                       ? "#FF7473"
                       : "#BE3830",
             label: t.avgSymptoms,
-            // FIX: use avgCat derived from catRecords only
             value: avgCat ?? "–",
           },
           {
