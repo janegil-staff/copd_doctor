@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-const DEFAULT_LANG = process.env.NEXT_PUBLIC_DEFAULT_LANG ?? "no";
+const DEFAULT_LANG = process.env.NEXT_PUBLIC_DEFAULT_LANG ?? "en";
 
 const LangContext = createContext({ lang: DEFAULT_LANG, setLang: () => {} });
 
