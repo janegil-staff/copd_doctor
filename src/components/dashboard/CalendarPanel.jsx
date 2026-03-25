@@ -54,7 +54,6 @@ function Checkbox({ checked, onChange, label, color }) {
   );
 }
 
-// show and onToggleShow come from page.js (lifted state)
 export default function CalendarPanel({
   t,
   records,
@@ -72,14 +71,12 @@ export default function CalendarPanel({
     return map;
   }, [records]);
 
-  // weekMap: for every date, find the record whose Mon–Sun week contains it
   const weekMap = useMemo(() => {
     const map = {};
 
-    // Parse YYYY-MM-DD safely without timezone shifting
     const parseLocal = (dateStr) => {
       const [y, m, d] = dateStr.split("-").map(Number);
-      return new Date(y, m - 1, d); // local midnight — no UTC offset
+      return new Date(y, m - 1, d);
     };
 
     const toKey = (d) =>
@@ -87,18 +84,13 @@ export default function CalendarPanel({
 
     (records || []).forEach((r) => {
       const d = parseLocal(r.date);
-      const dow = (d.getDay() + 6) % 7; // 0=Mon … 6=Sun
+      const dow = (d.getDay() + 6) % 7;
       for (let i = 0; i < 7; i++) {
-        const dd = new Date(
-          d.getFullYear(),
-          d.getMonth(),
-          d.getDate() - dow + i,
-        );
+        const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate() - dow + i);
         const key = toKey(dd);
         if (!map[key]) map[key] = r;
       }
     });
-    // Exact record dates always win
     (records || []).forEach((r) => {
       map[r.date] = r;
     });
@@ -120,18 +112,8 @@ export default function CalendarPanel({
   const cells = buildCalendar(viewYear, viewMonth);
   const pad = (n) => String(n).padStart(2, "0");
   const months = t.monthNames ?? [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
   ];
   const days = t.days ?? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -148,30 +130,45 @@ export default function CalendarPanel({
     } else setViewMonth((m) => m + 1);
   };
 
-  const monthRecords = Object.entries(recordMap)
-    .filter(([d]) => d.startsWith(`${viewYear}-${pad(viewMonth + 1)}`))
-    .map(([, r]) => r);
+  // Build monthRecords from weekMap — same logic as calendar rows
+  const monthRecords = useMemo(() => {
+    const seen = new Set();
+    const result = [];
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(viewYear, viewMonth, d);
+      const dow = (date.getDay() + 6) % 7;
+      const mon = new Date(viewYear, viewMonth, d - dow);
+      const monKey = `${mon.getFullYear()}-${String(mon.getMonth() + 1).padStart(2, "0")}-${String(mon.getDate()).padStart(2, "0")}`;
+      const record = weekMap[monKey];
+      if (record && !seen.has(record.date)) {
+        seen.add(record.date);
+        result.push(record);
+      }
+    }
+    return result;
+  }, [viewYear, viewMonth, weekMap]);
 
   const counts = {
-    low: monthRecords.filter((r) => r.cat8 != null && r.cat8 <= 10).length,
-    medium: monthRecords.filter(
-      (r) => r.cat8 != null && r.cat8 > 10 && r.cat8 <= 20,
+    low:                  monthRecords.filter((r) => r.cat8 != null && r.cat8 <= 10).length,
+    medium:               monthRecords.filter((r) => r.cat8 != null && r.cat8 > 10 && r.cat8 <= 20).length,
+    high:                 monthRecords.filter((r) => r.cat8 != null && r.cat8 > 20 && r.cat8 <= 30).length,
+    veryHigh:             monthRecords.filter((r) => r.cat8 != null && r.cat8 > 30).length,
+    // FIX: count moderate and serious separately
+    moderateExacerbations: monthRecords.filter(
+      (r) => r.moderateExacerbations && !r.seriousExacerbations
     ).length,
-    high: monthRecords.filter(
-      (r) => r.cat8 != null && r.cat8 > 20 && r.cat8 <= 30,
+    seriousExacerbations:  monthRecords.filter(
+      (r) => r.seriousExacerbations
     ).length,
-    veryHigh: monthRecords.filter((r) => r.cat8 != null && r.cat8 > 30).length,
-    exacerbations: monthRecords.filter(
-      (r) => r.moderateExacerbations || r.seriousExacerbations,
-    ).length,
-    filled: monthRecords.length,
+    filled:               monthRecords.length,
   };
 
   const checkboxes = [
     { key: "medicine", label: t.showMedicine, color: "#0ea5e9" },
-    { key: "note", label: t.showNote, color: "#8b5cf6" },
+    { key: "note",     label: t.showNote,     color: "#8b5cf6" },
     { key: "activity", label: t.showActivity, color: "#0f8a6a" },
-    { key: "weight", label: t.showWeight, color: "#a16200" },
+    { key: "weight",   label: t.showWeight,   color: "#a16200" },
   ];
 
   return (
@@ -203,33 +200,25 @@ export default function CalendarPanel({
         </button>
       </div>
 
-      {/* Week rows — one bar per week */}
+      {/* Week rows */}
       <div className="space-y-1">
         {(() => {
-          // Build week rows from ISO weeks that overlap with this month
           const rows = [];
           const seen = new Set();
 
-          // Iterate every day of the month, collect unique ISO weeks
           const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
           for (let d = 1; d <= daysInMonth; d++) {
             const date = new Date(viewYear, viewMonth, d);
-            const dow = (date.getDay() + 6) % 7; // 0=Mon
+            const dow = (date.getDay() + 6) % 7;
             const mon = new Date(viewYear, viewMonth, d - dow);
             const monKey = `${mon.getFullYear()}-${String(mon.getMonth() + 1).padStart(2, "0")}-${String(mon.getDate()).padStart(2, "0")}`;
             if (seen.has(monKey)) continue;
             seen.add(monKey);
 
-            // ISO week number
-            const thu = new Date(
-              mon.getFullYear(),
-              mon.getMonth(),
-              mon.getDate() + 3,
-            );
+            const thu = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 3);
             const jan4 = new Date(thu.getFullYear(), 0, 4);
             const wn = 1 + Math.round((thu - jan4) / 604800000);
 
-            // Find record via weekMap using the Monday date
             const record = weekMap[monKey];
             const isSelected = record && selectedDate === record.date;
 
@@ -238,9 +227,9 @@ export default function CalendarPanel({
               record &&
               (record.moderateExacerbations || record.seriousExacerbations);
             const showNoteDot = show.note && record?.note?.trim();
-            const showMedDot = show.medicine && record?.medicines?.length > 0;
-            const showActDot = show.activity && record?.physicalActivity > 0;
-            const showWtDot = show.weight && record?.weight != null;
+            const showMedDot  = show.medicine && record?.medicines?.length > 0;
+            const showActDot  = show.activity && record?.physicalActivity > 0;
+            const showWtDot   = show.weight && record?.weight != null;
             const anyDot =
               showExDot || showNoteDot || showMedDot || showActDot || showWtDot;
 
@@ -255,6 +244,7 @@ export default function CalendarPanel({
                       ? "#FF7473"
                       : "#BE3830"
               : "rgba(38,142,134,0.03)";
+
             const stripeColor = isSelected
               ? "#0f6b63"
               : record
@@ -293,7 +283,6 @@ export default function CalendarPanel({
                   WebkitTextFillColor: record ? "#1a1a1a" : "#a0b8b6",
                 }}
               >
-                {/* Day numbers Mon–Sun */}
                 <div
                   className="flex items-center justify-between w-full"
                   style={{ direction: "ltr" }}
@@ -413,18 +402,11 @@ export default function CalendarPanel({
             iconColor:
               counts.filled === 0
                 ? "#a0b8b6"
-                : monthRecords.length &&
-                    monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) /
-                      monthRecords.length <=
-                      10
+                : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) / monthRecords.length <= 10
                   ? "#4CC189"
-                  : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) /
-                        monthRecords.length <=
-                      20
+                  : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) / monthRecords.length <= 20
                     ? "#FFC659"
-                    : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) /
-                          monthRecords.length <=
-                        30
+                    : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) / monthRecords.length <= 30
                       ? "#FF7473"
                       : "#BE3830",
             label: t.avgSymptoms,
@@ -439,13 +421,13 @@ export default function CalendarPanel({
             icon: "⚠",
             iconColor: "#f97316",
             label: t.moderateExacerbation,
-            value: counts.exacerbations,
+            value: counts.moderateExacerbations,  // FIX: only moderate, not serious
           },
           {
             icon: "⚠",
             iconColor: "#ef4444",
             label: t.seriousExacerbation,
-            value: monthRecords.filter((r) => r.seriousExacerbations).length,
+            value: counts.seriousExacerbations,   // FIX: only serious
           },
           {
             icon: "🏃",
