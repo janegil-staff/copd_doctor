@@ -149,19 +149,23 @@ export default function CalendarPanel({
     return result;
   }, [viewYear, viewMonth, weekMap]);
 
+  // FIX: only average records that actually have a cat8 value — skip nulls
+  const catRecords = monthRecords.filter((r) => r.cat8 != null);
+  const avgCat = catRecords.length
+    ? Math.round(catRecords.reduce((s, r) => s + r.cat8, 0) / catRecords.length)
+    : null;
+  const avgCatRaw = catRecords.length
+    ? catRecords.reduce((s, r) => s + r.cat8, 0) / catRecords.length
+    : null;
+
   const counts = {
-    low:                  monthRecords.filter((r) => r.cat8 != null && r.cat8 <= 10).length,
-    medium:               monthRecords.filter((r) => r.cat8 != null && r.cat8 > 10 && r.cat8 <= 20).length,
-    high:                 monthRecords.filter((r) => r.cat8 != null && r.cat8 > 20 && r.cat8 <= 30).length,
-    veryHigh:             monthRecords.filter((r) => r.cat8 != null && r.cat8 > 30).length,
-    // FIX: count moderate and serious separately
-    moderateExacerbations: monthRecords.filter(
-      (r) => r.moderateExacerbations && !r.seriousExacerbations
-    ).length,
-    seriousExacerbations:  monthRecords.filter(
-      (r) => r.seriousExacerbations
-    ).length,
-    filled:               monthRecords.length,
+    low:                   monthRecords.filter((r) => r.cat8 != null && r.cat8 <= 10).length,
+    medium:                monthRecords.filter((r) => r.cat8 != null && r.cat8 > 10 && r.cat8 <= 20).length,
+    high:                  monthRecords.filter((r) => r.cat8 != null && r.cat8 > 20 && r.cat8 <= 30).length,
+    veryHigh:              monthRecords.filter((r) => r.cat8 != null && r.cat8 > 30).length,
+    moderateExacerbations: monthRecords.filter((r) => r.moderateExacerbations && !r.seriousExacerbations).length,
+    seriousExacerbations:  monthRecords.filter((r) => r.seriousExacerbations).length,
+    filled:                monthRecords.length,
   };
 
   const checkboxes = [
@@ -399,35 +403,32 @@ export default function CalendarPanel({
         {[
           {
             icon: "⬤",
+            // FIX: use avgCatRaw (not ?? 0) for color threshold too
             iconColor:
-              counts.filled === 0
+              avgCatRaw == null
                 ? "#a0b8b6"
-                : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) / monthRecords.length <= 10
+                : avgCatRaw <= 10
                   ? "#4CC189"
-                  : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) / monthRecords.length <= 20
+                  : avgCatRaw <= 20
                     ? "#FFC659"
-                    : monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) / monthRecords.length <= 30
+                    : avgCatRaw <= 30
                       ? "#FF7473"
                       : "#BE3830",
             label: t.avgSymptoms,
-            value: counts.filled
-              ? Math.round(
-                  monthRecords.reduce((s, r) => s + (r.cat8 ?? 0), 0) /
-                    monthRecords.length,
-                )
-              : "–",
+            // FIX: use avgCat derived from catRecords only
+            value: avgCat ?? "–",
           },
           {
             icon: "⚠",
             iconColor: "#f97316",
             label: t.moderateExacerbation,
-            value: counts.moderateExacerbations,  // FIX: only moderate, not serious
+            value: counts.moderateExacerbations,
           },
           {
             icon: "⚠",
             iconColor: "#ef4444",
             label: t.seriousExacerbation,
-            value: counts.seriousExacerbations,   // FIX: only serious
+            value: counts.seriousExacerbations,
           },
           {
             icon: "🏃",
