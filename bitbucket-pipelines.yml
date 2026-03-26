@@ -5,7 +5,6 @@ definitions:
     node: node_modules
 
 pipelines:
-  # Runs on every push to any branch
   default:
     - step:
         name: Install & Lint
@@ -16,52 +15,31 @@ pipelines:
           - npm run lint
 
   branches:
-    # Testing branch — install, lint, test
     testing:
       - step:
-          name: Install
+          name: Install, Lint & Test
           caches:
             - node
           script:
             - npm ci
-      - step:
-          name: Lint
-          caches:
-            - node
-          script:
             - npm run lint
-      - step:
-          name: Test
-          caches:
-            - node
-          script:
             - npm test -- --watchAll=false --passWithNoTests
 
-    # Main branch — full pipeline including production build
     main:
       - step:
-          name: Install
+          name: Install, Lint & Test
           caches:
             - node
           script:
             - npm ci
-      - step:
-          name: Lint
-          caches:
-            - node
-          script:
             - npm run lint
-      - step:
-          name: Test
-          caches:
-            - node
-          script:
             - npm test -- --watchAll=false --passWithNoTests
       - step:
           name: Build
           caches:
             - node
           script:
+            - npm ci
             - npm run build
           artifacts:
             - .next/**
