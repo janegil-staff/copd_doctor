@@ -1,3 +1,6 @@
+"use client";
+import Image from "next/image";
+
 export default function PatientView({ data }) {
   const latest = data.records?.[0];
 
@@ -39,10 +42,12 @@ export default function PatientView({ data }) {
             {data.userMedicines.map((um) => (
               <li key={um.medicineId} className="flex items-center gap-3">
                 {um.medicine.image && (
-                  <img
+                  <Image
                     src={um.medicine.image}
                     alt={um.medicine.name}
-                    className="w-10 h-10 object-contain rounded"
+                    width={40}
+                    height={40}
+                    className="object-contain rounded"
                   />
                 )}
                 <div>

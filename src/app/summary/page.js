@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLang } from "@/context/LangContext";
 import no from "@/app/messages/no.json";
 import en from "@/app/messages/en.json";
@@ -35,15 +36,29 @@ const CAT_BG = (score) => {
 
 // ─── Tiny SVG line/bar charts ──────────────────────────────────────────────
 
-function LineChart({ data, color = "#268E86", min: forceMin, max: forceMax, height = 90 }) {
+function LineChart({
+  data,
+  color = "#268E86",
+  min: forceMin,
+  max: forceMax,
+  height = 90,
+}) {
   if (!data?.length)
-    return <p className="text-xs text-center py-4" style={{ color: "#a0b8b6" }}>–</p>;
+    return (
+      <p className="text-xs text-center py-4" style={{ color: "#a0b8b6" }}>
+        –
+      </p>
+    );
   const vals = data.map((d) => d.value);
   const minV = forceMin ?? Math.min(...vals);
   const maxV = forceMax ?? Math.max(...vals);
   const range = maxV - minV || 1;
-  const W = 400, H = height;
-  const padL = 36, padR = 8, padT = 8, padB = 8;
+  const W = 400,
+    H = height;
+  const padL = 36,
+    padR = 8,
+    padT = 8,
+    padB = 8;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
 
@@ -52,7 +67,9 @@ function LineChart({ data, color = "#268E86", min: forceMin, max: forceMax, heig
     const y = padT + chartH - ((d.value - minV) / range) * chartH;
     return [x, y];
   });
-  const path = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ");
+  const path = pts
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`)
+    .join(" ");
   const area = `${path} L${pts[pts.length - 1][0]},${padT + chartH} L${pts[0][0]},${padT + chartH} Z`;
 
   const ticks = [0, 0.5, 1].map((f) => ({
@@ -63,19 +80,47 @@ function LineChart({ data, color = "#268E86", min: forceMin, max: forceMax, heig
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height }}>
       <defs>
-        <linearGradient id={`grad-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient
+          id={`grad-${color.replace("#", "")}`}
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
           <stop offset="0%" stopColor={color} stopOpacity="0.18" />
           <stop offset="100%" stopColor={color} stopOpacity="0.02" />
         </linearGradient>
       </defs>
       {ticks.map((tick, i) => (
         <g key={i}>
-          <line x1={padL} y1={tick.y} x2={W - padR} y2={tick.y} stroke="#e0eeec" strokeWidth="1" />
-          <text x={padL - 4} y={tick.y + 3.5} textAnchor="end" fontSize="9" fill="#a0b8b6">{tick.value}</text>
+          <line
+            x1={padL}
+            y1={tick.y}
+            x2={W - padR}
+            y2={tick.y}
+            stroke="#e0eeec"
+            strokeWidth="1"
+          />
+          <text
+            x={padL - 4}
+            y={tick.y + 3.5}
+            textAnchor="end"
+            fontSize="9"
+            fill="#a0b8b6"
+          >
+            {tick.value}
+          </text>
         </g>
       ))}
       <path d={area} fill={`url(#grad-${color.replace("#", "")})`} />
-      <path d={path} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       {pts.map(([x, y], i) => (
         <circle key={i} cx={x} cy={y} r="3" fill={color} />
       ))}
@@ -85,11 +130,19 @@ function LineChart({ data, color = "#268E86", min: forceMin, max: forceMax, heig
 
 function BarChart({ data, colorFn, height = 90 }) {
   if (!data?.length)
-    return <p className="text-xs text-center py-4" style={{ color: "#a0b8b6" }}>–</p>;
+    return (
+      <p className="text-xs text-center py-4" style={{ color: "#a0b8b6" }}>
+        –
+      </p>
+    );
   const vals = data.map((d) => d.value);
   const maxV = Math.max(...vals, 1);
-  const W = 400, H = height;
-  const padL = 36, padR = 8, padT = 8, padB = 8;
+  const W = 400,
+    H = height;
+  const padL = 36,
+    padR = 8,
+    padT = 8,
+    padB = 8;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
   const bw = chartW / data.length;
@@ -103,8 +156,23 @@ function BarChart({ data, colorFn, height = 90 }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height }}>
       {ticks.map((tick, i) => (
         <g key={i}>
-          <line x1={padL} y1={tick.y} x2={W - padR} y2={tick.y} stroke="#e0eeec" strokeWidth="1" />
-          <text x={padL - 4} y={tick.y + 3.5} textAnchor="end" fontSize="9" fill="#a0b8b6">{tick.value}</text>
+          <line
+            x1={padL}
+            y1={tick.y}
+            x2={W - padR}
+            y2={tick.y}
+            stroke="#e0eeec"
+            strokeWidth="1"
+          />
+          <text
+            x={padL - 4}
+            y={tick.y + 3.5}
+            textAnchor="end"
+            fontSize="9"
+            fill="#a0b8b6"
+          >
+            {tick.value}
+          </text>
         </g>
       ))}
       {data.map((d, i) => {
@@ -113,7 +181,16 @@ function BarChart({ data, colorFn, height = 90 }) {
         const y = padT + chartH - barH;
         const color = colorFn ? colorFn(d.value) : "#268E86";
         return (
-          <rect key={i} x={x} y={y} width={bw * 0.7} height={Math.max(barH, 2)} rx="3" fill={color} opacity="0.85" />
+          <rect
+            key={i}
+            x={x}
+            y={y}
+            width={bw * 0.7}
+            height={Math.max(barH, 2)}
+            rx="3"
+            fill={color}
+            opacity="0.85"
+          />
         );
       })}
     </svg>
@@ -134,7 +211,10 @@ function Card({ title, subtitle, children, accent }) {
       }}
     >
       <div className="flex items-start justify-between mb-1">
-        <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "#7a9a98" }}>
+        <p
+          className="text-xs font-semibold tracking-widest uppercase"
+          style={{ color: "#7a9a98" }}
+        >
           {title}
         </p>
         {accent && (
@@ -144,7 +224,9 @@ function Card({ title, subtitle, children, accent }) {
         )}
       </div>
       {subtitle && (
-        <p className="text-xs mb-3" style={{ color: "#a0b8b6" }}>{subtitle}</p>
+        <p className="text-xs mb-3" style={{ color: "#a0b8b6" }}>
+          {subtitle}
+        </p>
       )}
       {children}
     </div>
@@ -157,8 +239,12 @@ function StatRow({ label, value, color }) {
       className="flex items-center justify-between py-1.5"
       style={{ borderBottom: "1px solid rgba(38,142,134,0.07)" }}
     >
-      <span className="text-xs" style={{ color: "#7a9a98" }}>{label}</span>
-      <span className="text-sm font-bold" style={{ color: color ?? "#268E86" }}>{value}</span>
+      <span className="text-xs" style={{ color: "#7a9a98" }}>
+        {label}
+      </span>
+      <span className="text-sm font-bold" style={{ color: color ?? "#268E86" }}>
+        {value}
+      </span>
     </div>
   );
 }
@@ -166,7 +252,11 @@ function StatRow({ label, value, color }) {
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
 const isoWeek = (dateStr) => {
-  const d = new Date(dateStr.slice(0, 4), dateStr.slice(5, 7) - 1, dateStr.slice(8, 10));
+  const d = new Date(
+    dateStr.slice(0, 4),
+    dateStr.slice(5, 7) - 1,
+    dateStr.slice(8, 10),
+  );
   const dow = (d.getDay() + 6) % 7;
   const thu = new Date(d.getFullYear(), d.getMonth(), d.getDate() - dow + 3);
   const jan4 = new Date(thu.getFullYear(), 0, 4);
@@ -174,11 +264,35 @@ const isoWeek = (dateStr) => {
 };
 
 const weekMonday = (dateStr) => {
-  const d = new Date(dateStr.slice(0, 4), dateStr.slice(5, 7) - 1, dateStr.slice(8, 10));
+  const d = new Date(
+    dateStr.slice(0, 4),
+    dateStr.slice(5, 7) - 1,
+    dateStr.slice(8, 10),
+  );
   const dow = (d.getDay() + 6) % 7;
   const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() - dow);
   return `${String(mon.getDate()).padStart(2, "0")}.${String(mon.getMonth() + 1).padStart(2, "0")}`;
 };
+
+function parseInitialState() {
+  if (typeof window === "undefined")
+    return { patient: null, viewYear: null, viewMonth: null };
+  const raw = sessionStorage.getItem("patientData");
+  if (!raw) return { patient: null, viewYear: null, viewMonth: null };
+  const data = JSON.parse(raw);
+  const sorted = [...(data.records ?? [])].sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
+  if (sorted.length) {
+    const last = sorted[sorted.length - 1].date;
+    return {
+      patient: data,
+      viewYear: parseInt(last.slice(0, 4)),
+      viewMonth: parseInt(last.slice(5, 7)) - 1,
+    };
+  }
+  return { patient: data, viewYear: null, viewMonth: null };
+}
 
 // ─── Main ──────────────────────────────────────────────────────────────────
 
@@ -186,26 +300,23 @@ export default function SummaryPage() {
   const router = useRouter();
   const { lang } = useLang();
   const t = translations[lang] ?? translations.en;
-  const [patient, setPatient] = useState(null);
-  const [viewYear, setViewYear] = useState(null);
-  const [viewMonth, setViewMonth] = useState(null);
 
+  const [patient, setPatient] = useState(() => parseInitialState().patient);
+  const [viewYear, setViewYear] = useState(() => parseInitialState().viewYear);
+  const [viewMonth, setViewMonth] = useState(
+    () => parseInitialState().viewMonth,
+  );
+
+  // Redirect if no patient data
   useEffect(() => {
-    const raw = sessionStorage.getItem("patientData");
-    if (!raw) { router.replace("/"); return; }
-    const data = JSON.parse(raw);
-    setPatient(data);
-    const sorted = [...(data.records ?? [])].sort((a, b) => a.date.localeCompare(b.date));
-    if (sorted.length) {
-      const last = sorted[sorted.length - 1].date;
-      setViewYear(parseInt(last.slice(0, 4)));
-      setViewMonth(parseInt(last.slice(5, 7)) - 1);
-    }
-  }, []);
+    if (!patient) router.replace("/");
+  }, [patient, router]);
 
   if (!patient) return null;
 
-  const allRecords = [...(patient.records ?? [])].sort((a, b) => a.date.localeCompare(b.date));
+  const allRecords = [...(patient.records ?? [])].sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
   const pad = (n) => String(n).padStart(2, "0");
 
   const vy = viewYear ?? new Date().getFullYear();
@@ -216,17 +327,31 @@ export default function SummaryPage() {
   const records = allRecords.filter((r) => r.date.startsWith(monthKey));
 
   const months = t.monthNames ?? [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   const prevMonth = () => {
-    if (vm === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
-    else setViewMonth((m) => m - 1);
+    if (vm === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else setViewMonth((m) => m - 1);
   };
   const nextMonth = () => {
-    if (vm === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
-    else setViewMonth((m) => m + 1);
+    if (vm === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else setViewMonth((m) => m + 1);
   };
   const hasPrev = allRecords.some((r) => r.date < monthKey);
   const hasNext = allRecords.some((r) => r.date > monthKey + "-31");
@@ -240,14 +365,16 @@ export default function SummaryPage() {
   });
   const weeks = Object.values(weekMap).sort((a, b) => a.wn - b.wn);
 
-  // ── CAT trend per week — FIX: skip null cat8, don't use ?? 0 ────────────
+  // ── CAT trend per week ───────────────────────────────────────────────────
   const catTrend = weeks
     .map((w) => {
       const catItems = w.items.filter((r) => r.cat8 != null);
       if (!catItems.length) return null;
       return {
         label: `${t.week ?? "W"}${w.wn}`,
-        value: Math.round(catItems.reduce((s, r) => s + r.cat8, 0) / catItems.length),
+        value: Math.round(
+          catItems.reduce((s, r) => s + r.cat8, 0) / catItems.length,
+        ),
       };
     })
     .filter(Boolean);
@@ -255,14 +382,18 @@ export default function SummaryPage() {
   // ── Weekly exacerbation counts ───────────────────────────────────────────
   const exWeekly = weeks.map((w) => ({
     label: `${t.week ?? "W"}${w.wn}`,
-    value: w.items.filter((r) => r.moderateExacerbations || r.seriousExacerbations).length,
+    value: w.items.filter(
+      (r) => r.moderateExacerbations || r.seriousExacerbations,
+    ).length,
   }));
 
-  // ── Exacerbation counts — FIX: moderate excludes serious ────────────────
-  const modEx = records.filter((r) => r.moderateExacerbations && !r.seriousExacerbations).length;
+  // ── Exacerbation counts ──────────────────────────────────────────────────
+  const modEx = records.filter(
+    (r) => r.moderateExacerbations && !r.seriousExacerbations,
+  ).length;
   const sevEx = records.filter((r) => r.seriousExacerbations).length;
 
-  // ── Overall CAT stats — FIX: skip null values ────────────────────────────
+  // ── Overall CAT stats ────────────────────────────────────────────────────
   const catVals = records.map((r) => r.cat8).filter((v) => v != null);
   const avgCat = catVals.length
     ? Math.round(catVals.reduce((a, b) => a + b, 0) / catVals.length)
@@ -275,8 +406,12 @@ export default function SummaryPage() {
     .map((w) => {
       const withWeight = w.items.filter((r) => r.weight != null);
       if (!withWeight.length) return null;
-      const avg = withWeight.reduce((s, r) => s + r.weight, 0) / withWeight.length;
-      return { label: `${t.week ?? "W"}${w.wn}`, value: Math.round(avg * 10) / 10 };
+      const avg =
+        withWeight.reduce((s, r) => s + r.weight, 0) / withWeight.length;
+      return {
+        label: `${t.week ?? "W"}${w.wn}`,
+        value: Math.round(avg * 10) / 10,
+      };
     })
     .filter(Boolean);
 
@@ -288,7 +423,9 @@ export default function SummaryPage() {
     })
     .filter((d) => d.value > 0);
   const avgActivity = activityData.length
-    ? Math.round(activityData.reduce((s, d) => s + d.value, 0) / activityData.length)
+    ? Math.round(
+        activityData.reduce((s, d) => s + d.value, 0) / activityData.length,
+      )
     : null;
 
   // ── Medicine usage ────────────────────────────────────────────────────────
@@ -297,32 +434,48 @@ export default function SummaryPage() {
     (r.medicines ?? []).forEach((id, i) => {
       const name =
         patient.medicines?.find((m) => m.id === id)?.name ??
-        patient.userMedicines?.find((um) => um.medicineId === id)?.medicine?.name ??
+        patient.userMedicines?.find((um) => um.medicineId === id)?.medicine
+          ?.name ??
         `ID ${id}`;
       if (!medUsage[name]) medUsage[name] = { count: 0, times: 0 };
       medUsage[name].count++;
       medUsage[name].times += r.medicinesUsedTimes?.[i] ?? 1;
     });
   });
-  const medList = Object.entries(medUsage).sort((a, b) => b[1].count - a[1].count);
+  const medList = Object.entries(medUsage).sort(
+    (a, b) => b[1].count - a[1].count,
+  );
 
   // ── GAD-7 ─────────────────────────────────────────────────────────────────
   const gad7 = patient.latestGad7;
   const GAD7_KEYS = [
-    "feelingNervous", "noWorryingControl", "worrying",
-    "troubleRelaxing", "restless", "easilyAnnoyed", "afraid",
+    "feelingNervous",
+    "noWorryingControl",
+    "worrying",
+    "troubleRelaxing",
+    "restless",
+    "easilyAnnoyed",
+    "afraid",
   ];
-  const gad7Sum = gad7 ? GAD7_KEYS.reduce((s, k) => s + (gad7[k] ?? 0), 0) : null;
+  const gad7Sum = gad7
+    ? GAD7_KEYS.reduce((s, k) => s + (gad7[k] ?? 0), 0)
+    : null;
   const gad7Level =
-    gad7Sum === null ? null
-    : gad7Sum <= 9 ? t.mild
-    : gad7Sum <= 14 ? t.moderate
-    : t.serious;
+    gad7Sum === null
+      ? null
+      : gad7Sum <= 9
+        ? t.mild
+        : gad7Sum <= 14
+          ? t.moderate
+          : t.serious;
   const gad7Color =
-    gad7Sum === null ? "#7a9a98"
-    : gad7Sum <= 9 ? "#0f8a6a"
-    : gad7Sum <= 14 ? "#a16200"
-    : "#b91c1c";
+    gad7Sum === null
+      ? "#7a9a98"
+      : gad7Sum <= 9
+        ? "#0f8a6a"
+        : gad7Sum <= 14
+          ? "#a16200"
+          : "#b91c1c";
 
   return (
     <div
@@ -346,7 +499,11 @@ export default function SummaryPage() {
         <button
           onClick={() => router.push("/dashboard")}
           className="text-sm font-semibold px-3 py-1.5 rounded-full transition-all hover:opacity-80"
-          style={{ background: "rgba(38,142,134,0.1)", color: "#268E86", border: "1px solid rgba(38,142,134,0.25)" }}
+          style={{
+            background: "rgba(38,142,134,0.1)",
+            color: "#268E86",
+            border: "1px solid rgba(38,142,134,0.25)",
+          }}
         >
           {t.back}
         </button>
@@ -362,7 +519,11 @@ export default function SummaryPage() {
           </button>
           <span
             className="text-sm font-semibold px-1"
-            style={{ color: "#268E86", textAlign: "center", whiteSpace: "nowrap" }}
+            style={{
+              color: "#268E86",
+              textAlign: "center",
+              whiteSpace: "nowrap",
+            }}
           >
             {months[vm]} {vy}
           </span>
@@ -376,10 +537,13 @@ export default function SummaryPage() {
           </button>
         </div>
 
-        {/* FIX: show week count, not entry count */}
         <span
           className="text-xs px-3 py-1.5 rounded-full"
-          style={{ background: "rgba(38,142,134,0.08)", color: "#268E86", border: "1px solid rgba(38,142,134,0.2)" }}
+          style={{
+            background: "rgba(38,142,134,0.08)",
+            color: "#268E86",
+            border: "1px solid rgba(38,142,134,0.2)",
+          }}
         >
           {weeks.length} {t.entries}
         </span>
@@ -389,19 +553,38 @@ export default function SummaryPage() {
       <main className="flex-1 px-4 sm:px-6 py-6 max-w-4xl mx-auto w-full pb-16">
         <div
           className="grid gap-4"
-          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}
+          style={{
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          }}
         >
           {/* CAT overview */}
           <Card
             title={t.catScore}
-            accent={avgCat != null ? { value: avgCat, color: CAT_COLOR(avgCat) } : undefined}
+            accent={
+              avgCat != null
+                ? { value: avgCat, color: CAT_COLOR(avgCat) }
+                : undefined
+            }
             subtitle={t.avgSymptoms}
           >
-            {/* FIX: weeksRecorded instead of daysRecorded */}
-            <StatRow label={t.weeksRecorded ?? t.daysRecorded} value={weeks.length} />
-            {minCat != null && <StatRow label="Min CAT" value={minCat} color={CAT_COLOR(minCat)} />}
-            {maxCat != null && <StatRow label="Max CAT" value={maxCat} color={CAT_COLOR(maxCat)} />}
-            {/* FIX: moderate excludes serious */}
+            <StatRow
+              label={t.weeksRecorded ?? t.daysRecorded}
+              value={weeks.length}
+            />
+            {minCat != null && (
+              <StatRow
+                label="Min CAT"
+                value={minCat}
+                color={CAT_COLOR(minCat)}
+              />
+            )}
+            {maxCat != null && (
+              <StatRow
+                label="Max CAT"
+                value={maxCat}
+                color={CAT_COLOR(maxCat)}
+              />
+            )}
             <StatRow
               label={t.moderateExacerbation}
               value={modEx}
@@ -416,11 +599,24 @@ export default function SummaryPage() {
 
           {/* CAT trend */}
           {catTrend.length > 0 && (
-            <Card title={t.catScore + " – " + t.symptomLog} subtitle={months[vm] + " " + vy}>
-              <LineChart data={catTrend} color="#268E86" min={0} max={40} height={90} />
+            <Card
+              title={t.catScore + " – " + t.symptomLog}
+              subtitle={months[vm] + " " + vy}
+            >
+              <LineChart
+                data={catTrend}
+                color="#268E86"
+                min={0}
+                max={40}
+                height={90}
+              />
               <div className="flex justify-between mt-1">
                 {catTrend.map((d, i) => (
-                  <span key={i} className="text-xs tabular-nums" style={{ color: "#a0b8b6", fontSize: 10 }}>
+                  <span
+                    key={i}
+                    className="text-xs tabular-nums"
+                    style={{ color: "#a0b8b6", fontSize: 10 }}
+                  >
                     {d.label}
                   </span>
                 ))}
@@ -430,7 +626,12 @@ export default function SummaryPage() {
 
           {records.length === 0 && (
             <Card title={t.summaryTab}>
-              <p className="text-sm text-center py-4" style={{ color: "#a0b8b6" }}>{t.noEntries}</p>
+              <p
+                className="text-sm text-center py-4"
+                style={{ color: "#a0b8b6" }}
+              >
+                {t.noEntries}
+              </p>
             </Card>
           )}
 
@@ -440,7 +641,11 @@ export default function SummaryPage() {
               <BarChart data={exWeekly} colorFn={() => "#ef4444"} height={80} />
               <div className="flex justify-between mt-1">
                 {exWeekly.map((d, i) => (
-                  <span key={i} className="text-xs tabular-nums" style={{ color: "#a0b8b6", fontSize: 10 }}>
+                  <span
+                    key={i}
+                    className="text-xs tabular-nums"
+                    style={{ color: "#a0b8b6", fontSize: 10 }}
+                  >
                     {d.label}
                   </span>
                 ))}
@@ -452,12 +657,23 @@ export default function SummaryPage() {
           {weightData.length > 0 && (
             <Card
               title={t.weight}
-              accent={weightData.length ? { value: weightData[weightData.length - 1].value + " kg", color: "#268E86" } : undefined}
+              accent={
+                weightData.length
+                  ? {
+                      value: weightData[weightData.length - 1].value + " kg",
+                      color: "#268E86",
+                    }
+                  : undefined
+              }
             >
               <LineChart data={weightData} color="#0ea5e9" height={80} />
               <div className="flex justify-between mt-1">
                 {weightData.map((d, i) => (
-                  <span key={i} className="text-xs tabular-nums" style={{ color: "#a0b8b6", fontSize: 10 }}>
+                  <span
+                    key={i}
+                    className="text-xs tabular-nums"
+                    style={{ color: "#a0b8b6", fontSize: 10 }}
+                  >
                     {d.label}
                   </span>
                 ))}
@@ -469,13 +685,30 @@ export default function SummaryPage() {
           {activityData.length > 0 && (
             <Card
               title={t.physicalActivity}
-              accent={avgActivity != null ? { value: t.activityLabels?.[Math.round(avgActivity)] ?? Math.round(avgActivity), color: "#0f8a6a" } : undefined}
+              accent={
+                avgActivity != null
+                  ? {
+                      value:
+                        t.activityLabels?.[Math.round(avgActivity)] ??
+                        Math.round(avgActivity),
+                      color: "#0f8a6a",
+                    }
+                  : undefined
+              }
               subtitle={t.avgSymptoms}
             >
-              <BarChart data={activityData} colorFn={() => "#34d399"} height={80} />
+              <BarChart
+                data={activityData}
+                colorFn={() => "#34d399"}
+                height={80}
+              />
               <div className="flex justify-between mt-1">
                 {activityData.map((d, i) => (
-                  <span key={i} className="text-xs tabular-nums" style={{ color: "#a0b8b6", fontSize: 10 }}>
+                  <span
+                    key={i}
+                    className="text-xs tabular-nums"
+                    style={{ color: "#a0b8b6", fontSize: 10 }}
+                  >
                     {d.label}
                   </span>
                 ))}
@@ -488,31 +721,54 @@ export default function SummaryPage() {
             <Card title={t.medicines}>
               <div className="space-y-2 mt-1">
                 {medList.map(([name, stats]) => {
-                  const um = patient.userMedicines?.find((u) => u.medicine?.name === name);
+                  const um = patient.userMedicines?.find(
+                    (u) => u.medicine?.name === name,
+                  );
                   return (
                     <div
                       key={name}
                       className="flex items-center gap-3 px-3 py-2 rounded-xl"
-                      style={{ background: "rgba(38,142,134,0.05)", border: "1px solid rgba(38,142,134,0.12)" }}
+                      style={{
+                        background: "rgba(38,142,134,0.05)",
+                        border: "1px solid rgba(38,142,134,0.12)",
+                      }}
                     >
                       {um?.medicine?.image && (
-                        <img
+                        <Image
                           src={um.medicine.image}
                           alt={name}
-                          className="w-8 h-8 object-contain rounded-lg"
-                          style={{ background: "rgba(38,142,134,0.07)", padding: 3 }}
+                          width={32}
+                          height={32}
+                          className="object-contain rounded-lg"
+                          style={{
+                            background: "rgba(38,142,134,0.07)",
+                            padding: 3,
+                          }}
                         />
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#1a3a38" }}>{name}</p>
+                        <p
+                          className="text-sm font-semibold truncate"
+                          style={{ color: "#1a3a38" }}
+                        >
+                          {name}
+                        </p>
                         <p className="text-xs" style={{ color: "#7a9a98" }}>
-                          {stats.count} {(t.weeksRecorded ?? t.daysRecorded)?.toLowerCase()} · {stats.times} {t.timesUsed}
+                          {stats.count}{" "}
+                          {(t.weeksRecorded ?? t.daysRecorded)?.toLowerCase()} ·{" "}
+                          {stats.times} {t.timesUsed}
                         </p>
                       </div>
-                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(38,142,134,0.1)" }}>
+                      <div
+                        className="w-16 h-1.5 rounded-full overflow-hidden"
+                        style={{ background: "rgba(38,142,134,0.1)" }}
+                      >
                         <div
                           className="h-full rounded-full"
-                          style={{ width: `${(stats.count / records.length) * 100}%`, background: "#268E86" }}
+                          style={{
+                            width: `${(stats.count / records.length) * 100}%`,
+                            background: "#268E86",
+                          }}
                         />
                       </div>
                     </div>

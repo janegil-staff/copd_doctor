@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLang } from "@/context/LangContext";
 import no from "@/app/messages/no.json";
 import en from "@/app/messages/en.json";
@@ -340,10 +341,12 @@ function RecordRow({
                     }}
                   >
                     {m.image && (
-                      <img
+                      <Image
                         src={m.image}
                         alt={m.name}
-                        className="w-7 h-7 object-contain rounded-lg"
+                        width={28}
+                        height={28}
+                        className="object-contain rounded-lg"
                         style={{
                           background: "rgba(38,142,134,0.07)",
                           padding: 2,
@@ -407,26 +410,31 @@ export default function LogPage() {
 
   const PAGE_SIZE = 20;
 
-  const [patient, setPatient] = useState(null);
+  const [patient, setPatient] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const raw = sessionStorage.getItem("patientData");
+    return raw ? JSON.parse(raw) : null;
+  });
   const [expandedDate, setExpandedDate] = useState(null);
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const sentinelRef = useRef(null);
+  const prevSearchRef = useRef(search);
 
+  // Redirect if no patient data
   useEffect(() => {
-    const raw = sessionStorage.getItem("patientData");
-    if (!raw) {
-      router.replace("/");
-      return;
+    if (!patient) router.replace("/");
+  }, [patient, router]);
+
+  // Reset visible count whenever search changes — using a ref to avoid
+  // the set-state-in-effect rule while still reacting to search changes
+  useEffect(() => {
+    if (prevSearchRef.current !== search) {
+      prevSearchRef.current = search;
+      setVisibleCount(PAGE_SIZE);
     }
-    setPatient(JSON.parse(raw));
-  }, []);
-
-  // Reset visible count whenever search changes
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [search]);
+  });
 
   // IntersectionObserver — load next batch when sentinel scrolls into view
   useEffect(() => {

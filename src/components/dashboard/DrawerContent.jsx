@@ -1,5 +1,6 @@
 // src/components/dashboard/DrawerContent.jsx
 "use client";
+import Image from "next/image";
 import { CAT_KEYS } from "./catUtils";
 
 function Bar({ value, max = 5 }) {
@@ -15,18 +16,7 @@ function Bar({ value, max = 5 }) {
   );
 }
 
-/**
- * Pure content panel — no scroll container, no animation wrapper.
- * Rendered inside both the mobile slide-up and the desktop modal.
- *
- * Props:
- *   t             – translation object
- *   record        – the selected day record
- *   catColor      – { text, bg, border } from catColor(record.cat8)
- *   usedMedicines – resolved array from resolveMedicines()
- *   onClose       – close handler
- *   show          – visibility toggles { catScore, exacerbation, medicine, note, weight, activity }
- */
+
 export default function DrawerContent({ t, record, catColor, usedMedicines, onClose, show }) {
   return (
     <div className="p-6">
@@ -139,10 +129,12 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
                 style={{ background: "#f0f9ff", border: "1px solid #bae6fd" }}
               >
                 {m.image && (
-                  <img
+                  <Image
                     src={m.image}
                     alt={m.name}
-                    className="w-8 h-8 object-contain rounded-lg"
+                    width={32}
+                    height={32}
+                    className="object-contain rounded-lg"
                     style={{ background: "rgba(38,142,134,0.07)", padding: 3 }}
                   />
                 )}

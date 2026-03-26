@@ -19,35 +19,45 @@ import pt from "@/app/messages/pt.json";
 
 const translations = { no, en, nl, fr, de, it, sv, da, fi, es, pl, pt };
 
+function parsePatientData() {
+  if (typeof window === "undefined")
+    return { patient: null, selectedRecord: null };
+  const raw = sessionStorage.getItem("patientData");
+  if (!raw) return { patient: null, selectedRecord: null };
+  const data = JSON.parse(raw);
+  const selectedRecord = data.records?.length
+    ? data.records[data.records.length - 1]
+    : null;
+  return { patient: data, selectedRecord };
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const { lang } = useLang();
   const t = translations[lang] ?? translations.en;
 
-  const [patient, setPatient]           = useState(null);
-  const [selectedRecord, setSelectedRecord] = useState(null);
-  const [drawerOpen, setDrawerOpen]     = useState(false);
+  const [patient, setPatient] = useState(() => parsePatientData().patient);
+  const [selectedRecord, setSelectedRecord] = useState(
+    () => parsePatientData().selectedRecord,
+  );
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [show, setShow] = useState({
-    catScore:     true,
+    catScore: true,
     exacerbation: true,
-    medicine:     true,
-    note:         true,
-    activity:     true,
-    weight:       true,
+    medicine: true,
+    note: true,
+    activity: true,
+    weight: true,
   });
-  const toggleShow = (key) => setShow(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleShow = (key) =>
+    setShow((prev) => ({ ...prev, [key]: !prev[key] }));
 
+  // Redirect if no patient data
   useEffect(() => {
-    const raw = sessionStorage.getItem("patientData");
-    if (!raw) { router.replace("/"); return; }
-    const data = JSON.parse(raw);
-    setPatient(data);
-    if (data.records?.length) {
-      setSelectedRecord(data.records[data.records.length - 1]);
-    }
-  }, []);
+    if (!patient) router.replace("/");
+  }, [patient, router]);
 
   const handleDayClick = (record) => {
     setSelectedRecord(record);
@@ -93,13 +103,41 @@ export default function Dashboard() {
         </div>
         {/* Desktop nav — hidden on small screens */}
         <div className="hidden sm:flex items-center gap-2">
-          <button onClick={() => router.push("/summary")} className="text-xs px-4 py-1.5 rounded-full font-semibold transition-all hover:opacity-80" style={{ background: "rgba(38,142,134,0.08)", color: "#268E86", border: "1px solid rgba(38,142,134,0.2)" }}>
+          <button
+            onClick={() => router.push("/summary")}
+            className="text-xs px-4 py-1.5 rounded-full font-semibold transition-all hover:opacity-80"
+            style={{
+              background: "rgba(38,142,134,0.08)",
+              color: "#268E86",
+              border: "1px solid rgba(38,142,134,0.2)",
+            }}
+          >
             {t.summaryTab}
           </button>
-          <button onClick={() => router.push("/log")} className="text-xs px-4 py-1.5 rounded-full font-semibold transition-all hover:opacity-80" style={{ background: "rgba(38,142,134,0.08)", color: "#268E86", border: "1px solid rgba(38,142,134,0.2)" }}>
+          <button
+            onClick={() => router.push("/log")}
+            className="text-xs px-4 py-1.5 rounded-full font-semibold transition-all hover:opacity-80"
+            style={{
+              background: "rgba(38,142,134,0.08)",
+              color: "#268E86",
+              border: "1px solid rgba(38,142,134,0.2)",
+            }}
+          >
             {t.logTab}
           </button>
-          <button onClick={() => { sessionStorage.removeItem("patientData"); localStorage.removeItem("sessionStartAt"); router.replace("/"); }} className="text-xs px-4 py-1.5 rounded-full font-semibold transition-all hover:opacity-80" style={{ background: "rgba(38,142,134,0.12)", color: "#268E86", border: "1px solid rgba(38,142,134,0.3)" }}>
+          <button
+            onClick={() => {
+              sessionStorage.removeItem("patientData");
+              localStorage.removeItem("sessionStartAt");
+              router.replace("/");
+            }}
+            className="text-xs px-4 py-1.5 rounded-full font-semibold transition-all hover:opacity-80"
+            style={{
+              background: "rgba(38,142,134,0.12)",
+              color: "#268E86",
+              border: "1px solid rgba(38,142,134,0.3)",
+            }}
+          >
             {t.logout}
           </button>
         </div>
@@ -107,19 +145,44 @@ export default function Dashboard() {
         {/* Mobile nav — hamburger dropdown */}
         <div className="relative sm:hidden">
           <button
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen((o) => !o)}
             className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-full transition-all"
-            style={{ background: menuOpen ? "rgba(38,142,134,0.15)" : "rgba(38,142,134,0.08)", border: "1px solid rgba(38,142,134,0.25)" }}
+            style={{
+              background: menuOpen
+                ? "rgba(38,142,134,0.15)"
+                : "rgba(38,142,134,0.08)",
+              border: "1px solid rgba(38,142,134,0.25)",
+            }}
           >
-            <span className="block w-4 h-0.5 rounded-full transition-all" style={{ background: "#268E86", transform: menuOpen ? "translateY(4px) rotate(45deg)" : "none" }} />
-            <span className="block w-4 h-0.5 rounded-full transition-all" style={{ background: "#268E86", opacity: menuOpen ? 0 : 1 }} />
-            <span className="block w-4 h-0.5 rounded-full transition-all" style={{ background: "#268E86", transform: menuOpen ? "translateY(-8px) rotate(-45deg)" : "none" }} />
+            <span
+              className="block w-4 h-0.5 rounded-full transition-all"
+              style={{
+                background: "#268E86",
+                transform: menuOpen ? "translateY(4px) rotate(45deg)" : "none",
+              }}
+            />
+            <span
+              className="block w-4 h-0.5 rounded-full transition-all"
+              style={{ background: "#268E86", opacity: menuOpen ? 0 : 1 }}
+            />
+            <span
+              className="block w-4 h-0.5 rounded-full transition-all"
+              style={{
+                background: "#268E86",
+                transform: menuOpen
+                  ? "translateY(-8px) rotate(-45deg)"
+                  : "none",
+              }}
+            />
           </button>
 
           {menuOpen && (
             <>
               {/* Backdrop to close on outside click */}
-              <div className="fixed inset-0 z-[199]" onClick={() => setMenuOpen(false)} />
+              <div
+                className="fixed inset-0 z-[199]"
+                onClick={() => setMenuOpen(false)}
+              />
               {/* Dropdown */}
               <div
                 className="absolute right-0 top-11 z-[200] rounded-2xl overflow-hidden flex flex-col"
@@ -132,15 +195,39 @@ export default function Dashboard() {
                 }}
               >
                 {[
-                  { label: t.summaryTab, action: () => { setMenuOpen(false); router.push("/summary"); } },
-                  { label: t.logTab,     action: () => { setMenuOpen(false); router.push("/log"); } },
-                  { label: t.logout,     action: () => { setMenuOpen(false); sessionStorage.removeItem("patientData"); localStorage.removeItem("sessionStartAt"); router.replace("/"); }, danger: true },
+                  {
+                    label: t.summaryTab,
+                    action: () => {
+                      setMenuOpen(false);
+                      router.push("/summary");
+                    },
+                  },
+                  {
+                    label: t.logTab,
+                    action: () => {
+                      setMenuOpen(false);
+                      router.push("/log");
+                    },
+                  },
+                  {
+                    label: t.logout,
+                    action: () => {
+                      setMenuOpen(false);
+                      sessionStorage.removeItem("patientData");
+                      localStorage.removeItem("sessionStartAt");
+                      router.replace("/");
+                    },
+                    danger: true,
+                  },
                 ].map(({ label, action, danger }) => (
                   <button
                     key={label}
                     onClick={action}
                     className="text-left px-5 py-3 text-sm font-semibold transition-all hover:bg-black/5"
-                    style={{ color: danger ? "#b91c1c" : "#268E86", borderBottom: "1px solid rgba(38,142,134,0.08)" }}
+                    style={{
+                      color: danger ? "#b91c1c" : "#268E86",
+                      borderBottom: "1px solid rgba(38,142,134,0.08)",
+                    }}
                   >
                     {label}
                   </button>
@@ -165,7 +252,10 @@ export default function Dashboard() {
         >
           <h1
             className="text-center text-xl font-bold mb-4"
-            style={{ color: "#268E86", fontFamily: "'Playfair Display', Georgia, serif" }}
+            style={{
+              color: "#268E86",
+              fontFamily: "'Playfair Display', Georgia, serif",
+            }}
           >
             {t.title}
           </h1>
