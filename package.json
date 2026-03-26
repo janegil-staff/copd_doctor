@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "jest",
     "lint": "eslint",
     "seed:symptoms": "node --experimental-vm-modules scripts/seedSymptoms.js"
   },
