@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 
@@ -43,13 +43,14 @@ export default function SummaryPage() {
   const { lang } = useLang();
   const t = translations[lang] ?? translations.en;
 
-  const [patient, setPatient] = useState(() => parseInitialState().patient);
-  const [viewYear, setViewYear] = useState(() => parseInitialState().viewYear);
-  const [viewMonth, setViewMonth] = useState(() => parseInitialState().viewMonth);
+  const [state, setState] = useState({ patient: null, viewYear: null, viewMonth: null });
+  const { patient, viewYear, viewMonth } = state;
 
   useEffect(() => {
-    if (!patient) router.replace("/");
-  }, [patient, router]);
+    const parsed = parseInitialState();
+    if (!parsed.patient) { router.replace("/"); return; }
+    startTransition(() => setState(parsed));
+  }, [router]);
 
   if (!patient) return null;
 
@@ -69,14 +70,18 @@ export default function SummaryPage() {
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
   ];
 
-  const prevMonth = () => {
-    if (vm === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
-    else setViewMonth((m) => m - 1);
-  };
-  const nextMonth = () => {
-    if (vm === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
-    else setViewMonth((m) => m + 1);
-  };
+  const prevMonth = () =>
+    setState((s) =>
+      s.viewMonth === 0
+        ? { ...s, viewMonth: 11, viewYear: s.viewYear - 1 }
+        : { ...s, viewMonth: s.viewMonth - 1 }
+    );
+  const nextMonth = () =>
+    setState((s) =>
+      s.viewMonth === 11
+        ? { ...s, viewMonth: 0, viewYear: s.viewYear + 1 }
+        : { ...s, viewMonth: s.viewMonth + 1 }
+    );
   const hasPrev = allRecords.some((r) => r.date < monthKey);
   const hasNext = allRecords.some((r) => r.date > monthKey + "-31");
 
