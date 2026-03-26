@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useLang } from "@/context/LangContext";
@@ -416,25 +416,29 @@ export default function LogPage() {
     return raw ? JSON.parse(raw) : null;
   });
   const [expandedDate, setExpandedDate] = useState(null);
-  const [search, setSearch] = useState("");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  // search and visibleCount are co-located so resetting on search change
+  // is a single setState in the event handler — no effect needed
+  const [searchState, setSearchState] = useState({
+    query: "",
+    visibleCount: PAGE_SIZE,
+  });
+  const search = searchState.query;
+  const visibleCount = searchState.visibleCount;
+  const setSearch = (q) =>
+    setSearchState({ query: q, visibleCount: PAGE_SIZE });
+  const setVisibleCount = (updater) =>
+    setSearchState((prev) => ({
+      ...prev,
+      visibleCount:
+        typeof updater === "function" ? updater(prev.visibleCount) : updater,
+    }));
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const sentinelRef = useRef(null);
-  const prevSearchRef = useRef(search);
 
   // Redirect if no patient data
   useEffect(() => {
     if (!patient) router.replace("/");
   }, [patient, router]);
-
-  // Reset visible count whenever search changes — using a ref to avoid
-  // the set-state-in-effect rule while still reacting to search changes
-  useEffect(() => {
-    if (prevSearchRef.current !== search) {
-      prevSearchRef.current = search;
-      setVisibleCount(PAGE_SIZE);
-    }
-  });
 
   // IntersectionObserver — load next batch when sentinel scrolls into view
   useEffect(() => {
