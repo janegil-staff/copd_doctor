@@ -214,7 +214,6 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
       const vline = (xx, y1, y2, lw = 0.1) => {
         doc.setLineWidth(lw);
         doc.setDrawColor(...rule);
-        // inset 0.5mm from top/bottom so dividers never touch row borders
         doc.line(xx, y1 + 0.5, xx, y2 - 0.5);
       };
       const box = (x, yy, w, h, fill, stroke, lw = 0.3) => {
@@ -230,11 +229,9 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
       };
 
       const drawFrame = () => {
-        // Single clean outer border
         doc.setLineWidth(0.4);
         doc.setDrawColor(140, 140, 140);
         doc.rect(11, 11, W - 22, 275, "S");
-        // Footer rule
         doc.setLineWidth(0.1);
         doc.setDrawColor(...rule);
         doc.line(14, 274, W - 14, 274);
@@ -256,7 +253,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
       setFont(18, "bold", ink);
       doc.text((t.reportTitle ?? t.symptomLog).toUpperCase(), ML, 26);
 
-      // Right column: label, date, patient
+      // Right column: date, patient
       setFont(7, "normal", light);
       doc.text(t.reportDate ?? "Date", W - MR, 20, { align: "right" });
       setFont(8, "bold", ink);
@@ -269,13 +266,12 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
         { align: "right" },
       );
 
-      // Date range — left, same baseline as patient info
+      // Date range — left
       if (fromDate || toDate) {
         setFont(7, "normal", light);
         doc.text(`${fromDate ?? "–"}  →  ${toDate ?? "–"}`, ML, 30);
       }
 
-      // Rule drawn AFTER all header text, with 2mm clearance below lowest text (y=30)
       doc.setLineWidth(0.25);
       doc.setDrawColor(170, 170, 170);
       doc.line(ML, 33.5, W - MR, 33.5);
@@ -298,7 +294,6 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
         : null;
 
       const stats = [
-        // FIX: use weekCount and t.weeksRecorded (falls back to "UKER REGISTRERT")
         {
           label: t.weeksRecorded ?? "UKER REGISTRERT",
           value: String(weekCount),
@@ -332,13 +327,11 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
 
       y += statH + 10;
 
-      // ── Column definitions (adapt based on visible fields) ─
-      // Always show date. Other columns shown only if toggled on.
+      // ── Column definitions ─────────────────────────────
       const showSubs = fields.catScore && fields.catSubScores;
       const showMeds = fields.medicines;
       const showStats = fields.weight || fields.activity;
 
-      // Dynamic column layout
       let colX = ML;
       const COL = { date: { x: colX, w: 32 } };
       colX += 33;
@@ -381,7 +374,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
         );
       if (COL.meds)
         doc.text(
-          (t.medication ?? "Medication").toUpperCase(),
+          (t.medication ?? t.medicines ?? "Medication").toUpperCase(),
           COL.meds.x + 2,
           y + 4.8,
         );
@@ -398,19 +391,18 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
       y += thH;
 
       // ── Layout constants ─────────────────────────────────
-      const LINE_H = 4.2; // mm per text line
-      const PAD_TOP = 4.5; // top padding inside a row
-      const PAD_BOT = 4; // bottom padding inside a row
-      const PAD_SIDE = 2; // left padding inside each cell
-      const SEP_H = 5.5; // height of exacerbation / note separator bands
+      const LINE_H = 4.2;
+      const PAD_TOP = 4.5;
+      const PAD_BOT = 4;
+      const PAD_SIDE = 2;
+      const SEP_H = 5.5;
 
       // ── Records ──────────────────────────────────────────
       filtered
         .slice()
         .reverse()
         .forEach((r, idx, arr) => {
-          const prevEntry = arr[idx - 1] ?? null;
-          // ── Year headline ────────────────────────────────────
+          // ── Year headline ─────────────────────────────────
           const rd0 = new Date(
             r.date.slice(0, 4),
             r.date.slice(5, 7) - 1,
@@ -441,7 +433,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
               : null;
           if (year !== prevYear) {
             checkY(10);
-            if (idx > 0) y += 3; // extra space before new year
+            if (idx > 0) y += 3;
             setFont(7, "bold", [38, 142, 134]);
             doc.text(year, ML + PAD_SIDE, y + 5);
             doc.setLineWidth(0.15);
@@ -449,6 +441,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             doc.line(ML + PAD_SIDE + 10, y + 4, W - MR, y + 4);
             y += 8;
           }
+
           const catLabel =
             r.cat8 <= 10
               ? t.low
@@ -466,7 +459,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             return base?.name ?? user?.medicine?.name ?? `ID ${id}`;
           });
 
-          // ── Measure everything at render font size ──────────
+          // ── Measure row height ───────────────────────────
           doc.setFontSize(6.5);
           const medText = usedMeds.join(", ");
           const medW = (COL.meds?.w ?? 40) - PAD_SIDE * 2;
@@ -483,16 +476,11 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
               )
             : [];
 
-          // Sub-scores occupy 4 rows of LINE_H each
           const subContentH = showSubs ? 4 * LINE_H : 0;
-          // Medicines content height
           const medContentH =
             medSplit.length > 0 ? medSplit.length * LINE_H : 0;
-          // Body = tallest content column + top + bottom padding
           const bodyContentH = Math.max(subContentH, medContentH, LINE_H * 3);
           const bodyH = PAD_TOP + bodyContentH + PAD_BOT;
-
-          // Extra bands below body
           const exH = exLine ? SEP_H : 0;
           const noteH =
             noteSplit.length > 0
@@ -502,23 +490,19 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
 
           checkY(rowH + 1);
 
-          // ── Draw all lines FIRST, then text on top ───────────
-          // Row background fill
+          // ── Row background ────────────────────────────────
           if (idx % 2 === 0) {
             doc.setFillColor(...shade);
             doc.rect(ML, y, CW, rowH, "F");
           }
-          // Row outer border — very faint
           doc.setLineWidth(0.1);
           doc.setDrawColor(215, 215, 215);
           doc.rect(ML, y, CW, rowH, "S");
 
-          // Column dividers — inset so they don't pierce the outer border
           Object.entries(COL)
             .filter(([k]) => k !== "date")
             .forEach(([, c]) => vline(c.x, y, y + bodyH + exH));
 
-          // Ex band separator
           if (exLine) {
             doc.setFillColor(255, 250, 250);
             doc.rect(ML, y + bodyH, CW, exH, "F");
@@ -527,7 +511,6 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             doc.line(ML + 1, y + bodyH, W - MR - 1, y + bodyH);
           }
 
-          // Note band separator
           if (noteSplit.length > 0) {
             doc.setFillColor(251, 250, 255);
             doc.rect(ML, y + bodyH + exH, CW, noteH, "F");
@@ -536,25 +519,17 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             doc.line(ML + 1, y + bodyH + exH, W - MR - 1, y + bodyH + exH);
           }
 
-          const ty = y + PAD_TOP; // first text baseline
+          const ty = y + PAD_TOP;
 
-          // ── Week number + full Mon / Sun dates stacked ───────
+          // ── Week number + Mon/Sun dates ───────────────────
           const rd = new Date(
             r.date.slice(0, 4),
             r.date.slice(5, 7) - 1,
             r.date.slice(8, 10),
           );
           const dow = (rd.getDay() + 6) % 7;
-          const mon = new Date(
-            rd.getFullYear(),
-            rd.getMonth(),
-            rd.getDate() - dow,
-          );
-          const sun = new Date(
-            rd.getFullYear(),
-            rd.getMonth(),
-            rd.getDate() - dow + 6,
-          );
+          const mon = new Date(rd.getFullYear(), rd.getMonth(), rd.getDate() - dow);
+          const sun = new Date(rd.getFullYear(), rd.getMonth(), rd.getDate() - dow + 6);
           const fmt = (d) =>
             `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
           const thu = new Date(rd);
@@ -566,29 +541,21 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
           doc.text(`${t.week ?? "W"}${wn}`, COL.date.x + PAD_SIDE, ty);
           setFont(6.5, "bold", ink);
           doc.text(fmt(mon), COL.date.x + PAD_SIDE, ty + LINE_H * 0.95);
-          setFont(6.5, "bold", ink);
-          doc.text(
-            fmt(sun),
-            COL.date.x + PAD_SIDE,
-            ty + LINE_H * 0.95 + LINE_H,
-          );
+          doc.text(fmt(sun), COL.date.x + PAD_SIDE, ty + LINE_H * 0.95 + LINE_H);
 
-          // ── CAT score ───────────────────────────────────────
+          // ── CAT score ─────────────────────────────────────
           if (COL.cat) {
             setFont(12, "bold", ink);
             doc.text(String(r.cat8), COL.cat.x + COL.cat.w / 2, ty + 1.5, {
               align: "center",
             });
             setFont(5.5, "normal", light);
-            doc.text(
-              catLabel.toUpperCase(),
-              COL.cat.x + COL.cat.w / 2,
-              ty + 6,
-              { align: "center" },
-            );
+            doc.text(catLabel.toUpperCase(), COL.cat.x + COL.cat.w / 2, ty + 6, {
+              align: "center",
+            });
           }
 
-          // ── CAT sub-scores — 2-col grid ─────────────────────
+          // ── CAT sub-scores — 2-col grid ───────────────────
           if (COL.subs) {
             setFont(6.5, "normal", mid);
             const pairW = (COL.subs.w - PAD_SIDE * 3) / 2;
@@ -601,17 +568,15 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
               const py = ty + row * LINE_H;
               doc.setFont("helvetica", "normal");
               doc.setTextColor(...mid);
-              // Label — clipped to available width minus score digit
               const lblSplit = doc.splitTextToSize(`${lbl}:`, pairW - 6);
               doc.text(lblSplit[0], px, py);
-              // Value — right-aligned in pair column
               doc.setFont("helvetica", "bold");
               doc.setTextColor(...ink);
               doc.text(String(val), px + pairW - 1, py, { align: "right" });
             });
           }
 
-          // ── Medicines ───────────────────────────────────────
+          // ── Medicines ─────────────────────────────────────
           if (COL.meds && medSplit.length > 0) {
             setFont(6.5, "normal", ink);
             medSplit.forEach((ln, li) =>
@@ -619,7 +584,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             );
           }
 
-          // ── Weight / activity ────────────────────────────────
+          // ── Weight / activity ─────────────────────────────
           if (COL.stats) {
             setFont(7, "normal", ink);
             let sy = ty;
@@ -629,15 +594,14 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             }
             if (fields.activity && r.physicalActivity > 0) {
               doc.text(
-                (t.activityLabels?.[r.physicalActivity] ?? r.physicalActivity) +
-                  "",
+                (t.activityLabels?.[r.physicalActivity] ?? r.physicalActivity) + "",
                 COL.stats.x + PAD_SIDE,
                 sy,
               );
             }
           }
 
-          // ── Exacerbation text ───────────────────────────────
+          // ── Exacerbation band ─────────────────────────────
           if (exLine) {
             const ey = y + bodyH;
             setFont(6.5, "bold", [150, 40, 40]);
@@ -647,7 +611,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             doc.text(`! ${exLbl}`, ML + PAD_SIDE + 1, ey + 3.8);
           }
 
-          // ── Note text ───────────────────────────────────────
+          // ── Note band ─────────────────────────────────────
           if (noteSplit.length > 0) {
             const ny = y + bodyH + exH;
             setFont(6.5, "italic", [120, 100, 160]);
@@ -663,7 +627,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
       doc.setDrawColor(160, 160, 160);
       doc.line(ML, y, W - MR, y);
 
-      // ── Footer ───────────────────────────────────────────
+      // ── Footer ────────────────────────────────────────────
       const pageCount = doc.getNumberOfPages();
       for (let p = 1; p <= pageCount; p++) {
         doc.setPage(p);
@@ -776,7 +740,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
                 max={toDate || maxDate}
               />
               <DateInput
-                label={t.stopped ?? "To"}
+                label={t.to ?? t.stopped ?? "To"}
                 value={toDate}
                 onChange={setToDate}
                 min={fromDate || minDate}
