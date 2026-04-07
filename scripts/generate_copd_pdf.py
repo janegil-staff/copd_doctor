@@ -601,8 +601,9 @@ def generate_pdf(data, out_path):
             name   = (um.get("medicine") or {}).get("name") or d["med_lookup"].get(mid_id,"Unknown")
             sat_val = d["satisf"].get(mid_id, 0)
             sat_lbl = SAT.get(sat_val, "")
-            c.setFillColor(DARK); c.setFont("Helvetica-Bold",10)
+            c.setFillColor(DARK); c.setFont("Helvetica",8)
             c.drawString(ML, med_y, name.capitalize())
+
             draw_dice(c, ML+98, med_y-2, max(1, min(6, sat_val)), size=18)
             c.setFillColor(DARK); c.setFont("Helvetica-Bold",9)
             c.drawString(ML+124, med_y+4, sat_lbl)
