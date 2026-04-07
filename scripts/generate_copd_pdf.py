@@ -93,73 +93,183 @@ def make_radar(labels, datasets, colors, legends, px=280):
 
 
 # ─── Human body silhouette ────────────────────────────────────────────────────
+def _silhouette_path(c, cx, base_y, h, w, fill_col, stroke_col, line_w=0.7):
+    """
+    Human silhouette as ONE continuous closed path tracing the full outline.
+    h=77pt (fixed). w = shoulder half-width.
+    Trace order: neck-left → left-shoulder → left-arm-outer → left-armpit →
+                 left-waist → left-hip → right-hip → right-waist →
+                 right-armpit → right-arm-outer → right-shoulder → neck-right → close
+    """
+    c.setLineWidth(line_w)
+    filled = bool(fill_col)
+
+    # ── Y levels (fraction of h from base_y) ─────────────────────
+    hr          = h * 0.058
+    y_hd        = base_y + h - hr                  # head centre
+    y_nt        = y_hd - hr                         # neck top (bottom of head)
+    y_nb        = y_nt  - h * 0.042                 # neck bottom
+    y_sh        = y_nb  - h * 0.026                 # shoulder top (rapid flare)
+    y_sh2       = y_sh  - h * 0.030                 # shoulder full width
+    y_ap        = base_y + h * 0.390                # armpit / arm bottom
+    y_wa        = base_y + h * 0.330                # waist
+    y_hi        = base_y + h * 0.205                # hips
+    y_kn        = base_y + h * 0.130                # knee / leg split
+    y_an        = base_y + h * 0.025                # ankle / feet
+
+    # ── Half-widths ───────────────────────────────────────────────
+    nk_w  = w * 0.27     # neck
+    sh_w  = w * 1.00     # shoulder
+    arm_w = w * 0.55     # arm bulge — pronounced like reference
+    bd_w  = w * 0.60     # body narrows after armpit
+    wa_w  = w * 0.56     # waist pinch
+    hi_w  = w * 0.54     # hips (nearly same as waist)
+    lg_w  = w * 0.45     # each leg half-width
+    lg_g  = max(w * 0.22, 2.2)  # leg gap — bigger minimum
+
+    # ── HEAD ─────────────────────────────────────────────────────
+    if filled:
+        c.setFillColor(fill_col); c.setStrokeColor(fill_col)
+        c.circle(cx, y_hd, hr, fill=1, stroke=0)
+    else:
+        c.setFillColor(white); c.setStrokeColor(stroke_col)
+        c.circle(cx, y_hd, hr, fill=1, stroke=1)
+
+    # ── FULL BODY — single closed outline path ────────────────────
+    p = c.beginPath()
+
+    # START: left neck top
+    p.moveTo(cx - nk_w, y_nt)
+    p.lineTo(cx - nk_w, y_nb)
+
+    # neck → shoulder flare (sharp, 2-step)
+    p.curveTo(cx - nk_w * 2.2, y_nb - (y_nb - y_sh2) * 0.2,
+              cx - sh_w * 0.85, y_sh,
+              cx - sh_w,        y_sh2)
+
+    # left arm outer edge — curves down, wider at mid-arm
+    p.curveTo(cx - sh_w - arm_w * 0.8, y_sh2 - (y_sh2 - y_ap) * 0.25,
+              cx - sh_w - arm_w * 1.0, y_sh2 - (y_sh2 - y_ap) * 0.60,
+              cx - sh_w - arm_w * 0.7, y_ap)
+
+    # armpit curve — smooth round into body
+    p.curveTo(cx - sh_w - arm_w * 0.2, y_ap,
+              cx - bd_w,                y_ap,
+              cx - bd_w,                y_ap)
+
+    # left body: armpit → waist → hip
+    p.curveTo(cx - wa_w, y_wa,
+              cx - hi_w, y_hi,
+              cx - hi_w, y_hi)
+
+    # left hip → left leg outer (tapers to ankle)
+    p.curveTo(cx - hi_w,             y_hi - (y_hi - y_kn) * 0.15,
+              cx - lg_g - lg_w,      y_hi - (y_hi - y_kn) * 0.5,
+              cx - lg_g - lg_w * 0.9, y_an)
+
+    # left ankle → inner left leg
+    p.lineTo(cx - lg_g * 0.4, y_an)
+    p.curveTo(cx - lg_g * 0.4, y_hi - (y_hi - y_kn) * 0.45,
+              cx - lg_g * 0.25, y_hi - (y_hi - y_kn) * 0.08,
+              cx - lg_g * 0.25, y_hi)
+
+    # crotch → right inner leg
+    p.lineTo(cx + lg_g * 0.25, y_hi)
+    p.curveTo(cx + lg_g * 0.25, y_hi - (y_hi - y_kn) * 0.08,
+              cx + lg_g * 0.4,  y_hi - (y_hi - y_kn) * 0.45,
+              cx + lg_g * 0.4,  y_an)
+
+    # right ankle → right leg outer (tapers from ankle to hip)
+    p.lineTo(cx + lg_g + lg_w * 0.9, y_an)
+    p.curveTo(cx + lg_g + lg_w,      y_hi - (y_hi - y_kn) * 0.5,
+              cx + hi_w,             y_hi - (y_hi - y_kn) * 0.15,
+              cx + hi_w,             y_hi)
+
+    # right hip → waist → armpit
+    p.curveTo(cx + hi_w, y_hi,
+              cx + wa_w, y_wa,
+              cx + bd_w, y_ap)
+
+    # right armpit corner
+    p.curveTo(cx + bd_w,                y_ap,
+              cx + sh_w + arm_w * 0.2,  y_ap,
+              cx + sh_w + arm_w * 0.7,  y_ap)
+
+    # right arm outer edge — curves up, wider at mid-arm
+    p.curveTo(cx + sh_w + arm_w * 1.0, y_sh2 - (y_sh2 - y_ap) * 0.60,
+              cx + sh_w + arm_w * 0.8, y_sh2 - (y_sh2 - y_ap) * 0.25,
+              cx + sh_w,               y_sh2)
+
+    # right shoulder → neck
+    p.curveTo(cx + sh_w * 0.85,  y_sh,
+              cx + nk_w * 2.2,   y_nb - (y_nb - y_sh2) * 0.2,
+              cx + nk_w,         y_nb)
+    p.lineTo(cx + nk_w, y_nt)
+    p.close()
+
+    if filled:
+        c.setFillColor(fill_col); c.setStrokeColor(fill_col)
+        c.drawPath(p, fill=1, stroke=0)
+    else:
+        c.setFillColor(white); c.setStrokeColor(stroke_col)
+        c.drawPath(p, fill=1, stroke=1)
+
+    c.setLineWidth(0.3)
+
+
 def draw_human_silhouette(c, cx, base_y, h, w, col):
-    c.setFillColor(col)
-    hr = h*0.11; hcy = base_y+h-hr; nw = w*0.30; nh = h*0.06; ny = hcy-hr
-    sh_w = w*1.05; hip_w = w*0.80; tor_top = ny-nh; tor_bot = base_y+h*0.36
-    tor_h = tor_top-tor_bot; leg_h = h*0.34; leg_w = w*0.38; leg_gap = w*0.08
-    arm_len = tor_h*0.80; arm_w = w*0.22
-
-    c.circle(cx, hcy, hr, fill=1, stroke=0)
-
-    p = c.beginPath()
-    p.moveTo(cx-nw, ny); p.lineTo(cx+nw, ny)
-    p.lineTo(cx+nw, ny-nh); p.lineTo(cx-nw, ny-nh)
-    p.close(); c.drawPath(p, fill=1, stroke=0)
-
-    p = c.beginPath()
-    p.moveTo(cx-sh_w, tor_top)
-    p.curveTo(cx-sh_w*1.05, tor_top-tor_h*0.4, cx-hip_w*1.05, tor_top-tor_h*0.7, cx-hip_w, tor_bot)
-    p.lineTo(cx+hip_w, tor_bot)
-    p.curveTo(cx+hip_w*1.05, tor_top-tor_h*0.7, cx+sh_w*1.05, tor_top-tor_h*0.4, cx+sh_w, tor_top)
-    p.close(); c.drawPath(p, fill=1, stroke=0)
-
-    arm_top_y = tor_top-tor_h*0.05; arm_bot_y = arm_top_y-arm_len
-    for sign in [-1, 1]:
-        atx = cx+sign*sh_w; abx = cx+sign*(sh_w+arm_len*0.25)
-        p = c.beginPath()
-        p.moveTo(atx+sign*arm_w*0.3, arm_top_y)
-        p.curveTo(atx+sign*arm_w*0.5, arm_top_y-arm_len*0.4,
-                  abx+sign*arm_w*0.5, arm_bot_y+arm_len*0.2, abx, arm_bot_y)
-        p.curveTo(abx-sign*arm_w*0.6, arm_bot_y+arm_len*0.1,
-                  atx-sign*arm_w*0.6, arm_top_y-arm_len*0.3, atx-sign*arm_w*0.3, arm_top_y)
-        p.close(); c.drawPath(p, fill=1, stroke=0)
-
-    lx = cx-leg_gap-leg_w
-    p = c.beginPath()
-    p.moveTo(cx-leg_gap*0.5, tor_bot)
-    p.curveTo(cx-leg_gap*0.5, tor_bot-leg_h*0.2, lx+leg_w, tor_bot-leg_h*0.3, lx+leg_w*0.9, base_y)
-    p.lineTo(lx, base_y)
-    p.curveTo(lx, tor_bot-leg_h*0.4, cx-leg_gap*1.5, tor_bot-leg_h*0.1, cx-leg_gap*1.5, tor_bot)
-    p.close(); c.drawPath(p, fill=1, stroke=0)
-
-    lx = cx+leg_gap
-    p = c.beginPath()
-    p.moveTo(cx+leg_gap*0.5, tor_bot)
-    p.curveTo(cx+leg_gap*0.5, tor_bot-leg_h*0.2, lx, tor_bot-leg_h*0.3, lx+leg_w*0.1, base_y)
-    p.lineTo(lx+leg_w, base_y)
-    p.curveTo(lx+leg_w, tor_bot-leg_h*0.4, cx+leg_gap*1.5, tor_bot-leg_h*0.1, cx+leg_gap*1.5, tor_bot)
-    p.close(); c.drawPath(p, fill=1, stroke=0)
+    """Solid filled silhouette (used internally)."""
+    _silhouette_path(c, cx, base_y, h, w, fill_col=col, stroke_col=col)
 
 
 def draw_bmi_figures(c, x, y, bmi, tr):
+    """
+    4 BMI silhouettes matching the reference PDF layout.
+    All same height (77pt), baseline-aligned.
+    Active = solid fill. Inactive = coloured outline on white.
+    Dots below match the reference (1 / 3 / 2 / 3 dots left-to-right).
+    """
+    FIG_H = 77   # all figures same height, matching reference
+
+    # (label, colour, active, body_half_w, n_dots)
+    # widths tuned to match reference: thin 6, normal 9, stocky 11, obese 14
     items = [
-        ("<18,5",   HexColor("#e53935"), bmi < 18.5,   4,  28, 1),
-        ("18,5-25", HexColor("#2e7d32"), 18.5<=bmi<25, 6,  32, 2),
-        ("25-30",   HexColor("#757575"), 25<=bmi<30,   8,  30, 3),
-        (">30",     HexColor("#1565c0"), bmi >= 30,    11, 29, 4),
+        ("<18,5",   HexColor("#e53935"), bmi < 18.5,     6,  1),
+        ("18,5-25", HexColor("#2e7d32"), 18.5<=bmi<25,   9,  3),
+        ("25-30",   HexColor("#1e6b33"), 25<=bmi<30,    11,  2),
+        (">30",     HexColor("#1565c0"), bmi >= 30,     14,  3),
     ]
-    spacing = 22; dim = HexColor("#dddddd")
-    for i, (lbl, full_col, active, hw, fh, n_dots) in enumerate(items):
-        cx = x+i*spacing+spacing/2; col = full_col if active else dim
-        draw_human_silhouette(c, cx, y-fh, fh, hw, col)
-        c.setFillColor(col); c.setFont("Helvetica", 3.8)
-        c.drawCentredString(cx, y-fh-5,   t(tr, "pdfBmi"))
-        c.drawCentredString(cx, y-fh-9.5, lbl)
-        dot_sp = 3.5; start_x = cx-(n_dots-1)*dot_sp/2
+    # Slot width = 35pt (139pt / 4 figures), centre of each slot
+    slot_w = 35
+    base_y_fig = y - FIG_H   # all figures share same base_y
+
+    for i, (lbl, col, active, hw, n_dots) in enumerate(items):
+        cx = x + i * slot_w + slot_w / 2
+
+        # Active figure 3 (25-30) uses solid dark green like the reference
+        if i == 2:
+            col = HexColor("#1e6b33")  # dark green matching reference active
+
+        if active:
+            _silhouette_path(c, cx, base_y_fig, FIG_H, hw,
+                             fill_col=col, stroke_col=col)
+        else:
+            _silhouette_path(c, cx, base_y_fig, FIG_H, hw,
+                             fill_col=None, stroke_col=col, line_w=0.7)
+
+        # BMI label
+        c.setFillColor(col); c.setFont("Helvetica", 4.0)
+        c.drawCentredString(cx, base_y_fig - 6,  t(tr, "pdfBmi"))
+        c.drawCentredString(cx, base_y_fig - 11, lbl)
+
+        # Dot indicators
+        dot_r   = 2.2
+        dot_sp  = 5.0
+        dot_y   = base_y_fig - 18
+        start_x = cx - (n_dots - 1) * dot_sp / 2
         for di in range(n_dots):
             c.setFillColor(col)
-            c.circle(start_x+di*dot_sp, y-fh-15, 1.5, fill=1, stroke=0)
+            c.circle(start_x + di * dot_sp, dot_y, dot_r, fill=1, stroke=0)
 
 
 # ─── Data processing ──────────────────────────────────────────────────────────
@@ -316,7 +426,7 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     c.drawString(tx, y-9-lh*2,   f"{t(tr, 'pdfWeight')}:  {d['weight']} kg.")
     c.drawString(tx, y-9-lh*3,   f"{t(tr, 'pdfHeight')}:  {d['height']} cm.    {t(tr, 'pdfBmi')}: {d['bmi']} kg/m\u00b2")
 
-    draw_bmi_figures(c, W-MR-76, y-2, d["bmi"], tr)
+    draw_bmi_figures(c, W-MR-142, y-2, d["bmi"], tr)
     y -= logo_sz + 17
 
     # ════════════════════════════════════════════════════════════════
