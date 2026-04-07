@@ -20,7 +20,7 @@ ML = 15*mm; MR = 15*mm; MT = 12*mm
 PW = W - ML - MR
 
 TEAL      = HexColor("#2a7d6f")
-CAL_BROWN = HexColor("#7a5c3a")
+CAL_BROWN = HexColor("#c8b89a")
 TEAL_PALE = HexColor("#e6f2ef")
 DARK      = HexColor("#1a1a1a")
 MID       = HexColor("#4a4a4a")
@@ -544,8 +544,9 @@ def generate_pdf(data, out_path, icon_path=None):
     c.drawImage(ImageReader(pbuf), ML + each_w + 8, gad_radar_y - each_w,
                 width=each_w, height=each_w)
 
+
     score_y = gad_radar_y - each_w - 14
-    ROW_H2  = 9; NUM_W = 28; FONT_H = 6
+    ROW_H2  = 9; NUM_W = 38; FONT_H = 6
 
     def draw_score_table(c, tx, ty, title, rows):
         c.setFillColor(DARK); c.setFont("Helvetica-Bold", 7.5)
