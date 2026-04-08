@@ -62,33 +62,81 @@ def cat_color(score):
 
 
 # ─── Radar ───────────────────────────────────────────────────────────────────
-def make_radar(labels, datasets, colors, legends, px=280):
+def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upper_right=False):
+    """
+    Radar chart with a perfectly circular (square) spider.
+    Strategy: render at 2x px, polar axes in a strict square sub-rect,
+    then crop to an exact square before returning — eliminates all distortion.
+    """
+    from PIL import Image as PILImage
+    import io as _io
+
     N = len(labels)
-    ang = np.linspace(0, 2*np.pi, N, endpoint=False).tolist()
+    ang   = np.linspace(0, 2*np.pi, N, endpoint=False).tolist()
     ang_c = ang + ang[:1]
 
-    fig, ax = plt.subplots(figsize=(px/96, px/96), subplot_kw=dict(polar=True))
-    fig.patch.set_color("white"); ax.set_facecolor("white")
+    # Render on a tall-ish canvas to leave room for labels and legend
+    dpi   = 150
+    sz_in = (px * 2) / dpi        # figure side in inches at dpi
+    fig   = plt.figure(figsize=(sz_in, sz_in))
+    fig.patch.set_color("white")
+
+    # Polar axes occupy a strict central square so the circle is never distorted.
+    # Margins leave room for axis labels on all sides.
+    margin = 0.18
+    ax = fig.add_axes([margin, margin, 1-2*margin, 1-2*margin], polar=True)
+    ax.set_facecolor("white")
     ax.set_theta_offset(np.pi/2); ax.set_theta_direction(-1)
     ax.set_ylim(0, 5)
     ax.set_yticks([1, 2, 3, 4, 5])
-    ax.set_yticklabels(["1","2","3","4","5"], size=4.5, color="#aaa")
+    ax.set_yticklabels(["1","2","3","4","5"], size=5, color="#aaa")
     ax.set_xticks(ang)
-    ax.set_xticklabels(labels, size=6, color="#333")
-    ax.grid(color="#bbb", linestyle="--", linewidth=0.4, alpha=0.8)
-    ax.spines["polar"].set_color("#bbb")
+    ax.set_xticklabels(labels, size=6.5, color="#333")
+    ax.grid(color="#cccccc", linestyle="-", linewidth=0.5, alpha=0.6)
+    ax.spines["polar"].set_color("#aaaaaa")
 
-    for vals, col, lbl in zip(datasets, colors, legends):
+    if fills is None:
+        fills = [0.15] * len(datasets)
+
+    for vals, col, lbl, alpha in zip(datasets, colors, legends, fills):
         v = list(vals) + [vals[0]]
-        ax.plot(ang_c, v, color=col, linewidth=1.2, label=lbl)
+        ax.plot(ang_c, v, color=col, linewidth=2.2, label=lbl, zorder=3)
+        if alpha > 0:
+            ax.fill(ang_c, v, color=col, alpha=alpha, zorder=2)
 
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.28),
-              ncol=len(legends), fontsize=5, frameon=False,
-              handlelength=1.2, handletextpad=0.4)
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=150, bbox_inches="tight",
-                transparent=False, facecolor="white", pad_inches=0.04)
-    plt.close(fig); buf.seek(0)
+    if legend_upper_right:
+        # Place legend just outside the top-right of the polar axes
+        ax.legend(loc="upper left", bbox_to_anchor=(1.00, 1.12),
+                  ncol=1, fontsize=8, frameon=True,
+                  framealpha=0.95, edgecolor="#cccccc",
+                  handlelength=2.0, handletextpad=0.6,
+                  markerscale=2.0)
+    else:
+        ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.22),
+                  ncol=min(len(legends), 3), fontsize=8, frameon=False,
+                  handlelength=2.0, handletextpad=0.6,
+                  markerscale=2.0)
+
+    # Save to buffer — NOT tight so axes stay square
+    raw = _io.BytesIO()
+    plt.savefig(raw, format="png", dpi=dpi,
+                transparent=False, facecolor="white")
+    plt.close(fig)
+    raw.seek(0)
+
+    # Crop to a perfect square (px*2 x px*2 pixels) centred in the rendered image
+    rendered = PILImage.open(raw).convert("RGB")
+    rw, rh = rendered.size
+    side = min(rw, rh)
+    left = (rw - side) // 2
+    top  = (rh - side) // 2
+    cropped = rendered.crop((left, top, left+side, top+side))
+    # Downscale to target px
+    cropped = cropped.resize((px, px), PILImage.LANCZOS)
+
+    buf = _io.BytesIO()
+    cropped.save(buf, format="PNG")
+    buf.seek(0)
     return buf
 
 
@@ -535,11 +583,14 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr, "pdfCatBreathless"), t(tr, "pdfCatActivities"), t(tr, "pdfCatConfidence"),
         t(tr, "pdfCatSleep"), t(tr, "pdfCatEnergy"),
     ]
+    # Floor best at 1 on every axis so it renders as a small visible polygon
+    cat_best_vis = [max(v, 1) for v in d["cat_best"]]
     buf = make_radar(cat_labels,
-                     [d["cat_best"], d["cat_worst"], d["cat_last"]],
-                     ["#2a7d6f","#cc2222","#2244bb"],
+                     [cat_best_vis, d["cat_worst"], d["cat_last"]],
+                     ["#2244bb", "#f5820a", "#388e3c"],
                      [t(tr,"pdfCatBestLevel"), t(tr,"pdfCatWorstLevel"), t(tr,"pdfCatLastWeek")],
-                     px=int(rad_sz*2.4))
+                     px=int(rad_sz*2.4),
+                     fills=[0.12, 0.18, 0.20])
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 7)
     c.drawCentredString(rx+rad_sz/2, ry_top+3, t(tr, "pdfCatTitle"))
     c.drawImage(ImageReader(buf), rx, ry_top-rad_sz, width=rad_sz, height=rad_sz)
@@ -606,6 +657,11 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     # ════════════════════════════════════════════════════════════════
     gad_zone_w = vacc_x-ML-8; each_w = (gad_zone_w-8)/2; gad_y = section_top
 
+    # Both radars rendered at identical pixel dimensions so they appear the same size on page.
+    # We force a square figure and use a fixed dpi — bbox_inches="tight" is OFF so the
+    # axes area stays perfectly square regardless of label lengths.
+    RADAR_PX = int(each_w * 2.8)   # pixel canvas size for both charts
+
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 8)
     c.drawString(ML,              gad_y-38, t(tr, "pdfGad7Title"))
     c.drawString(ML+each_w+8,    gad_y-38, t(tr, "pdfPhq9Title"))
@@ -618,11 +674,18 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr,"pdfGad7Worrying"), t(tr,"pdfGad7Afraid"),
     ]
     gad_vals7 = (d["gad_vals"]+[0]*7)[:7]
+    # GAD-7: 3 lines matching reference exactly
+    # blue=best(tiny floor), orange=last week(patient data), green=worst([5]*7 outer ring)
+    gad_best_vis = [0.5] * 7   # floor so blue line is visible near centre
+    # Floor last week at 1 on each axis so it's always visible even if score=0
+    gad_last_vis = [max(v, 1) for v in gad_vals7]
     gbuf = make_radar(gad_labels,
-                      [[0]*7, [5]*7, gad_vals7],
-                      ["#2a7d6f","#cc2222","#2244bb"],
-                      [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7WorstLevel"), t(tr,"pdfGad7LastWeek")],
-                      px=int(each_w*2.2))
+                      [gad_best_vis, gad_last_vis, [5]*7],
+                      ["#2244bb", "#f5820a", "#388e3c"],
+                      [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")],
+                      px=RADAR_PX,
+                      fills=[0.08, 0.22, 0.15],
+                      legend_upper_right=True)
     c.drawImage(ImageReader(gbuf), ML, gad_radar_y-each_w, width=each_w, height=each_w)
 
     phq_labels = [
@@ -630,12 +693,14 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr,"pdfPhq9Energy"),   t(tr,"pdfPhq9Appetite"),  t(tr,"pdfPhq9SelfEsteem"),
         t(tr,"pdfPhq9Concentration"), t(tr,"pdfPhq9Movement"), t(tr,"pdfPhq9Suicidal"),
     ]
-    phq_vals9 = (d["phq_vals"]+[0]*9)[:9]
+    # PHQ-9: 3 reference bands only — no patient data line
     pbuf = make_radar(phq_labels,
-                      [[2]*9, [4]*9, [7]*9, phq_vals9],
-                      ["#388e3c","#f9a825","#cc2222","#2244bb"],
-                      [t(tr,"pdfPhq9Low"), t(tr,"pdfPhq9Medium"), t(tr,"pdfPhq9High"), t(tr,"pdfGad7LastWeek")],
-                      px=int(each_w*2.2))
+                      [[2]*9, [4]*9, [7]*9],
+                      ["#388e3c", "#f9a825", "#f5820a"],
+                      [t(tr,"pdfPhq9Low"), t(tr,"pdfPhq9Medium"), t(tr,"pdfPhq9High")],
+                      px=RADAR_PX,
+                      fills=[0.25, 0.25, 0.25],
+                      legend_upper_right=True)
     c.drawImage(ImageReader(pbuf), ML+each_w+8, gad_radar_y-each_w, width=each_w, height=each_w)
 
     score_y = gad_radar_y-each_w-14
