@@ -21,7 +21,6 @@ import { filterRecords } from "@/lib/log/logHelpers";
 import { LogHeader } from "@/components/log/LogHeader";
 import { LogSearch } from "@/components/log/LogSearch";
 import { RecordList } from "@/components/log/RecordList";
-import PdfExportModal from "@/components/PdfExportModal";
 import CopdSummaryPdfModal from "@/components/CopdSummaryPdfModal";
 
 const translations = { no, en, nl, fr, de, it, sv, da, fi, es, pl, pt };
@@ -32,25 +31,27 @@ export default function LogPage() {
   const { lang } = useLang();
   const t = translations[lang] ?? translations.en;
 
-  // ── Fix: read sessionStorage in useEffect, not useState initializer
-  // This ensures server and client render the same thing on first pass,
-  // eliminating the hydration mismatch.
-  const [patient, setPatient]           = useState(null);
-  const [mounted, setMounted]           = useState(false);
+  // Read sessionStorage in lazy initializer — safe on client, returns null on server.
+  // suppressHydrationWarning on the wrapper div handles the SSR/CSR diff.
+  const [patient] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const raw = sessionStorage.getItem("patientData");
+    return raw ? JSON.parse(raw) : null;
+  });
+
+  const [mounted, setMounted] = useState(false);
   const [expandedDate, setExpandedDate] = useState(null);
-  const [searchState, setSearchState]   = useState({ query: "", visibleCount: PAGE_SIZE });
-  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [searchState, setSearchState] = useState({
+    query: "",
+    visibleCount: PAGE_SIZE,
+  });
   const [summaryPdfOpen, setSummaryPdfOpen] = useState(false);
   const sentinelRef = useRef(null);
 
-  // Load patient from sessionStorage once on mount
-  useEffect(() => {
-    const raw = sessionStorage.getItem("patientData");
-    setPatient(raw ? JSON.parse(raw) : null);
-    setMounted(true);
-  }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setMounted(true); }, []);
 
-  const search       = searchState.query;
+  const search = searchState.query;
   const visibleCount = searchState.visibleCount;
 
   const setSearch = (q) =>
@@ -74,7 +75,8 @@ export default function LogPage() {
     if (!el) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) setVisibleCount((prev) => prev + PAGE_SIZE);
+        if (entries[0].isIntersecting)
+          setVisibleCount((prev) => prev + PAGE_SIZE);
       },
       { rootMargin: "200px" },
     );
@@ -86,16 +88,18 @@ export default function LogPage() {
   if (!mounted) return null;
   if (!patient) return null;
 
-  const records  = [...(patient.records ?? [])].reverse();
+  const records = [...(patient.records ?? [])].reverse();
   const filtered = filterRecords(records, search, patient, t);
-  const visible  = filtered.slice(0, visibleCount);
-  const hasMore  = visibleCount < filtered.length;
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
 
   const handleToggle = (date) =>
     setExpandedDate((prev) => (prev === date ? null : date));
 
   return (
+    // suppressHydrationWarning absorbs the SSR/CSR diff from sessionStorage reads
     <div
+      suppressHydrationWarning
       className="min-h-screen flex flex-col"
       style={{
         backgroundImage: "url('/background-copd.svg')",
@@ -108,7 +112,6 @@ export default function LogPage() {
         t={t}
         filteredCount={filtered.length}
         onBack={() => router.push("/dashboard")}
-        onPdfOpen={() => setPdfModalOpen(true)}
         onSummaryPdfOpen={() => setSummaryPdfOpen(true)}
       />
 
@@ -128,15 +131,6 @@ export default function LogPage() {
         />
       </main>
 
-      {/* Existing week-log PDF 
-      <PdfExportModal
-        open={pdfModalOpen}
-        onClose={() => setPdfModalOpen(false)}
-        patient={patient}
-        t={t}
-      />
-*/}
-      {/* One-page clinical summary PDF */}
       <CopdSummaryPdfModal
         open={summaryPdfOpen}
         onClose={() => setSummaryPdfOpen(false)}
