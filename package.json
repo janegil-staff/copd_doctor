@@ -11,12 +11,14 @@
     "seed:symptoms": "node --experimental-vm-modules scripts/seedSymptoms.js"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.97",
     "dotenv": "^17.3.1",
     "jspdf": "^4.2.1",
     "knex": "^3.1.0",
     "mongoose": "^9.3.1",
     "mysql2": "^3.20.0",
     "next": "16.2.0",
+    "pdfkit": "^0.18.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
