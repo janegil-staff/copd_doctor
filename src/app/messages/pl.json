@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Łagodna depresja",
   "pdfPhq9Moderate": "Umiarkowana depresja",
   "pdfPhq9ModSevere": "Umiarkowanie ciężka depresja",
-  "pdfPhq9Severe": "Ciężka depresja"
+  "pdfPhq9Severe": "Ciężka depresja",
+  "summaryPdfDesc": "Generuje jednostronicowy przegląd kliniczny zawierający wykres radarowy CAT, 12-miesięczny kalendarz, leki, szczepienia oraz wykresy GAD-7 i PHQ-9.",
+  "reportContains": "Raport zawiera",
+  "pdfError": "Nie można wygenerować pliku PDF.",
+  "exSmoker": "Były palacz",
+  "smoker": "Aktywny palacz",
+  "nonSmoker": "Niepalący",
+  "smoking": "Palenie",
+  "vaccinations": "Szczepienia"
 }

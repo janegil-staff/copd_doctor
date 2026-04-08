@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Lievä masennus",
   "pdfPhq9Moderate": "Kohtalainen masennus",
   "pdfPhq9ModSevere": "Kohtalaisen vakava masennus",
-  "pdfPhq9Severe": "Vakava masennus"
+  "pdfPhq9Severe": "Vakava masennus",
+  "summaryPdfDesc": "Luo yksisivuisen kliinisen yleiskatsauksen, joka sisältää CAT-tutkaskaavion, 12 kuukauden kalenterin, lääkkeet, rokotukset sekä GAD-7- ja PHQ-9-kaaviot.",
+  "reportContains": "Raportti sisältää",
+  "pdfError": "PDF:n luominen epäonnistui.",
+  "exSmoker": "Entinen tupakoitsija",
+  "smoker": "Tupakoitsija",
+  "nonSmoker": "Tupakoimaton",
+  "smoking": "Tupakointi",
+  "vaccinations": "Rokotukset"
 }

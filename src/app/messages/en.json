@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Mild depression",
   "pdfPhq9Moderate": "Moderate depression",
   "pdfPhq9ModSevere": "Moderately severe depression",
-  "pdfPhq9Severe": "Severe depression"
+  "pdfPhq9Severe": "Severe depression",
+  "summaryPdfDesc": "Generates a single-page clinical overview including CAT radar chart, 12-month calendar, medications, vaccinations, GAD-7 and PHQ-9 charts.",
+  "reportContains": "Report contains",
+  "pdfError": "Could not generate PDF.",
+  "exSmoker": "Ex-smoker",
+  "smoker": "Current smoker",
+  "nonSmoker": "Non-smoker",
+  "smoking": "Smoking",
+  "vaccinations": "Vaccinations"
 }

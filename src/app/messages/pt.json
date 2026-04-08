@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Depressão leve",
   "pdfPhq9Moderate": "Depressão moderada",
   "pdfPhq9ModSevere": "Depressão moderadamente grave",
-  "pdfPhq9Severe": "Depressão grave"
+  "pdfPhq9Severe": "Depressão grave",
+  "summaryPdfDesc": "Gera uma visão geral clínica de uma página com gráfico de radar CAT, calendário de 12 meses, medicamentos, vacinações e gráficos GAD-7 e PHQ-9.",
+  "reportContains": "O relatório contém",
+  "pdfError": "Não foi possível gerar o PDF.",
+  "exSmoker": "Ex-fumador",
+  "smoker": "Fumador ativo",
+  "nonSmoker": "Não fumador",
+  "smoking": "Tabagismo",
+  "vaccinations": "Vacinações"
 }

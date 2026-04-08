@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Leichte Depression",
   "pdfPhq9Moderate": "Moderate Depression",
   "pdfPhq9ModSevere": "Mittelschwere Depression",
-  "pdfPhq9Severe": "Schwere Depression"
+  "pdfPhq9Severe": "Schwere Depression",
+  "summaryPdfDesc": "Erstellt eine einseitige klinische Übersicht mit CAT-Radardiagramm, 12-Monats-Kalender, Medikamenten, Impfungen sowie GAD-7- und PHQ-9-Diagrammen.",
+  "reportContains": "Bericht enthält",
+  "pdfError": "PDF konnte nicht erstellt werden.",
+  "exSmoker": "Ex-Raucher",
+  "smoker": "Aktiver Raucher",
+  "nonSmoker": "Nichtraucher",
+  "smoking": "Rauchen",
+  "vaccinations": "Impfungen"
 }

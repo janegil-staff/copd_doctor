@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Mild depression",
   "pdfPhq9Moderate": "Moderat depression",
   "pdfPhq9ModSevere": "Moderat alvorlig depression",
-  "pdfPhq9Severe": "Alvorlig depression"
+  "pdfPhq9Severe": "Alvorlig depression",
+  "summaryPdfDesc": "Genererer en enkeltsidet klinisk oversigt med CAT-radardiagram, 12-månederskalender, medicin, vaccinationer og GAD-7 og PHQ-9 diagrammer.",
+  "reportContains": "Rapporten indeholder",
+  "pdfError": "Kunne ikke generere PDF.",
+  "exSmoker": "Ex-ryger",
+  "smoker": "Aktiv ryger",
+  "nonSmoker": "Ikke-ryger",
+  "smoking": "Rygning",
+  "vaccinations": "Vaccinationer"
 }

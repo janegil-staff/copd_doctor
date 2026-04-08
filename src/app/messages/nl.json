@@ -226,5 +226,13 @@
   "pdfPhq9Mild": "Milde depressie",
   "pdfPhq9Moderate": "Matige depressie",
   "pdfPhq9ModSevere": "Matig ernstige depressie",
-  "pdfPhq9Severe": "Ernstige depressie"
+  "pdfPhq9Severe": "Ernstige depressie",
+  "summaryPdfDesc": "Genereert een eenpagina klinisch overzicht met CAT-radardiagram, 12-maandenkalender, medicatie, vaccinaties en GAD-7- en PHQ-9-grafieken.",
+  "reportContains": "Rapport bevat",
+  "pdfError": "PDF kon niet worden gegenereerd.",
+  "exSmoker": "Ex-roker",
+  "smoker": "Actieve roker",
+  "nonSmoker": "Niet-roker",
+  "smoking": "Roken",
+  "vaccinations": "Vaccinaties"
 }
