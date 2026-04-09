@@ -459,8 +459,7 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     c.setFillColor(TEAL_PALE)
     c.roundRect(ML, y-15, PW, 17, 3, fill=1, stroke=0)
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 10)
-    hosp_word = t(tr, "pdfHospitalization") if hosp == 1 else t(tr, "pdfHospitalizations")
-    c.drawString(ML+6, y-10, f"{t(tr, 'pdfSymptomsPast12')}:  {total}  ({hosp} {hosp_word})")
+    c.drawString(ML+6, y-10, t(tr, 'pdfSymptomsPast12'))
     y -= 21
 
     # ════════════════════════════════════════════════════════════════
