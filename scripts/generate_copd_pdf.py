@@ -89,20 +89,16 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
     ax.set_theta_offset(np.pi/2); ax.set_theta_direction(-1)
     ax.set_ylim(0, 5)
     ax.set_yticks([1, 2, 3, 4, 5])
-    ax.set_yticklabels(["1","2","3","4","5"], size=5, color="#aaa")
+    ax.set_yticklabels(["1","2","3","4","5"], size=7, color="#888", fontweight="bold")
     ax.set_xticks(ang)
     ax.set_xticklabels(labels, size=6.5, color="#333")
     ax.grid(color="#cccccc", linestyle="-", linewidth=0.5, alpha=0.6)
     ax.spines["polar"].set_color("#aaaaaa")
 
-    if fills is None:
-        fills = [0.15] * len(datasets)
-
-    for vals, col, lbl, alpha in zip(datasets, colors, legends, fills):
+    for vals, col, lbl in zip(datasets, colors, legends):
         v = list(vals) + [vals[0]]
         ax.plot(ang_c, v, color=col, linewidth=2.2, label=lbl, zorder=3)
-        if alpha > 0:
-            ax.fill(ang_c, v, color=col, alpha=alpha, zorder=2)
+        # No fill — white background only
 
     if legend_upper_right:
         # Place legend just outside the top-right of the polar axes
@@ -370,17 +366,46 @@ def process(data, tr):
     satisf     = {ms["medicineId"]: ms["satisfaction"]
                   for ms in (data.get("latestMedicineSatisfaction") or {}).get("medicines", [])}
 
-    gad   = data.get("latestGad7", {})
     gad_f = ["feelingNervous","noWorryingControl","worrying","troubleRelaxing",
              "restless","easilyAnnoyed","afraid"]
-    gad_vals  = [gad.get(f, 0) for f in gad_f]
-    gad_total = sum(gad_vals)
-
-    phq   = data.get("latestPhq9", {})
     phq_f = ["noPleasureDoingThings","depressed","stayingAsleep","noEnergy",
              "noAppetite","selfPity","troubleConcentration","slowMovingSpeeking","suicidal"]
-    phq_vals  = [phq.get(f, 0) for f in phq_f]
-    phq_total = sum(phq_vals)
+
+    # Support history array (gad7History) or fall back to latestGad7
+    gad_history = data.get("gad7History") or []
+    if not gad_history and data.get("latestGad7"):
+        gad_history = [data["latestGad7"]]
+    gad_history = sorted(gad_history, key=lambda x: x.get("date",""))
+
+    phq_history = data.get("phq9History") or []
+    if not phq_history and data.get("latestPhq9"):
+        phq_history = [data["latestPhq9"]]
+    phq_history = sorted(phq_history, key=lambda x: x.get("date",""))
+
+    def entry_vals(entry, fields):
+        return [entry.get(f, 0) for f in fields]
+
+    def best_entry(history, fields):
+        """Entry with lowest total score"""
+        if not history: return [0]*len(fields)
+        return min(history, key=lambda e: sum(e.get(f,0) for f in fields))
+
+    def worst_entry(history, fields):
+        """Entry with highest total score"""
+        if not history: return [0]*len(fields)
+        return max(history, key=lambda e: sum(e.get(f,0) for f in fields))
+
+    gad        = gad_history[-1] if gad_history else {}
+    gad_vals   = entry_vals(gad, gad_f)
+    gad_total  = sum(gad_vals)
+    gad_best   = entry_vals(best_entry(gad_history, gad_f),  gad_f)
+    gad_worst  = entry_vals(worst_entry(gad_history, gad_f), gad_f)
+
+    phq        = phq_history[-1] if phq_history else {}
+    phq_vals   = entry_vals(phq, phq_f)
+    phq_total  = sum(phq_vals)
+    phq_best   = entry_vals(best_entry(phq_history, phq_f),  phq_f)
+    phq_worst  = entry_vals(worst_entry(phq_history, phq_f), phq_f)
 
     return dict(
         records=records, exac_dates=exac_dates,
@@ -393,8 +418,8 @@ def process(data, tr):
         vacc_pneu=vacc.get("pneumococ", False), vacc_rs=vacc.get("rs", False),
         vacc_pert=vacc.get("pertussis", False),
         user_meds=data.get("userMedicines", []), med_lookup=med_lookup, satisf=satisf,
-        gad_vals=gad_vals, gad_total=gad_total,
-        phq_vals=phq_vals, phq_total=phq_total,
+        gad_vals=gad_vals, gad_total=gad_total, gad_best=gad_best, gad_worst=gad_worst,
+        phq_vals=phq_vals, phq_total=phq_total, phq_best=phq_best, phq_worst=phq_worst,
         cat_score=last_r.get("cat8", 0),
         cat_best=cv(best_r), cat_worst=cv(worst_r), cat_last=cv(last_r),
     )
@@ -583,14 +608,16 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr, "pdfCatBreathless"), t(tr, "pdfCatActivities"), t(tr, "pdfCatConfidence"),
         t(tr, "pdfCatSleep"), t(tr, "pdfCatEnergy"),
     ]
-    # Floor best at 1 on every axis so it renders as a small visible polygon
-    cat_best_vis = [max(v, 1) for v in d["cat_best"]]
+    # best=green(inner), last=orange(mid), worst=red(outer) — consistent with GAD/PHQ
+    cat_best_vis  = [max(v, 0.5) for v in d["cat_best"]]
+    cat_worst_vis = [max(v, 0.5) for v in d["cat_worst"]]
+    cat_last_vis  = [max(v, 0.5) for v in d["cat_last"]]
     buf = make_radar(cat_labels,
-                     [cat_best_vis, d["cat_worst"], d["cat_last"]],
-                     ["#2244bb", "#f5820a", "#388e3c"],
-                     [t(tr,"pdfCatBestLevel"), t(tr,"pdfCatWorstLevel"), t(tr,"pdfCatLastWeek")],
+                     [cat_best_vis, cat_last_vis, cat_worst_vis],
+                     ["#388e3c", "#f5820a", "#e74c3c"],
+                     [t(tr,"pdfCatBestLevel"), t(tr,"pdfCatLastWeek"), t(tr,"pdfCatWorstLevel")],
                      px=int(rad_sz*2.4),
-                     fills=[0.12, 0.18, 0.20])
+                     fills=[0.08, 0.22, 0.15])
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 7)
     c.drawCentredString(rx+rad_sz/2, ry_top+3, t(tr, "pdfCatTitle"))
     c.drawImage(ImageReader(buf), rx, ry_top-rad_sz, width=rad_sz, height=rad_sz)
@@ -676,15 +703,28 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     gad_vals7 = (d["gad_vals"]+[0]*7)[:7]
     # GAD-7: 3 lines matching reference exactly
     # blue=best(tiny floor), orange=last week(patient data), green=worst([5]*7 outer ring)
-    gad_best_vis = [0.5] * 7   # floor so blue line is visible near centre
-    # Floor last week at 1 on each axis so it's always visible even if score=0
-    gad_last_vis = [max(v, 1) for v in gad_vals7]
+    gad_has_history = len(data.get("gad7History") or []) > 1
+    if gad_has_history:
+        gad_best_vis  = [max(v, 0.5) for v in (d["gad_best"]+[0]*7)[:7]]
+        gad_worst_vis = [max(v, 0.5) for v in (d["gad_worst"]+[0]*7)[:7]]
+        gad_last_vis  = [max(v, 0.5) for v in gad_vals7]
+        gad_datasets  = [gad_best_vis, gad_last_vis, gad_worst_vis]
+        gad_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
+        gad_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
+        gad_fills     = [0.08, 0.22, 0.15]
+    else:
+        # Single entry — show reference bands + patient line
+        gad_last_vis  = [max(v, 0.5) for v in gad_vals7]
+        gad_datasets  = [[0.5]*7, gad_last_vis, [5]*7]
+        gad_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
+        gad_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
+        gad_fills     = [0.08, 0.22, 0.15]
     gbuf = make_radar(gad_labels,
-                      [gad_best_vis, gad_last_vis, [5]*7],
-                      ["#2244bb", "#f5820a", "#388e3c"],
-                      [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")],
+                      gad_datasets,
+                      gad_colors,
+                      gad_legends,
                       px=RADAR_PX,
-                      fills=[0.08, 0.22, 0.15],
+
                       legend_upper_right=True)
     c.drawImage(ImageReader(gbuf), ML, gad_radar_y-each_w, width=each_w, height=each_w)
 
@@ -694,17 +734,33 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr,"pdfPhq9Concentration"), t(tr,"pdfPhq9Movement"), t(tr,"pdfPhq9Suicidal"),
     ]
     # PHQ-9: 3 reference bands only — no patient data line
+    phq_vals9     = (d["phq_vals"]+[0]*9)[:9]
+    phq_has_history = len(data.get("phq9History") or []) > 1
+    if phq_has_history:
+        phq_best_vis  = [max(v, 0.5) for v in (d["phq_best"]+[0]*9)[:9]]
+        phq_worst_vis = [max(v, 0.5) for v in (d["phq_worst"]+[0]*9)[:9]]
+        phq_last_vis  = [max(v, 0.5) for v in phq_vals9]
+        phq_datasets  = [phq_best_vis, phq_last_vis, phq_worst_vis]
+        phq_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
+        phq_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
+        phq_fills     = [0.08, 0.22, 0.15]
+    else:
+        phq_last_vis  = [max(v, 0.5) for v in phq_vals9]
+        phq_datasets  = [[0.5]*9, phq_last_vis, [3]*9]
+        phq_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
+        phq_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
+        phq_fills     = [0.08, 0.22, 0.15]
     pbuf = make_radar(phq_labels,
-                      [[2]*9, [4]*9, [7]*9],
-                      ["#388e3c", "#f9a825", "#f5820a"],
-                      [t(tr,"pdfPhq9Low"), t(tr,"pdfPhq9Medium"), t(tr,"pdfPhq9High")],
+                      phq_datasets,
+                      phq_colors,
+                      phq_legends,
                       px=RADAR_PX,
-                      fills=[0.25, 0.25, 0.25],
+
                       legend_upper_right=True)
     c.drawImage(ImageReader(pbuf), ML+each_w+8, gad_radar_y-each_w, width=each_w, height=each_w)
 
     score_y = gad_radar_y-each_w-14
-    ROW_H2 = 10; NUM_W = 38; FONT_H = 6
+    ROW_H2 = 10; NUM_W = 52; FONT_H = 6
 
     def draw_score_table(c, tx, ty, title, rows):
         c.setFillColor(DARK); c.setFont("Helvetica-Bold", 7.5)

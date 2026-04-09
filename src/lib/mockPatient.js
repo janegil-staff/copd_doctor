@@ -276,4 +276,163 @@ export const mockPatient = {
   scores: {},
   questionnaires: [],
   advice: [],
+,
+  "gad7History": [
+  {
+    "date": "2025-10-15",
+    "feelingNervous": 3,
+    "noWorryingControl": 1,
+    "worrying": 0,
+    "troubleRelaxing": 0,
+    "restless": 0,
+    "easilyAnnoyed": 3,
+    "afraid": 1
+  },
+  {
+    "date": "2025-11-12",
+    "feelingNervous": 2,
+    "noWorryingControl": 2,
+    "worrying": 0,
+    "troubleRelaxing": 3,
+    "restless": 3,
+    "easilyAnnoyed": 0,
+    "afraid": 0
+  },
+  {
+    "date": "2025-12-10",
+    "feelingNervous": 0,
+    "noWorryingControl": 1,
+    "worrying": 0,
+    "troubleRelaxing": 1,
+    "restless": 1,
+    "easilyAnnoyed": 3,
+    "afraid": 0
+  },
+  {
+    "date": "2026-01-14",
+    "feelingNervous": 0,
+    "noWorryingControl": 1,
+    "worrying": 0,
+    "troubleRelaxing": 1,
+    "restless": 0,
+    "easilyAnnoyed": 1,
+    "afraid": 1
+  },
+  {
+    "date": "2026-02-11",
+    "feelingNervous": 0,
+    "noWorryingControl": 0,
+    "worrying": 1,
+    "troubleRelaxing": 1,
+    "restless": 0,
+    "easilyAnnoyed": 1,
+    "afraid": 0
+  },
+  {
+    "date": "2026-03-11",
+    "feelingNervous": 0,
+    "noWorryingControl": 1,
+    "worrying": 0,
+    "troubleRelaxing": 1,
+    "restless": 0,
+    "easilyAnnoyed": 1,
+    "afraid": 1
+  },
+  {
+    "date": "2026-04-01",
+    "feelingNervous": 0,
+    "noWorryingControl": 0,
+    "worrying": 0,
+    "troubleRelaxing": 1,
+    "restless": 0,
+    "easilyAnnoyed": 0,
+    "afraid": 0
+  }
+],
+  "phq9History": [
+  {
+    "date": "2025-10-15",
+    "noPleasureDoingThings": 1,
+    "depressed": 0,
+    "stayingAsleep": 1,
+    "noEnergy": 2,
+    "noAppetite": 0,
+    "selfPity": 0,
+    "troubleConcentration": 3,
+    "slowMovingSpeeking": 1,
+    "suicidal": 0
+  },
+  {
+    "date": "2025-11-12",
+    "noPleasureDoingThings": 1,
+    "depressed": 0,
+    "stayingAsleep": 2,
+    "noEnergy": 3,
+    "noAppetite": 3,
+    "selfPity": 1,
+    "troubleConcentration": 0,
+    "slowMovingSpeeking": 0,
+    "suicidal": 0
+  },
+  {
+    "date": "2025-12-10",
+    "noPleasureDoingThings": 3,
+    "depressed": 0,
+    "stayingAsleep": 1,
+    "noEnergy": 0,
+    "noAppetite": 0,
+    "selfPity": 1,
+    "troubleConcentration": 1,
+    "slowMovingSpeeking": 1,
+    "suicidal": 0
+  },
+  {
+    "date": "2026-01-14",
+    "noPleasureDoingThings": 1,
+    "depressed": 0,
+    "stayingAsleep": 0,
+    "noEnergy": 1,
+    "noAppetite": 1,
+    "selfPity": 1,
+    "troubleConcentration": 0,
+    "slowMovingSpeeking": 1,
+    "suicidal": 0
+  },
+  {
+    "date": "2026-02-11",
+    "noPleasureDoingThings": 0,
+    "depressed": 1,
+    "stayingAsleep": 0,
+    "noEnergy": 1,
+    "noAppetite": 0,
+    "selfPity": 0,
+    "troubleConcentration": 1,
+    "slowMovingSpeeking": 1,
+    "suicidal": 0
+  },
+  {
+    "date": "2026-03-11",
+    "noPleasureDoingThings": 1,
+    "depressed": 0,
+    "stayingAsleep": 0,
+    "noEnergy": 1,
+    "noAppetite": 1,
+    "selfPity": 1,
+    "troubleConcentration": 0,
+    "slowMovingSpeeking": 1,
+    "suicidal": 0
+  },
+  {
+    "date": "2026-04-01",
+    "noPleasureDoingThings": 2,
+    "depressed": 0,
+    "stayingAsleep": 0,
+    "noEnergy": 1,
+    "noAppetite": 1,
+    "selfPity": 0,
+    "troubleConcentration": 0,
+    "slowMovingSpeeking": 1,
+    "suicidal": 0
+  }
+]
 };
