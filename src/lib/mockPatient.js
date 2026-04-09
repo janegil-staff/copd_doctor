@@ -276,7 +276,6 @@ export const mockPatient = {
   scores: {},
   questionnaires: [],
   advice: [],
-,
   "gad7History": [
   {
     "date": "2025-10-15",
