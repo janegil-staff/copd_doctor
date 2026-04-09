@@ -162,7 +162,6 @@
   "pdfActivity2_3": "2-3 timer/uke",
   "pdfActivity3_5": "3-5 timer/uke",
   "pdfActivity5plus": "> 5 timer/uke",
-  "pdfExacerbationsPast12": "Eksaserbasjoner siste 12 måneder",
   "pdfHospitalization": "sykehusinnleggelse",
   "pdfHospitalizations": "sykehusinnleggelser",
   "pdfCatTitle": "CAT-skår",
@@ -234,5 +233,6 @@
   "smoker": "Aktiv røyker",
   "nonSmoker": "Ikke-røyker",
   "smoking": "Røyking",
-  "vaccinations": "Vaksiner"
+  "vaccinations": "Vaksiner",
+  "pdfSymptomsPast12": "Symptomer siste 12 måneder"
 }

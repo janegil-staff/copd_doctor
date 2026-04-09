@@ -162,7 +162,6 @@
   "pdfActivity2_3": "2-3 timmar/vecka",
   "pdfActivity3_5": "3-5 timmar/vecka",
   "pdfActivity5plus": "> 5 timmar/vecka",
-  "pdfExacerbationsPast12": "Exacerbationer senaste 12 månaderna",
   "pdfHospitalization": "sjukhusvistelse",
   "pdfHospitalizations": "sjukhusvistelser",
   "pdfCatTitle": "CAT-poäng",
@@ -234,5 +233,6 @@
   "smoker": "Aktiv rökare",
   "nonSmoker": "Icke-rökare",
   "smoking": "Rökning",
-  "vaccinations": "Vaccinationer"
+  "vaccinations": "Vaccinationer",
+  "pdfSymptomsPast12": "Symtom de senaste 12 månaderna"
 }

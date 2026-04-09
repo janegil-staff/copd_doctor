@@ -162,7 +162,6 @@
   "pdfActivity2_3": "2-3 tuntia/viikko",
   "pdfActivity3_5": "3-5 tuntia/viikko",
   "pdfActivity5plus": "> 5 tuntia/viikko",
-  "pdfExacerbationsPast12": "Pahenemiset viimeiset 12 kuukautta",
   "pdfHospitalization": "sairaalahoito",
   "pdfHospitalizations": "sairaalahoidot",
   "pdfCatTitle": "CAT-pisteet",
@@ -234,5 +233,6 @@
   "smoker": "Tupakoitsija",
   "nonSmoker": "Tupakoimaton",
   "smoking": "Tupakointi",
-  "vaccinations": "Rokotukset"
+  "vaccinations": "Rokotukset",
+  "pdfSymptomsPast12": "Oireet viimeisen 12 kuukauden aikana"
 }

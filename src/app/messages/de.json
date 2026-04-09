@@ -162,7 +162,6 @@
   "pdfActivity2_3": "2-3 Stunden/Woche",
   "pdfActivity3_5": "3-5 Stunden/Woche",
   "pdfActivity5plus": "> 5 Stunden/Woche",
-  "pdfExacerbationsPast12": "Exazerbationen letzte 12 Monate",
   "pdfHospitalization": "Krankenhausaufenthalt",
   "pdfHospitalizations": "Krankenhausaufenthalte",
   "pdfCatTitle": "CAT-Score",
@@ -234,5 +233,6 @@
   "smoker": "Aktiver Raucher",
   "nonSmoker": "Nichtraucher",
   "smoking": "Rauchen",
-  "vaccinations": "Impfungen"
+  "vaccinations": "Impfungen",
+  "pdfSymptomsPast12": "Symptome der letzten 12 Monate"
 }

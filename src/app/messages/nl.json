@@ -162,7 +162,6 @@
   "pdfActivity2_3": "2-3 uur/week",
   "pdfActivity3_5": "3-5 uur/week",
   "pdfActivity5plus": "> 5 uur/week",
-  "pdfExacerbationsPast12": "Exacerbaties afgelopen 12 maanden",
   "pdfHospitalization": "ziekenhuisopname",
   "pdfHospitalizations": "ziekenhuisopnames",
   "pdfCatTitle": "CAT-score",
@@ -234,5 +233,6 @@
   "smoker": "Actieve roker",
   "nonSmoker": "Niet-roker",
   "smoking": "Roken",
-  "vaccinations": "Vaccinaties"
+  "vaccinations": "Vaccinaties",
+  "pdfSymptomsPast12": "Symptomen afgelopen 12 maanden"
 }

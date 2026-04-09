@@ -61,7 +61,7 @@ def cat_color(score):
     return HexColor("#e87070")
 
 
-# ─── Radar ───────────────────────────────────────────────────────────────────
+# ─── Radar ────────────────────────────────────────────────────────────────────
 def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upper_right=False):
     """
     Radar chart with a perfectly circular (square) spider.
@@ -75,14 +75,11 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
     ang   = np.linspace(0, 2*np.pi, N, endpoint=False).tolist()
     ang_c = ang + ang[:1]
 
-    # Render on a tall-ish canvas to leave room for labels and legend
     dpi   = 150
-    sz_in = (px * 2) / dpi        # figure side in inches at dpi
+    sz_in = (px * 2) / dpi
     fig   = plt.figure(figsize=(sz_in, sz_in))
     fig.patch.set_color("white")
 
-    # Polar axes occupy a strict central square so the circle is never distorted.
-    # Margins leave room for axis labels on all sides.
     margin = 0.18
     ax = fig.add_axes([margin, margin, 1-2*margin, 1-2*margin], polar=True)
     ax.set_facecolor("white")
@@ -98,10 +95,8 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
     for vals, col, lbl in zip(datasets, colors, legends):
         v = list(vals) + [vals[0]]
         ax.plot(ang_c, v, color=col, linewidth=2.2, label=lbl, zorder=3)
-        # No fill — white background only
 
     if legend_upper_right:
-        # Place legend just outside the top-right of the polar axes
         ax.legend(loc="upper left", bbox_to_anchor=(1.00, 1.12),
                   ncol=1, fontsize=8, frameon=True,
                   framealpha=0.95, edgecolor="#cccccc",
@@ -113,21 +108,19 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
                   handlelength=2.0, handletextpad=0.6,
                   markerscale=2.0)
 
-    # Save to buffer — NOT tight so axes stay square
     raw = _io.BytesIO()
     plt.savefig(raw, format="png", dpi=dpi,
                 transparent=False, facecolor="white")
     plt.close(fig)
     raw.seek(0)
 
-    # Crop to a perfect square (px*2 x px*2 pixels) centred in the rendered image
+    from PIL import Image as PILImage
     rendered = PILImage.open(raw).convert("RGB")
     rw, rh = rendered.size
     side = min(rw, rh)
     left = (rw - side) // 2
     top  = (rh - side) // 2
     cropped = rendered.crop((left, top, left+side, top+side))
-    # Downscale to target px
     cropped = cropped.resize((px, px), PILImage.LANCZOS)
 
     buf = _io.BytesIO()
@@ -138,40 +131,30 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
 
 # ─── Human body silhouette ────────────────────────────────────────────────────
 def _silhouette_path(c, cx, base_y, h, w, fill_col, stroke_col, line_w=0.7):
-    """
-    Human silhouette as ONE continuous closed path tracing the full outline.
-    h=77pt (fixed). w = shoulder half-width.
-    Trace order: neck-left → left-shoulder → left-arm-outer → left-armpit →
-                 left-waist → left-hip → right-hip → right-waist →
-                 right-armpit → right-arm-outer → right-shoulder → neck-right → close
-    """
     c.setLineWidth(line_w)
     filled = bool(fill_col)
 
-    # ── Y levels (fraction of h from base_y) ─────────────────────
     hr          = h * 0.058
-    y_hd        = base_y + h - hr                  # head centre
-    y_nt        = y_hd - hr                         # neck top (bottom of head)
-    y_nb        = y_nt  - h * 0.042                 # neck bottom
-    y_sh        = y_nb  - h * 0.026                 # shoulder top (rapid flare)
-    y_sh2       = y_sh  - h * 0.030                 # shoulder full width
-    y_ap        = base_y + h * 0.390                # armpit / arm bottom
-    y_wa        = base_y + h * 0.330                # waist
-    y_hi        = base_y + h * 0.205                # hips
-    y_kn        = base_y + h * 0.130                # knee / leg split
-    y_an        = base_y + h * 0.025                # ankle / feet
+    y_hd        = base_y + h - hr
+    y_nt        = y_hd - hr
+    y_nb        = y_nt  - h * 0.042
+    y_sh        = y_nb  - h * 0.026
+    y_sh2       = y_sh  - h * 0.030
+    y_ap        = base_y + h * 0.390
+    y_wa        = base_y + h * 0.330
+    y_hi        = base_y + h * 0.205
+    y_kn        = base_y + h * 0.130
+    y_an        = base_y + h * 0.025
 
-    # ── Half-widths ───────────────────────────────────────────────
-    nk_w  = w * 0.27     # neck
-    sh_w  = w * 1.00     # shoulder
-    arm_w = w * 0.55     # arm bulge — pronounced like reference
-    bd_w  = w * 0.60     # body narrows after armpit
-    wa_w  = w * 0.56     # waist pinch
-    hi_w  = w * 0.54     # hips (nearly same as waist)
-    lg_w  = w * 0.45     # each leg half-width
-    lg_g  = max(w * 0.22, 2.2)  # leg gap — bigger minimum
+    nk_w  = w * 0.27
+    sh_w  = w * 1.00
+    arm_w = w * 0.55
+    bd_w  = w * 0.60
+    wa_w  = w * 0.56
+    hi_w  = w * 0.54
+    lg_w  = w * 0.45
+    lg_g  = max(w * 0.22, 2.2)
 
-    # ── HEAD ─────────────────────────────────────────────────────
     if filled:
         c.setFillColor(fill_col); c.setStrokeColor(fill_col)
         c.circle(cx, y_hd, hr, fill=1, stroke=0)
@@ -179,72 +162,45 @@ def _silhouette_path(c, cx, base_y, h, w, fill_col, stroke_col, line_w=0.7):
         c.setFillColor(white); c.setStrokeColor(stroke_col)
         c.circle(cx, y_hd, hr, fill=1, stroke=1)
 
-    # ── FULL BODY — single closed outline path ────────────────────
     p = c.beginPath()
-
-    # START: left neck top
     p.moveTo(cx - nk_w, y_nt)
     p.lineTo(cx - nk_w, y_nb)
-
-    # neck → shoulder flare (sharp, 2-step)
     p.curveTo(cx - nk_w * 2.2, y_nb - (y_nb - y_sh2) * 0.2,
               cx - sh_w * 0.85, y_sh,
               cx - sh_w,        y_sh2)
-
-    # left arm outer edge — curves down, wider at mid-arm
     p.curveTo(cx - sh_w - arm_w * 0.8, y_sh2 - (y_sh2 - y_ap) * 0.25,
               cx - sh_w - arm_w * 1.0, y_sh2 - (y_sh2 - y_ap) * 0.60,
               cx - sh_w - arm_w * 0.7, y_ap)
-
-    # armpit curve — smooth round into body
     p.curveTo(cx - sh_w - arm_w * 0.2, y_ap,
               cx - bd_w,                y_ap,
               cx - bd_w,                y_ap)
-
-    # left body: armpit → waist → hip
     p.curveTo(cx - wa_w, y_wa,
               cx - hi_w, y_hi,
               cx - hi_w, y_hi)
-
-    # left hip → left leg outer (tapers to ankle)
     p.curveTo(cx - hi_w,             y_hi - (y_hi - y_kn) * 0.15,
               cx - lg_g - lg_w,      y_hi - (y_hi - y_kn) * 0.5,
               cx - lg_g - lg_w * 0.9, y_an)
-
-    # left ankle → inner left leg
     p.lineTo(cx - lg_g * 0.4, y_an)
     p.curveTo(cx - lg_g * 0.4, y_hi - (y_hi - y_kn) * 0.45,
               cx - lg_g * 0.25, y_hi - (y_hi - y_kn) * 0.08,
               cx - lg_g * 0.25, y_hi)
-
-    # crotch → right inner leg
     p.lineTo(cx + lg_g * 0.25, y_hi)
     p.curveTo(cx + lg_g * 0.25, y_hi - (y_hi - y_kn) * 0.08,
               cx + lg_g * 0.4,  y_hi - (y_hi - y_kn) * 0.45,
               cx + lg_g * 0.4,  y_an)
-
-    # right ankle → right leg outer (tapers from ankle to hip)
     p.lineTo(cx + lg_g + lg_w * 0.9, y_an)
     p.curveTo(cx + lg_g + lg_w,      y_hi - (y_hi - y_kn) * 0.5,
               cx + hi_w,             y_hi - (y_hi - y_kn) * 0.15,
               cx + hi_w,             y_hi)
-
-    # right hip → waist → armpit
     p.curveTo(cx + hi_w, y_hi,
               cx + wa_w, y_wa,
               cx + bd_w, y_ap)
-
-    # right armpit corner
     p.curveTo(cx + bd_w,                y_ap,
               cx + sh_w + arm_w * 0.2,  y_ap,
               cx + sh_w + arm_w * 0.7,  y_ap)
-
-    # right arm outer edge — curves up, wider at mid-arm
     p.curveTo(cx + sh_w + arm_w * 1.0, y_sh2 - (y_sh2 - y_ap) * 0.60,
               cx + sh_w + arm_w * 0.8, y_sh2 - (y_sh2 - y_ap) * 0.25,
               cx + sh_w,               y_sh2)
-
-    # right shoulder → neck
     p.curveTo(cx + sh_w * 0.85,  y_sh,
               cx + nk_w * 2.2,   y_nb - (y_nb - y_sh2) * 0.2,
               cx + nk_w,         y_nb)
@@ -262,51 +218,33 @@ def _silhouette_path(c, cx, base_y, h, w, fill_col, stroke_col, line_w=0.7):
 
 
 def draw_human_silhouette(c, cx, base_y, h, w, col):
-    """Solid filled silhouette (used internally)."""
     _silhouette_path(c, cx, base_y, h, w, fill_col=col, stroke_col=col)
 
 
 def draw_bmi_figures(c, x, y, bmi, tr):
-    """
-    4 BMI silhouettes matching the reference PDF layout.
-    All same height (77pt), baseline-aligned.
-    Active = solid fill. Inactive = coloured outline on white.
-    Dots below match the reference (1 / 3 / 2 / 3 dots left-to-right).
-    """
-    FIG_H = 77   # all figures same height, matching reference
-
-    # (label, colour, active, body_half_w, n_dots)
-    # widths tuned to match reference: thin 6, normal 9, stocky 11, obese 14
+    FIG_H = 77
     items = [
         ("<18,5",   HexColor("#e53935"), bmi < 18.5,     6,  1),
         ("18,5-25", HexColor("#2e7d32"), 18.5<=bmi<25,   9,  3),
         ("25-30",   HexColor("#1e6b33"), 25<=bmi<30,    11,  2),
         (">30",     HexColor("#1565c0"), bmi >= 30,     14,  3),
     ]
-    # Slot width = 35pt (139pt / 4 figures), centre of each slot
     slot_w = 35
-    base_y_fig = y - FIG_H   # all figures share same base_y
+    base_y_fig = y - FIG_H
 
     for i, (lbl, col, active, hw, n_dots) in enumerate(items):
         cx = x + i * slot_w + slot_w / 2
-
-        # Active figure 3 (25-30) uses solid dark green like the reference
         if i == 2:
-            col = HexColor("#1e6b33")  # dark green matching reference active
-
+            col = HexColor("#1e6b33")
         if active:
             _silhouette_path(c, cx, base_y_fig, FIG_H, hw,
                              fill_col=col, stroke_col=col)
         else:
             _silhouette_path(c, cx, base_y_fig, FIG_H, hw,
                              fill_col=None, stroke_col=col, line_w=0.7)
-
-        # BMI label
         c.setFillColor(col); c.setFont("Helvetica", 4.0)
         c.drawCentredString(cx, base_y_fig - 6,  t(tr, "pdfBmi"))
         c.drawCentredString(cx, base_y_fig - 11, lbl)
-
-        # Dot indicators
         dot_r   = 2.2
         dot_sp  = 5.0
         dot_y   = base_y_fig - 18
@@ -371,7 +309,6 @@ def process(data, tr):
     phq_f = ["noPleasureDoingThings","depressed","stayingAsleep","noEnergy",
              "noAppetite","selfPity","troubleConcentration","slowMovingSpeeking","suicidal"]
 
-    # Support history array (gad7History) or fall back to latestGad7
     gad_history = data.get("gad7History") or []
     if not gad_history and data.get("latestGad7"):
         gad_history = [data["latestGad7"]]
@@ -386,12 +323,10 @@ def process(data, tr):
         return [entry.get(f, 0) for f in fields]
 
     def best_entry(history, fields):
-        """Entry with lowest total score"""
         if not history: return [0]*len(fields)
         return min(history, key=lambda e: sum(e.get(f,0) for f in fields))
 
     def worst_entry(history, fields):
-        """Entry with highest total score"""
         if not history: return [0]*len(fields)
         return max(history, key=lambda e: sum(e.get(f,0) for f in fields))
 
@@ -422,6 +357,9 @@ def process(data, tr):
         phq_vals=phq_vals, phq_total=phq_total, phq_best=phq_best, phq_worst=phq_worst,
         cat_score=last_r.get("cat8", 0),
         cat_best=cv(best_r), cat_worst=cv(worst_r), cat_last=cv(last_r),
+        # pass through for radar history checks
+        _gad_history_len=len(gad_history),
+        _phq_history_len=len(phq_history),
     )
 
 
@@ -465,7 +403,6 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
 
     tr = load_translations(lang, trans_dir)
 
-    # Calendar labels from translation files
     MONTHS   = tr.get("monthNames", ["January","February","March","April","May","June",
                                       "July","August","September","October","November","December"])
     WEEKDAYS = tr.get("days", ["Mo","Tu","We","Th","Fr","Sa","Su"])
@@ -523,7 +460,7 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     c.roundRect(ML, y-15, PW, 17, 3, fill=1, stroke=0)
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 10)
     hosp_word = t(tr, "pdfHospitalization") if hosp == 1 else t(tr, "pdfHospitalizations")
-    c.drawString(ML+6, y-10, f"{t(tr, 'pdfExacerbationsPast12')}:  {total}  ({hosp} {hosp_word})")
+    c.drawString(ML+6, y-10, f"{t(tr, 'pdfSymptomsPast12')}:  {total}  ({hosp} {hosp_word})")
     y -= 21
 
     # ════════════════════════════════════════════════════════════════
@@ -608,7 +545,6 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr, "pdfCatBreathless"), t(tr, "pdfCatActivities"), t(tr, "pdfCatConfidence"),
         t(tr, "pdfCatSleep"), t(tr, "pdfCatEnergy"),
     ]
-    # best=green(inner), last=orange(mid), worst=red(outer) — consistent with GAD/PHQ
     cat_best_vis  = [max(v, 0.5) for v in d["cat_best"]]
     cat_worst_vis = [max(v, 0.5) for v in d["cat_worst"]]
     cat_last_vis  = [max(v, 0.5) for v in d["cat_last"]]
@@ -662,10 +598,13 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         4: t(tr, "pdfSatVerySatisfied"),
         5: t(tr, "pdfSatExcellent"),
     }
-    med_y = y-20
+
+    # ── Medication list — track how far down it goes ──────────────
+    med_y = y - 20
     if not d["user_meds"]:
         c.setFont("Helvetica", 8); c.setFillColor(MID)
         c.drawString(ML, med_y, t(tr, "pdfNoneRegistered"))
+        med_y -= 14   # still advance so GAD-7 clears the "none" line
     else:
         for um in d["user_meds"]:
             mid_id  = um.get("medicineId")
@@ -681,19 +620,29 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
 
     # ════════════════════════════════════════════════════════════════
     # SECTION 6 – GAD-7 + PHQ-9
+    # gad_y = snug below medication list (8pt gap).
+    # If content would overflow the page, start page 2.
     # ════════════════════════════════════════════════════════════════
-    gad_zone_w = vacc_x-ML-8; each_w = (gad_zone_w-8)/2; gad_y = section_top
+    gad_zone_w = vacc_x - ML - 8
+    each_w     = (gad_zone_w - 8) / 2
+    RADAR_PX   = int(each_w * 2.8)
 
-    # Both radars rendered at identical pixel dimensions so they appear the same size on page.
-    # We force a square figure and use a fixed dpi — bbox_inches="tight" is OFF so the
-    # axes area stays perfectly square regardless of label lengths.
-    RADAR_PX = int(each_w * 2.8)   # pixel canvas size for both charts
+    # Total height needed for Section 6
+    section6_h = 14 + each_w + 70 + 16
+
+    # Place snug below med list, never higher than section_top
+    gad_y = min(section_top, med_y - 8)
+
+    # Not enough room → new page
+    if gad_y - section6_h < MT:
+        c.showPage()
+        gad_y = H - MT
 
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 8)
-    c.drawString(ML,              gad_y-38, t(tr, "pdfGad7Title"))
-    c.drawString(ML+each_w+8,    gad_y-38, t(tr, "pdfPhq9Title"))
+    c.drawString(ML,           gad_y - 12, t(tr, "pdfGad7Title"))
+    c.drawString(ML+each_w+8, gad_y - 12, t(tr, "pdfPhq9Title"))
 
-    gad_radar_y = gad_y-43
+    gad_radar_y = gad_y - 16
 
     gad_labels = [
         t(tr,"pdfGad7Nervousness"), t(tr,"pdfGad7Slim"), t(tr,"pdfGad7Restlessness"),
@@ -701,9 +650,7 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr,"pdfGad7Worrying"), t(tr,"pdfGad7Afraid"),
     ]
     gad_vals7 = (d["gad_vals"]+[0]*7)[:7]
-    # GAD-7: 3 lines matching reference exactly
-    # blue=best(tiny floor), orange=last week(patient data), green=worst([5]*7 outer ring)
-    gad_has_history = len(data.get("gad7History") or []) > 1
+    gad_has_history = d["_gad_history_len"] > 1
     if gad_has_history:
         gad_best_vis  = [max(v, 0.5) for v in (d["gad_best"]+[0]*7)[:7]]
         gad_worst_vis = [max(v, 0.5) for v in (d["gad_worst"]+[0]*7)[:7]]
@@ -711,20 +658,17 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         gad_datasets  = [gad_best_vis, gad_last_vis, gad_worst_vis]
         gad_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
         gad_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
-        gad_fills     = [0.08, 0.22, 0.15]
     else:
-        # Single entry — show reference bands + patient line
         gad_last_vis  = [max(v, 0.5) for v in gad_vals7]
         gad_datasets  = [[0.5]*7, gad_last_vis, [5]*7]
         gad_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
         gad_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
-        gad_fills     = [0.08, 0.22, 0.15]
+
     gbuf = make_radar(gad_labels,
                       gad_datasets,
                       gad_colors,
                       gad_legends,
                       px=RADAR_PX,
-
                       legend_upper_right=True)
     c.drawImage(ImageReader(gbuf), ML, gad_radar_y-each_w, width=each_w, height=each_w)
 
@@ -733,9 +677,8 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         t(tr,"pdfPhq9Energy"),   t(tr,"pdfPhq9Appetite"),  t(tr,"pdfPhq9SelfEsteem"),
         t(tr,"pdfPhq9Concentration"), t(tr,"pdfPhq9Movement"), t(tr,"pdfPhq9Suicidal"),
     ]
-    # PHQ-9: 3 reference bands only — no patient data line
-    phq_vals9     = (d["phq_vals"]+[0]*9)[:9]
-    phq_has_history = len(data.get("phq9History") or []) > 1
+    phq_vals9       = (d["phq_vals"]+[0]*9)[:9]
+    phq_has_history = d["_phq_history_len"] > 1
     if phq_has_history:
         phq_best_vis  = [max(v, 0.5) for v in (d["phq_best"]+[0]*9)[:9]]
         phq_worst_vis = [max(v, 0.5) for v in (d["phq_worst"]+[0]*9)[:9]]
@@ -743,23 +686,21 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         phq_datasets  = [phq_best_vis, phq_last_vis, phq_worst_vis]
         phq_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
         phq_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
-        phq_fills     = [0.08, 0.22, 0.15]
     else:
         phq_last_vis  = [max(v, 0.5) for v in phq_vals9]
         phq_datasets  = [[0.5]*9, phq_last_vis, [3]*9]
         phq_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
         phq_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
-        phq_fills     = [0.08, 0.22, 0.15]
+
     pbuf = make_radar(phq_labels,
                       phq_datasets,
                       phq_colors,
                       phq_legends,
                       px=RADAR_PX,
-
                       legend_upper_right=True)
     c.drawImage(ImageReader(pbuf), ML+each_w+8, gad_radar_y-each_w, width=each_w, height=each_w)
 
-    score_y = gad_radar_y-each_w-14
+    score_y = gad_radar_y - each_w - 14
     ROW_H2 = 10; NUM_W = 52; FONT_H = 6
 
     def draw_score_table(c, tx, ty, title, rows):
