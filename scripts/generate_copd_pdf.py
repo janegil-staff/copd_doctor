@@ -281,7 +281,7 @@ def process(data, tr):
     height  = 177
     bmi     = round(weight/(height/100)**2, 1)
 
-    smk = data.get("smoking", {}); sv = smk.get("smoking", 0); py = smk.get("frequency", 0)
+    smk = data.get("smoking") or {}; sv = smk.get("smoking", 0); py = smk.get("frequency", 0)
     if sv == 1:
         smoke_str = t(tr, "pdfExSmoker", py=py)
     elif sv == 2:
@@ -289,7 +289,7 @@ def process(data, tr):
     else:
         smoke_str = t(tr, "pdfNonSmoker")
 
-    vp = data.get("vaping", {}); vv = vp.get("vaping", 0) if isinstance(vp, dict) else 0
+    vp = data.get("vaping") or {}; vv = vp.get("vaping", 0) if isinstance(vp, dict) else 0
     if vv == 1:
         vape_str = t(tr, "pdfExVaper")
     elif vv == 2:
@@ -331,15 +331,18 @@ def process(data, tr):
     phq_history = sorted(phq_history, key=lambda x: x.get("date",""))
 
     def entry_vals(entry, fields):
+        if not isinstance(entry, dict): return [0]*len(fields)
         return [entry.get(f, 0) for f in fields]
 
     def best_entry(history, fields):
-        if not history: return [0]*len(fields)
-        return min(history, key=lambda e: sum(e.get(f,0) for f in fields))
+        valid = [e for e in history if isinstance(e, dict)]
+        if not valid: return {}
+        return min(valid, key=lambda e: sum(e.get(f,0) for f in fields))
 
     def worst_entry(history, fields):
-        if not history: return [0]*len(fields)
-        return max(history, key=lambda e: sum(e.get(f,0) for f in fields))
+        valid = [e for e in history if isinstance(e, dict)]
+        if not valid: return {}
+        return max(valid, key=lambda e: sum(e.get(f,0) for f in fields))
 
     gad        = gad_history[-1] if gad_history else {}
     gad_vals   = entry_vals(gad, gad_f)
@@ -359,7 +362,7 @@ def process(data, tr):
         weight=weight, height=height, bmi=bmi, age=data.get("age", 0),
         smoke_str=smoke_str, vape_str=vape_str, asthma_str=asthma_str, pa_str=pa_str,
         copd_confirmed=data.get("copdDiagnosed", False),
-        alpha1_tested=data.get("latestAlpha1", {}).get("alpha1Tested", False),
+        alpha1_tested=(data.get("latestAlpha1") or {}).get("alpha1Tested", False),
         vacc_flu=vacc.get("flue", False),    vacc_covid=vacc.get("covid", False),
         vacc_pneu=vacc.get("pneumococ", False), vacc_rs=vacc.get("rs", False),
         vacc_pert=vacc.get("pertussis", False),
@@ -688,8 +691,6 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     VACC_W = 110; vacc_x = W-MR-VACC_W; section_top = y
 
     c.setFillColor(DARK); c.setFont("Helvetica-Bold", 9)
-    c.drawString(ML,      y, t(tr, "pdfMedicationHeader"))
-    c.drawString(ML+95,   y, t(tr, "pdfSatisfactionHeader"))
     c.drawString(vacc_x,  y, t(tr, "pdfVaccinationsHeader"))
 
     vacc_list = [
