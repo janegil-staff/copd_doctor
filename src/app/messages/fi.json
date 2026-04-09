@@ -235,7 +235,14 @@
   "smoking": "Tupakointi",
   "vaccinations": "Rokotukset",
   "pdfSymptomsPast12": "Oireet viimeisen 12 kuukauden aikana",
-  "pdfExacerbationsPast12": "Pahenemisvaiheet viimeisen 12 kuukauden aikana",
   "pdfExacModerate": "Kohtalainen paheneminen",
-  "pdfExacSerious": "Vakava paheneminen (sairaalahoito)"
+  "pdfExacSerious": "Vakava paheneminen (sairaalahoito)",
+  "pdfVapingStatus": "Höyrytystila",
+  "pdfNonVaper": "Ei höyryttele",
+  "pdfExVaper": "Entinen höyryttelijä",
+  "pdfCurrentVaper": "Höyryttää tällä hetkellä",
+  "pdfExacerbationsPast12": "Pahenemisvaiheet viimeisen 12 kuukauden aikana",
+  "pdfAsthmaStatus": "Astmatila",
+  "pdfAsthmaDiagnosed": "Lääkärin diagnosoima astma",
+  "pdfAsthmaNotDiagnosed": "Ei diagnosoitua astmaa"
 }

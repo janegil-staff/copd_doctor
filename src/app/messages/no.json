@@ -235,7 +235,14 @@
   "smoking": "Røyking",
   "vaccinations": "Vaksiner",
   "pdfSymptomsPast12": "Symptomer siste 12 måneder",
-  "pdfExacerbationsPast12": "Eksaserbasjoner siste 12 måneder",
   "pdfExacModerate": "Moderat eksaserbasjon",
-  "pdfExacSerious": "Alvorlig eksaserbasjon (sykehusinnleggelse)"
+  "pdfExacSerious": "Alvorlig eksaserbasjon (sykehusinnleggelse)",
+  "pdfVapingStatus": "Dampestatus",
+  "pdfNonVaper": "Aldri dampet",
+  "pdfExVaper": "Tidligere dampet",
+  "pdfCurrentVaper": "Damper nå",
+  "pdfExacerbationsPast12": "Eksaserbasjoner siste 12 måneder",
+  "pdfAsthmaStatus": "Astmastatus",
+  "pdfAsthmaDiagnosed": "Diagnostisert med astma av lege",
+  "pdfAsthmaNotDiagnosed": "Ikke diagnostisert med astma"
 }

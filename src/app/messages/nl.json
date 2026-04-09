@@ -235,7 +235,14 @@
   "smoking": "Roken",
   "vaccinations": "Vaccinaties",
   "pdfSymptomsPast12": "Symptomen afgelopen 12 maanden",
-  "pdfExacerbationsPast12": "Exacerbaties afgelopen 12 maanden",
   "pdfExacModerate": "Matige exacerbatie",
-  "pdfExacSerious": "Ernstige exacerbatie (ziekenhuisopname)"
+  "pdfExacSerious": "Ernstige exacerbatie (ziekenhuisopname)",
+  "pdfVapingStatus": "Dampstatus",
+  "pdfNonVaper": "Niet-damper",
+  "pdfExVaper": "Ex-damper",
+  "pdfCurrentVaper": "Huidige damper",
+  "pdfExacerbationsPast12": "Exacerbaties afgelopen 12 maanden",
+  "pdfAsthmaStatus": "Astmastatus",
+  "pdfAsthmaDiagnosed": "Gediagnosticeerd met astma door een arts",
+  "pdfAsthmaNotDiagnosed": "Niet gediagnosticeerd met astma"
 }

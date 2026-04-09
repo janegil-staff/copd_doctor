@@ -235,7 +235,14 @@
   "smoking": "Tabagismo",
   "vaccinations": "Vacinações",
   "pdfSymptomsPast12": "Sintomas nos últimos 12 meses",
-  "pdfExacerbationsPast12": "Exacerbações nos últimos 12 meses",
   "pdfExacModerate": "Exacerbação moderada",
-  "pdfExacSerious": "Exacerbação grave (hospitalização)"
+  "pdfExacSerious": "Exacerbação grave (hospitalização)",
+  "pdfVapingStatus": "Estado do vaporizador",
+  "pdfNonVaper": "Não vaporiza",
+  "pdfExVaper": "Ex-vaporizador",
+  "pdfCurrentVaper": "Vaporizador atual",
+  "pdfExacerbationsPast12": "Exacerbações nos últimos 12 meses",
+  "pdfAsthmaStatus": "Estado da asma",
+  "pdfAsthmaDiagnosed": "Diagnosticado com asma por um médico",
+  "pdfAsthmaNotDiagnosed": "Sem diagnóstico de asma"
 }

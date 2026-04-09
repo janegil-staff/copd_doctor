@@ -235,7 +235,14 @@
   "smoking": "Palenie",
   "vaccinations": "Szczepienia",
   "pdfSymptomsPast12": "Objawy w ciągu ostatnich 12 miesięcy",
-  "pdfExacerbationsPast12": "Zaostrzenia w ciągu ostatnich 12 miesięcy",
   "pdfExacModerate": "Umiarkowane zaostrzenie",
-  "pdfExacSerious": "Poważne zaostrzenie (hospitalizacja)"
+  "pdfExacSerious": "Poważne zaostrzenie (hospitalizacja)",
+  "pdfVapingStatus": "Status vapowania",
+  "pdfNonVaper": "Nie wapuje",
+  "pdfExVaper": "Były vaper",
+  "pdfCurrentVaper": "Aktualny vaper",
+  "pdfExacerbationsPast12": "Zaostrzenia w ciągu ostatnich 12 miesięcy",
+  "pdfAsthmaStatus": "Status astmy",
+  "pdfAsthmaDiagnosed": "Zdiagnozowana astma przez lekarza",
+  "pdfAsthmaNotDiagnosed": "Brak diagnozy astmy"
 }

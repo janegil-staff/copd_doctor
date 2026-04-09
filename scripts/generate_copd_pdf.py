@@ -289,6 +289,17 @@ def process(data, tr):
     else:
         smoke_str = t(tr, "pdfNonSmoker")
 
+    vp = data.get("vaping", {}); vv = vp.get("vaping", 0) if isinstance(vp, dict) else 0
+    if vv == 1:
+        vape_str = t(tr, "pdfExVaper")
+    elif vv == 2:
+        vape_str = t(tr, "pdfCurrentVaper")
+    else:
+        vape_str = t(tr, "pdfNonVaper")
+
+    asthma_diagnosed = data.get("asthma", False)
+    asthma_str = t(tr, "pdfAsthmaDiagnosed") if asthma_diagnosed else t(tr, "pdfAsthmaNotDiagnosed")
+
     pa_map = {
         1: t(tr, "pdfActivityNone"),
         2: t(tr, "pdfActivity1_2"),
@@ -346,13 +357,17 @@ def process(data, tr):
         records=records, exac_dates=exac_dates,
         n_mod=n_mod, n_ser=n_ser, total_exac=n_mod+n_ser,
         weight=weight, height=height, bmi=bmi, age=data.get("age", 0),
-        smoke_str=smoke_str, pa_str=pa_str,
+        smoke_str=smoke_str, vape_str=vape_str, asthma_str=asthma_str, pa_str=pa_str,
         copd_confirmed=data.get("copdDiagnosed", False),
         alpha1_tested=data.get("latestAlpha1", {}).get("alpha1Tested", False),
         vacc_flu=vacc.get("flue", False),    vacc_covid=vacc.get("covid", False),
         vacc_pneu=vacc.get("pneumococ", False), vacc_rs=vacc.get("rs", False),
         vacc_pert=vacc.get("pertussis", False),
         user_meds=data.get("userMedicines", []), med_lookup=med_lookup, satisf=satisf,
+        med_training={
+            entry["medicineId"]: entry
+            for entry in (data.get("latestMedicineTraining") or {}).get("medicines", [])
+        },
         gad_vals=gad_vals, gad_total=gad_total, gad_best=gad_best, gad_worst=gad_worst,
         phq_vals=phq_vals, phq_total=phq_total, phq_best=phq_best, phq_worst=phq_worst,
         cat_score=last_r.get("cat8", 0),
@@ -449,7 +464,9 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     c.drawString(ML, y, f"{t(tr, 'pdfDiagnose')}: {diag}"); y -= 14
     c.setFont("Helvetica", 9)
     c.drawString(ML, y, f"{t(tr, 'pdfAlpha1Label')}: {alpha}"); y -= 21
-    c.drawString(ML, y, f"{t(tr, 'pdfSmokingStatus')}: {d['smoke_str']}"); y -= 21
+    c.drawString(ML, y, f"{t(tr, 'pdfSmokingStatus')}: {d['smoke_str']}"); y -= 14
+    c.drawString(ML, y, f"{t(tr, 'pdfVapingStatus')}: {d['vape_str']}"); y -= 14
+    c.drawString(ML, y, f"{t(tr, 'pdfAsthmaStatus')}: {d['asthma_str']}"); y -= 21
     c.drawString(ML, y, f"{t(tr, 'pdfPhysicalActivity')}: {d['pa_str']}"); y -= 14
 
     # ════════════════════════════════════════════════════════════════
@@ -584,7 +601,7 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
 
     # ── Build day → exacerbation type map ──
     EXAC_SERIOUS  = HexColor("#e87070")
-    EXAC_MODERATE = HexColor("#f4a07a")
+    EXAC_MODERATE = HexColor("#f5c97a")
     day_exac = {}
     for r in d["records"]:
         rec_date = datetime.strptime(r["date"], "%Y-%m-%d").date()
@@ -700,23 +717,59 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     }
 
     # ── Medication list — track how far down it goes ──────────────
+    TRAIN_FLAGS = [
+        "generalPractitioner", "pharmacy", "homeCareNurse",
+        "rehabilitationCenter", "hospitalLungSpecialist", "trainingVideo",
+    ]
+    NO_TRAINING_BG  = HexColor("#fdecea")   # soft red background
+    NO_TRAINING_STR = HexColor("#e53935")   # red border
+    ROW_W = vacc_x - ML - 8                 # medication row width
+    MED_ROW_H  = 32                          # height of each medication row
+    PAGE_FLOOR = MT + 60                     # minimum y — enough room for full row + box
+
     med_y = y - 20
+    med_on_page2 = False                     # track if we spilled to page 2
+
     if not d["user_meds"]:
         c.setFont("Helvetica", 8); c.setFillColor(MID)
         c.drawString(ML, med_y, t(tr, "pdfNoneRegistered"))
-        med_y -= 14   # still advance so GAD-7 clears the "none" line
+        med_y -= 14
     else:
         for um in d["user_meds"]:
-            mid_id  = um.get("medicineId")
-            name    = (um.get("medicine") or {}).get("name") or d["med_lookup"].get(mid_id, "Unknown")
-            sat_val = d["satisf"].get(mid_id, 0)
-            sat_lbl = SAT.get(sat_val, "")
+            mid_id   = um.get("medicineId")
+            name     = (um.get("medicine") or {}).get("name") or d["med_lookup"].get(mid_id, "Unknown")
+            sat_val  = d["satisf"].get(mid_id, 0)
+            sat_lbl  = SAT.get(sat_val, "")
+            training = d["med_training"].get(mid_id, {})
+            has_training = any(training.get(flag, False) for flag in TRAIN_FLAGS)
+
+            # If this row would not have room for the full box → new page
+            if med_y < PAGE_FLOOR:
+                c.showPage()
+                med_y = H - MT
+                med_on_page2 = True
+                # Re-draw column headers on new page
+                c.setFillColor(DARK); c.setFont("Helvetica-Bold", 9)
+                c.drawString(ML,     med_y, t(tr, "pdfMedicationHeader"))
+                c.drawString(ML+95,  med_y, t(tr, "pdfSatisfactionHeader"))
+                med_y -= 20
+
+            # Medicine name
             c.setFillColor(DARK); c.setFont("Helvetica", 8)
             c.drawString(ML, med_y, name.capitalize())
-            draw_dice(c, ML+98, med_y-2, max(1,min(6,sat_val)), size=18)
+
+            # Red dot behind dice if no training recorded
+            if not has_training:
+                c.setFillColor(NO_TRAINING_BG)
+                c.setStrokeColor(NO_TRAINING_STR)
+                c.setLineWidth(0.5)
+                c.circle(ML+107, med_y - 8 + 9, 13, fill=1, stroke=1)
+
+            # Dice and satisfaction label
+            draw_dice(c, ML+98, med_y - 8, max(1,min(6,sat_val)), size=18)
             c.setFillColor(DARK); c.setFont("Helvetica-Bold", 9)
-            c.drawString(ML+124, med_y+4, sat_lbl)
-            med_y -= 28
+            c.drawString(ML+124, med_y - 4, sat_lbl)
+            med_y -= MED_ROW_H
 
     # ════════════════════════════════════════════════════════════════
     # SECTION 6 – GAD-7 + PHQ-9
@@ -731,9 +784,13 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     section6_h = 14 + each_w + 70 + 16
 
     # Place snug below med list, never higher than section_top
-    gad_y = min(section_top, med_y - 8)
+    # If meds already spilled to page 2, don't go above med_y
+    if med_on_page2:
+        gad_y = med_y - 8
+    else:
+        gad_y = min(section_top, med_y - 8)
 
-    # Not enough room → new page
+    # Not enough room on current page → new page
     if gad_y - section6_h < MT:
         c.showPage()
         gad_y = H - MT
