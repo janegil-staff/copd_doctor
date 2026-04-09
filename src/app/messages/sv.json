@@ -234,5 +234,8 @@
   "nonSmoker": "Icke-rökare",
   "smoking": "Rökning",
   "vaccinations": "Vaccinationer",
-  "pdfSymptomsPast12": "Symtom de senaste 12 månaderna"
+  "pdfSymptomsPast12": "Symtom de senaste 12 månaderna",
+  "pdfExacerbationsPast12": "Exacerbationer de senaste 12 månaderna",
+  "pdfExacModerate": "Måttlig exacerbation",
+  "pdfExacSerious": "Allvarlig exacerbation (sjukhusvistelse)"
 }

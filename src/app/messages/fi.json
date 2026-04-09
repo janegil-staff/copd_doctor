@@ -234,5 +234,8 @@
   "nonSmoker": "Tupakoimaton",
   "smoking": "Tupakointi",
   "vaccinations": "Rokotukset",
-  "pdfSymptomsPast12": "Oireet viimeisen 12 kuukauden aikana"
+  "pdfSymptomsPast12": "Oireet viimeisen 12 kuukauden aikana",
+  "pdfExacerbationsPast12": "Pahenemisvaiheet viimeisen 12 kuukauden aikana",
+  "pdfExacModerate": "Kohtalainen paheneminen",
+  "pdfExacSerious": "Vakava paheneminen (sairaalahoito)"
 }

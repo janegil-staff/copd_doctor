@@ -565,6 +565,107 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     y = cal_top - CAL_H - 15
 
     # ════════════════════════════════════════════════════════════════
+    # SECTION 4b – Exacerbation calendars (same page, below CAT calendars)
+    # Red = serious, Orange = moderate, beige background otherwise.
+    # Header: "Exacerbations past 12 months: Y (Z hospitalizations)"
+    # ════════════════════════════════════════════════════════════════
+
+    # ── Exacerbation banner ──
+    hosp_word = t(tr, "pdfHospitalization") if hosp == 1 else t(tr, "pdfHospitalizations")
+    exac_label = (
+        f"{t(tr, 'pdfExacerbationsPast12')}:  {d['total_exac']}"
+        f"  ({hosp} {hosp_word})"
+    )
+    c.setFillColor(TEAL_PALE)
+    c.roundRect(ML, y-15, PW, 17, 3, fill=1, stroke=0)
+    c.setFillColor(DARK); c.setFont("Helvetica-Bold", 10)
+    c.drawString(ML+6, y-10, exac_label)
+    y -= 21
+
+    # ── Build day → exacerbation type map ──
+    EXAC_SERIOUS  = HexColor("#e87070")
+    EXAC_MODERATE = HexColor("#f4a07a")
+    day_exac = {}
+    for r in d["records"]:
+        rec_date = datetime.strptime(r["date"], "%Y-%m-%d").date()
+        dow  = rec_date.weekday()
+        mon  = rec_date - timedelta(days=dow)
+        col_exac = None
+        if r.get("seriousExacerbations"):
+            col_exac = EXAC_SERIOUS
+        elif r.get("moderateExacerbations"):
+            col_exac = EXAC_MODERATE
+        if col_exac:
+            for offset in range(7):
+                day_exac[(mon + timedelta(days=offset)).isoformat()] = col_exac
+
+    # ── Draw 12 exacerbation calendars (full width, 4 cols × 3 rows) ──
+    ECAL_W = PW; ECAL_H = 210
+    ecw = ECAL_W / COLS; ech = ECAL_H / ROWS
+    exac_top = y
+
+    for idx, (yr, mo) in enumerate(months_list):
+        col = idx % COLS; row = idx // COLS
+        cx  = ML + col * ecw; cy = exac_top - row * ech
+        iw  = ecw - 2; dcw = iw / 7
+
+        c.setFillColor(CAL_BROWN)
+        c.rect(cx, cy-11, iw, 11, fill=1, stroke=0)
+        c.setFillColor(white); c.setFont("Helvetica-Bold", 6)
+        c.drawCentredString(cx+iw/2, cy-8.5, MONTHS[mo-1])
+
+        c.setFont("Helvetica", 4.5); c.setFillColor(HexColor("#555"))
+        for di, dl in enumerate(WEEKDAYS):
+            c.drawCentredString(cx+di*dcw+dcw/2, cy-18, dl)
+
+        c.setFillColor(HexColor("#ede0cc"))
+        c.rect(cx, cy-ech+2, iw, ech-13, fill=1, stroke=0)
+        c.setStrokeColor(HexColor("#c8b89a")); c.setLineWidth(0.3)
+        c.rect(cx, cy-ech+2, iw, ech-2, fill=0, stroke=1)
+
+        erow_fills = {}; tmp_ry = cy-27
+        first_dow_e, ndays_e = calendar.monthrange(yr, mo)
+        tmp_dc = first_dow_e
+        for day in range(1, ndays_e+1):
+            dstr = f"{yr}-{mo:02d}-{day:02d}"
+            fc_e = day_exac.get(dstr)
+            if fc_e:
+                if tmp_ry not in erow_fills:
+                    erow_fills[tmp_ry] = fc_e
+                else:
+                    if fc_e == EXAC_SERIOUS:
+                        erow_fills[tmp_ry] = EXAC_SERIOUS
+            tmp_dc += 1
+            if tmp_dc == 7: tmp_dc = 0; tmp_ry -= 8
+
+        for row_y, fc_e in erow_fills.items():
+            c.setFillColor(fc_e)
+            c.rect(cx+0.5, row_y-2, iw-1, 8.5, fill=1, stroke=0)
+
+        ry = cy-27; dc = first_dow_e
+        for day in range(1, ndays_e+1):
+            dx = cx + dc*dcw + dcw/2
+            c.setFillColor(DARK); c.setFont("Helvetica", 4.6)
+            c.drawCentredString(dx, ry, str(day))
+            dc += 1
+            if dc == 7: dc = 0; ry -= 8
+
+    # ── Colour legend ──
+    legend_y = exac_top - ECAL_H - 8
+    dot_r = 4
+    for lbl, col_l in [
+        (t(tr, "pdfExacModerate"), EXAC_MODERATE),
+        (t(tr, "pdfExacSerious"),  EXAC_SERIOUS),
+    ]:
+        c.setFillColor(col_l)
+        c.circle(ML + 6, legend_y + 3, dot_r, fill=1, stroke=0)
+        c.setFillColor(DARK); c.setFont("Helvetica", 7)
+        c.drawString(ML + 14, legend_y, lbl)
+        legend_y -= 13
+
+    y = legend_y - 10
+
+    # ════════════════════════════════════════════════════════════════
     # SECTION 5 – Medication | Satisfaction | Vaccinations
     # ════════════════════════════════════════════════════════════════
     VACC_W = 110; vacc_x = W-MR-VACC_W; section_top = y

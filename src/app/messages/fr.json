@@ -234,5 +234,8 @@
   "nonSmoker": "Non-fumeur",
   "smoking": "Tabagisme",
   "vaccinations": "Vaccinations",
-  "pdfSymptomsPast12": "Symptômes au cours des 12 derniers mois"
+  "pdfSymptomsPast12": "Symptômes au cours des 12 derniers mois",
+  "pdfExacerbationsPast12": "Exacerbations au cours des 12 derniers mois",
+  "pdfExacModerate": "Exacerbation modérée",
+  "pdfExacSerious": "Exacerbation sévère (hospitalisation)"
 }

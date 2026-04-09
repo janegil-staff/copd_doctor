@@ -234,5 +234,8 @@
   "nonSmoker": "Niet-roker",
   "smoking": "Roken",
   "vaccinations": "Vaccinaties",
-  "pdfSymptomsPast12": "Symptomen afgelopen 12 maanden"
+  "pdfSymptomsPast12": "Symptomen afgelopen 12 maanden",
+  "pdfExacerbationsPast12": "Exacerbaties afgelopen 12 maanden",
+  "pdfExacModerate": "Matige exacerbatie",
+  "pdfExacSerious": "Ernstige exacerbatie (ziekenhuisopname)"
 }

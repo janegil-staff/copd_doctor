@@ -162,8 +162,8 @@
   "pdfActivity2_3": "2-3 ore/settimana",
   "pdfActivity3_5": "3-5 ore/settimana",
   "pdfActivity5plus": "> 5 ore/settimana",
-  "pdfHospitalization": "ricovero",
-  "pdfHospitalizations": "ricoveri",
+  "pdfHospitalization": "ospedalizzazione",
+  "pdfHospitalizations": "ospedalizzazioni",
   "pdfCatTitle": "Punteggio CAT",
   "pdfCatScoreOf40": "Punteggio CAT: {score}/40",
   "pdfCatLow": "CAT < 10 - meno sintomatico",
@@ -234,5 +234,8 @@
   "nonSmoker": "Non fumatore",
   "smoking": "Fumo",
   "vaccinations": "Vaccinazioni",
-  "pdfSymptomsPast12": "Sintomi negli ultimi 12 mesi"
+  "pdfSymptomsPast12": "Sintomi negli ultimi 12 mesi",
+  "pdfExacerbationsPast12": "Riacutizzazioni negli ultimi 12 mesi",
+  "pdfExacModerate": "Riacutizzazione moderata",
+  "pdfExacSerious": "Riacutizzazione grave (ospedalizzazione)"
 }

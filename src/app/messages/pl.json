@@ -234,5 +234,8 @@
   "nonSmoker": "Niepalący",
   "smoking": "Palenie",
   "vaccinations": "Szczepienia",
-  "pdfSymptomsPast12": "Objawy w ciągu ostatnich 12 miesięcy"
+  "pdfSymptomsPast12": "Objawy w ciągu ostatnich 12 miesięcy",
+  "pdfExacerbationsPast12": "Zaostrzenia w ciągu ostatnich 12 miesięcy",
+  "pdfExacModerate": "Umiarkowane zaostrzenie",
+  "pdfExacSerious": "Poważne zaostrzenie (hospitalizacja)"
 }
