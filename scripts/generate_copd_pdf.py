@@ -42,7 +42,6 @@ def load_translations(lang, translations_dir):
 
 
 def t(translations, key, **kwargs):
-    """Get a translation string, optionally formatting with kwargs."""
     val = translations.get(key, key)
     if kwargs:
         try:
@@ -63,11 +62,6 @@ def cat_color(score):
 
 # ─── Radar ────────────────────────────────────────────────────────────────────
 def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upper_right=False):
-    """
-    Radar chart with a perfectly circular (square) spider.
-    Strategy: render at 2x px, polar axes in a strict square sub-rect,
-    then crop to an exact square before returning — eliminates all distortion.
-    """
     from PIL import Image as PILImage
     import io as _io
 
@@ -114,7 +108,6 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
     plt.close(fig)
     raw.seek(0)
 
-    from PIL import Image as PILImage
     rendered = PILImage.open(raw).convert("RGB")
     rw, rh = rendered.size
     side = min(rw, rh)
@@ -129,129 +122,31 @@ def make_radar(labels, datasets, colors, legends, px=280, fills=None, legend_upp
     return buf
 
 
-# ─── Human body silhouette ────────────────────────────────────────────────────
-def _silhouette_path(c, cx, base_y, h, w, fill_col, stroke_col, line_w=0.7):
-    c.setLineWidth(line_w)
-    filled = bool(fill_col)
-
-    hr          = h * 0.058
-    y_hd        = base_y + h - hr
-    y_nt        = y_hd - hr
-    y_nb        = y_nt  - h * 0.042
-    y_sh        = y_nb  - h * 0.026
-    y_sh2       = y_sh  - h * 0.030
-    y_ap        = base_y + h * 0.390
-    y_wa        = base_y + h * 0.330
-    y_hi        = base_y + h * 0.205
-    y_kn        = base_y + h * 0.130
-    y_an        = base_y + h * 0.025
-
-    nk_w  = w * 0.27
-    sh_w  = w * 1.00
-    arm_w = w * 0.55
-    bd_w  = w * 0.60
-    wa_w  = w * 0.56
-    hi_w  = w * 0.54
-    lg_w  = w * 0.45
-    lg_g  = max(w * 0.22, 2.2)
-
-    if filled:
-        c.setFillColor(fill_col); c.setStrokeColor(fill_col)
-        c.circle(cx, y_hd, hr, fill=1, stroke=0)
+# ─── BMI image ────────────────────────────────────────────────────────────────
+def bmi_image_path(script_dir, bmi, gender):
+    """
+    Returns path to the correct body image based on BMI and gender.
+    Folder: <script_dir>/male/ or <script_dir>/female/
+    Files:  1.png (BMI<18.5), 2.png (18.5-25), 3.png (25-30), 4.png (>30)
+    """
+    if bmi < 18.5:
+        n = 1
+    elif bmi < 25:
+        n = 2
+    elif bmi < 30:
+        n = 3
     else:
-        c.setFillColor(white); c.setStrokeColor(stroke_col)
-        c.circle(cx, y_hd, hr, fill=1, stroke=1)
-
-    p = c.beginPath()
-    p.moveTo(cx - nk_w, y_nt)
-    p.lineTo(cx - nk_w, y_nb)
-    p.curveTo(cx - nk_w * 2.2, y_nb - (y_nb - y_sh2) * 0.2,
-              cx - sh_w * 0.85, y_sh,
-              cx - sh_w,        y_sh2)
-    p.curveTo(cx - sh_w - arm_w * 0.8, y_sh2 - (y_sh2 - y_ap) * 0.25,
-              cx - sh_w - arm_w * 1.0, y_sh2 - (y_sh2 - y_ap) * 0.60,
-              cx - sh_w - arm_w * 0.7, y_ap)
-    p.curveTo(cx - sh_w - arm_w * 0.2, y_ap,
-              cx - bd_w,                y_ap,
-              cx - bd_w,                y_ap)
-    p.curveTo(cx - wa_w, y_wa,
-              cx - hi_w, y_hi,
-              cx - hi_w, y_hi)
-    p.curveTo(cx - hi_w,             y_hi - (y_hi - y_kn) * 0.15,
-              cx - lg_g - lg_w,      y_hi - (y_hi - y_kn) * 0.5,
-              cx - lg_g - lg_w * 0.9, y_an)
-    p.lineTo(cx - lg_g * 0.4, y_an)
-    p.curveTo(cx - lg_g * 0.4, y_hi - (y_hi - y_kn) * 0.45,
-              cx - lg_g * 0.25, y_hi - (y_hi - y_kn) * 0.08,
-              cx - lg_g * 0.25, y_hi)
-    p.lineTo(cx + lg_g * 0.25, y_hi)
-    p.curveTo(cx + lg_g * 0.25, y_hi - (y_hi - y_kn) * 0.08,
-              cx + lg_g * 0.4,  y_hi - (y_hi - y_kn) * 0.45,
-              cx + lg_g * 0.4,  y_an)
-    p.lineTo(cx + lg_g + lg_w * 0.9, y_an)
-    p.curveTo(cx + lg_g + lg_w,      y_hi - (y_hi - y_kn) * 0.5,
-              cx + hi_w,             y_hi - (y_hi - y_kn) * 0.15,
-              cx + hi_w,             y_hi)
-    p.curveTo(cx + hi_w, y_hi,
-              cx + wa_w, y_wa,
-              cx + bd_w, y_ap)
-    p.curveTo(cx + bd_w,                y_ap,
-              cx + sh_w + arm_w * 0.2,  y_ap,
-              cx + sh_w + arm_w * 0.7,  y_ap)
-    p.curveTo(cx + sh_w + arm_w * 1.0, y_sh2 - (y_sh2 - y_ap) * 0.60,
-              cx + sh_w + arm_w * 0.8, y_sh2 - (y_sh2 - y_ap) * 0.25,
-              cx + sh_w,               y_sh2)
-    p.curveTo(cx + sh_w * 0.85,  y_sh,
-              cx + nk_w * 2.2,   y_nb - (y_nb - y_sh2) * 0.2,
-              cx + nk_w,         y_nb)
-    p.lineTo(cx + nk_w, y_nt)
-    p.close()
-
-    if filled:
-        c.setFillColor(fill_col); c.setStrokeColor(fill_col)
-        c.drawPath(p, fill=1, stroke=0)
-    else:
-        c.setFillColor(white); c.setStrokeColor(stroke_col)
-        c.drawPath(p, fill=1, stroke=1)
-
-    c.setLineWidth(0.3)
+        n = 4
+    folder = "female" if str(gender).lower() == "female" else "male"
+    return os.path.join(script_dir, folder, f"{n}.png")
 
 
-def draw_human_silhouette(c, cx, base_y, h, w, col):
-    _silhouette_path(c, cx, base_y, h, w, fill_col=col, stroke_col=col)
-
-
-def draw_bmi_figures(c, x, y, bmi, tr):
-    FIG_H = 77
-    items = [
-        ("<18,5",   HexColor("#e53935"), bmi < 18.5,     6,  1),
-        ("18,5-25", HexColor("#2e7d32"), 18.5<=bmi<25,   9,  3),
-        ("25-30",   HexColor("#1e6b33"), 25<=bmi<30,    11,  2),
-        (">30",     HexColor("#1565c0"), bmi >= 30,     14,  3),
-    ]
-    slot_w = 35
-    base_y_fig = y - FIG_H
-
-    for i, (lbl, col, active, hw, n_dots) in enumerate(items):
-        cx = x + i * slot_w + slot_w / 2
-        if i == 2:
-            col = HexColor("#1e6b33")
-        if active:
-            _silhouette_path(c, cx, base_y_fig, FIG_H, hw,
-                             fill_col=col, stroke_col=col)
-        else:
-            _silhouette_path(c, cx, base_y_fig, FIG_H, hw,
-                             fill_col=None, stroke_col=col, line_w=0.7)
-        c.setFillColor(col); c.setFont("Helvetica", 4.0)
-        c.drawCentredString(cx, base_y_fig - 6,  t(tr, "pdfBmi"))
-        c.drawCentredString(cx, base_y_fig - 11, lbl)
-        dot_r   = 2.2
-        dot_sp  = 5.0
-        dot_y   = base_y_fig - 18
-        start_x = cx - (n_dots - 1) * dot_sp / 2
-        for di in range(n_dots):
-            c.setFillColor(col)
-            c.circle(start_x + di * dot_sp, dot_y, dot_r, fill=1, stroke=0)
+def draw_bmi_figure(c, x, y, w, h, script_dir, bmi, gender):
+    """Draw the single BMI body image, right-aligned in the header."""
+    img_path = bmi_image_path(script_dir, bmi, gender)
+    if os.path.exists(img_path):
+        c.drawImage(img_path, x, y, width=w, height=h,
+                    preserveAspectRatio=True, anchor="c", mask="auto")
 
 
 # ─── Data processing ──────────────────────────────────────────────────────────
@@ -360,6 +255,7 @@ def process(data, tr):
         records=records, exac_dates=exac_dates,
         n_mod=n_mod, n_ser=n_ser, total_exac=n_mod+n_ser,
         weight=weight, height=height, bmi=bmi, age=data.get("age", 0),
+        gender=data.get("gender", "male"),
         smoke_str=smoke_str, vape_str=vape_str, asthma_str=asthma_str, pa_str=pa_str,
         copd_confirmed=data.get("copdDiagnosed", False),
         alpha1_tested=(data.get("latestAlpha1") or {}).get("alpha1Tested", False),
@@ -375,7 +271,6 @@ def process(data, tr):
         phq_vals=phq_vals, phq_total=phq_total, phq_best=phq_best, phq_worst=phq_worst,
         cat_score=last_r.get("cat8", 0),
         cat_best=cv(best_r), cat_worst=cv(worst_r), cat_last=cv(last_r),
-        # pass through for radar history checks
         _gad_history_len=len(gad_history),
         _phq_history_len=len(phq_history),
     )
@@ -454,7 +349,16 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     c.drawString(tx, y-9-lh*2,   f"{t(tr, 'pdfWeight')}:  {d['weight']} kg.")
     c.drawString(tx, y-9-lh*3,   f"{t(tr, 'pdfHeight')}:  {d['height']} cm.    {t(tr, 'pdfBmi')}: {d['bmi']} kg/m\u00b2")
 
-    draw_bmi_figures(c, W-MR-142, y-2, d["bmi"], tr)
+    # BMI figure — single image from male/ or female/ folder
+    fig_sz = 210
+    draw_bmi_figure(c,
+                    x=W - MR - fig_sz,
+                    y=y - fig_sz + 30,
+                    w=fig_sz, h=fig_sz,
+                    script_dir=_script_dir,
+                    bmi=d["bmi"],
+                    gender=d["gender"])
+
     y -= logo_sz + 17
 
     # ════════════════════════════════════════════════════════════════
@@ -585,12 +489,8 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     y = cal_top - CAL_H - 15
 
     # ════════════════════════════════════════════════════════════════
-    # SECTION 4b – Exacerbation calendars (same page, below CAT calendars)
-    # Red = serious, Orange = moderate, beige background otherwise.
-    # Header: "Exacerbations past 12 months: Y (Z hospitalizations)"
+    # SECTION 4b – Exacerbation calendars
     # ════════════════════════════════════════════════════════════════
-
-    # ── Exacerbation banner ──
     hosp_word = t(tr, "pdfHospitalization") if hosp == 1 else t(tr, "pdfHospitalizations")
     exac_label = (
         f"{t(tr, 'pdfExacerbationsPast12')}:  {d['total_exac']}"
@@ -602,7 +502,6 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
     c.drawString(ML+6, y-10, exac_label)
     y -= 21
 
-    # ── Build day → exacerbation type map ──
     EXAC_SERIOUS  = HexColor("#e87070")
     EXAC_MODERATE = HexColor("#f5c97a")
     day_exac = {}
@@ -619,7 +518,6 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
             for offset in range(7):
                 day_exac[(mon + timedelta(days=offset)).isoformat()] = col_exac
 
-    # ── Draw 12 exacerbation calendars (full width, 4 cols × 3 rows) ──
     ECAL_W = PW; ECAL_H = 210
     ecw = ECAL_W / COLS; ech = ECAL_H / ROWS
     exac_top = y
@@ -670,7 +568,6 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
             dc += 1
             if dc == 7: dc = 0; ry -= 8
 
-    # ── Colour legend ──
     legend_y = exac_top - ECAL_H - 8
     dot_r = 4
     for lbl, col_l in [
@@ -717,19 +614,18 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         5: t(tr, "pdfSatExcellent"),
     }
 
-    # ── Medication list — track how far down it goes ──────────────
     TRAIN_FLAGS = [
         "generalPractitioner", "pharmacy", "homeCareNurse",
         "rehabilitationCenter", "hospitalLungSpecialist", "trainingVideo",
     ]
-    NO_TRAINING_BG  = HexColor("#fdecea")   # soft red background
-    NO_TRAINING_STR = HexColor("#e53935")   # red border
-    ROW_W = vacc_x - ML - 8                 # medication row width
-    MED_ROW_H  = 32                          # height of each medication row
-    PAGE_FLOOR = MT + 60                     # minimum y — enough room for full row + box
+    NO_TRAINING_BG  = HexColor("#fdecea")
+    NO_TRAINING_STR = HexColor("#e53935")
+    ROW_W = vacc_x - ML - 8
+    MED_ROW_H  = 32
+    PAGE_FLOOR = MT + 60
 
     med_y = y - 20
-    med_on_page2 = False                     # track if we spilled to page 2
+    med_on_page2 = False
 
     if not d["user_meds"]:
         c.setFont("Helvetica", 8); c.setFillColor(MID)
@@ -744,29 +640,24 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
             training = d["med_training"].get(mid_id, {})
             has_training = any(training.get(flag, False) for flag in TRAIN_FLAGS)
 
-            # If this row would not have room for the full box → new page
             if med_y < PAGE_FLOOR:
                 c.showPage()
                 med_y = H - MT
                 med_on_page2 = True
-                # Re-draw column headers on new page
                 c.setFillColor(DARK); c.setFont("Helvetica-Bold", 9)
                 c.drawString(ML,     med_y, t(tr, "pdfMedicationHeader"))
                 c.drawString(ML+95,  med_y, t(tr, "pdfSatisfactionHeader"))
                 med_y -= 20
 
-            # Medicine name
             c.setFillColor(DARK); c.setFont("Helvetica", 8)
             c.drawString(ML, med_y, name.capitalize())
 
-            # Red dot behind dice if no training recorded
             if not has_training:
                 c.setFillColor(NO_TRAINING_BG)
                 c.setStrokeColor(NO_TRAINING_STR)
                 c.setLineWidth(0.5)
                 c.circle(ML+107, med_y - 8 + 9, 13, fill=1, stroke=1)
 
-            # Dice and satisfaction label
             draw_dice(c, ML+98, med_y - 8, max(1,min(6,sat_val)), size=18)
             c.setFillColor(DARK); c.setFont("Helvetica-Bold", 9)
             c.drawString(ML+124, med_y - 4, sat_lbl)
@@ -774,24 +665,18 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
 
     # ════════════════════════════════════════════════════════════════
     # SECTION 6 – GAD-7 + PHQ-9
-    # gad_y = snug below medication list (8pt gap).
-    # If content would overflow the page, start page 2.
     # ════════════════════════════════════════════════════════════════
     gad_zone_w = vacc_x - ML - 8
     each_w     = (gad_zone_w - 8) / 2
     RADAR_PX   = int(each_w * 2.8)
 
-    # Total height needed for Section 6
     section6_h = 14 + each_w + 70 + 16
 
-    # Place snug below med list, never higher than section_top
-    # If meds already spilled to page 2, don't go above med_y
     if med_on_page2:
         gad_y = med_y - 8
     else:
         gad_y = min(section_top, med_y - 8)
 
-    # Not enough room on current page → new page
     if gad_y - section6_h < MT:
         c.showPage()
         gad_y = H - MT
@@ -822,12 +707,8 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         gad_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
         gad_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
 
-    gbuf = make_radar(gad_labels,
-                      gad_datasets,
-                      gad_colors,
-                      gad_legends,
-                      px=RADAR_PX,
-                      legend_upper_right=True)
+    gbuf = make_radar(gad_labels, gad_datasets, gad_colors, gad_legends,
+                      px=RADAR_PX, legend_upper_right=True)
     c.drawImage(ImageReader(gbuf), ML, gad_radar_y-each_w, width=each_w, height=each_w)
 
     phq_labels = [
@@ -850,12 +731,8 @@ def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=Non
         phq_colors    = ["#388e3c", "#f5820a", "#e74c3c"]
         phq_legends   = [t(tr,"pdfGad7BestLevel"), t(tr,"pdfGad7LastWeek"), t(tr,"pdfGad7WorstLevel")]
 
-    pbuf = make_radar(phq_labels,
-                      phq_datasets,
-                      phq_colors,
-                      phq_legends,
-                      px=RADAR_PX,
-                      legend_upper_right=True)
+    pbuf = make_radar(phq_labels, phq_datasets, phq_colors, phq_legends,
+                      px=RADAR_PX, legend_upper_right=True)
     c.drawImage(ImageReader(pbuf), ML+each_w+8, gad_radar_y-each_w, width=each_w, height=each_w)
 
     score_y = gad_radar_y - each_w - 14
