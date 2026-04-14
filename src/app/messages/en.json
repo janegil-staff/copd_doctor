@@ -139,6 +139,7 @@
     "Su"
   ],
   "downloadSummaryPdf": "Download Summary PDF",
+  "patientInformation": "Patient Information",
   "summaryReport": "COPD Summary",
   "generating": "Generating…",
   "pdfName": "Name: _________________________________",

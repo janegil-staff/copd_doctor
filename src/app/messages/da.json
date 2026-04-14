@@ -42,6 +42,7 @@
   "scoreHeader": "Score*",
   "symptomLog": "Symptomlog",
   "invalidCode": "Ugyldig kode",
+  "patientInformation": "Patientinformation",
   "current": "nu",
   "male": "Mand",
   "female": "Kvinde",
@@ -129,15 +130,7 @@
     "November",
     "December"
   ],
-  "days": [
-    "Man",
-    "Tir",
-    "Ons",
-    "Tor",
-    "Fre",
-    "Lør",
-    "Søn"
-  ],
+  "days": ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"],
   "downloadSummaryPdf": "Download oversigt PDF",
   "summaryReport": "KOL oversigt",
   "generating": "Genererer…",

@@ -49,6 +49,7 @@
   "logout": "Disconnettersi",
   "catScore": "Punteggio CAT",
   "catSubScores": "Sotto-punteggi CAT",
+  "patientInformation": "Informazioni paziente",
   "allRecords": "Tutti i record",
   "monthlySummary": "Riepilogo mensile",
   "filledDays": "Giorni compilati",
@@ -129,15 +130,7 @@
     "Novembre",
     "Dicembre"
   ],
-  "days": [
-    "Lun",
-    "Mar",
-    "Mer",
-    "Gio",
-    "Ven",
-    "Sab",
-    "Dom"
-  ],
+  "days": ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"],
   "downloadSummaryPdf": "Scarica PDF riepilogo",
   "summaryReport": "Riepilogo BPCO",
   "generating": "Generazione…",

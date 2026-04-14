@@ -244,5 +244,6 @@
   "pdfExacerbationsPast12": "Eksaserbasjoner siste 12 måneder",
   "pdfAsthmaStatus": "Astmastatus",
   "pdfAsthmaDiagnosed": "Diagnostisert med astma av lege",
-  "pdfAsthmaNotDiagnosed": "Ikke diagnostisert med astma"
+  "pdfAsthmaNotDiagnosed": "Ikke diagnostisert med astma",
+  "patientInformation": "Pasientinformasjon"
 }

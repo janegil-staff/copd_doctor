@@ -56,6 +56,7 @@
   "mediumImpact": "Medel (11–20)",
   "highImpact": "Hög (21–30)",
   "veryHighImpact": "Mycket hög (>30)",
+  "patientInformation": "Patientinformation",
   "low": "Låg",
   "high": "Hög",
   "veryHigh": "Mycket hög",
