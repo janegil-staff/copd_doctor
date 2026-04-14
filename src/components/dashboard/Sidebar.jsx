@@ -1,7 +1,7 @@
 "use client";
 
 // src/components/dashboard/Sidebar.jsx
-// Single card, no section headlines, key→value rows, empty data hidden.
+// Single card, fully translated via t prop, empty sections hidden.
 
 const A      = "#268E86";
 const BG     = "rgba(255,255,255,0.92)";
@@ -18,11 +18,8 @@ function Row({ label, value, color }) {
   if (value == null || value === "" || value === "–") return null;
   return (
     <div style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      padding: "4px 0",
-      borderBottom: `1px solid rgba(38,142,134,0.07)`,
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      padding: "4px 0", borderBottom: `1px solid rgba(38,142,134,0.07)`,
     }}>
       <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
         {label}
@@ -36,23 +33,14 @@ function Row({ label, value, color }) {
 
 function Divider({ label }) {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      padding: "8px 0 4px",
-    }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0 4px" }}>
       <span style={{
-        fontSize: 10,
-        fontWeight: 700,
-        color: A,
-        textTransform: "uppercase",
-        letterSpacing: 0.8,
-        whiteSpace: "nowrap",
+        fontSize: 10, fontWeight: 700, color: A,
+        textTransform: "uppercase", letterSpacing: 0.8, whiteSpace: "nowrap",
       }}>
         {label}
       </span>
-      <div style={{ flex: 1, height: 1, background: `rgba(38,142,134,0.15)` }} />
+      <div style={{ flex: 1, height: 1, background: "rgba(38,142,134,0.15)" }} />
     </div>
   );
 }
@@ -60,31 +48,8 @@ function Divider({ label }) {
 function Bar({ value, max, color }) {
   const pct = max > 0 ? Math.min(100, Math.round(((value ?? 0) / max) * 100)) : 0;
   return (
-    <div style={{
-      height: 4, borderRadius: 3,
-      background: "rgba(38,142,134,0.1)",
-      flex: 1, minWidth: 40, overflow: "hidden",
-    }}>
-      <div style={{
-        width: `${pct}%`, height: "100%",
-        borderRadius: 3, background: color ?? A,
-      }} />
-    </div>
-  );
-}
-
-function Squares({ value = 0 }) {
-  const clr = (i) => {
-    if (i > value) return "rgba(38,142,134,0.1)";
-    if (i <= 1) return OK;
-    if (i === 2) return WARN;
-    return DANGER;
-  };
-  return (
-    <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
-      {[0, 1, 2, 3].map(i => (
-        <div key={i} style={{ width: 8, height: 8, borderRadius: 2, background: clr(i) }} />
-      ))}
+    <div style={{ height: 4, borderRadius: 3, background: "rgba(38,142,134,0.1)", flex: 1, minWidth: 40, overflow: "hidden" }}>
+      <div style={{ width: `${pct}%`, height: "100%", borderRadius: 3, background: color ?? A }} />
     </div>
   );
 }
@@ -116,78 +81,30 @@ function Chip({ label }) {
 
 // ── score helpers ─────────────────────────────────────────────────────────────
 
-const GAD7_FIELDS = [
-  { key: "feelingNervous",     label: "Nervous / anxious" },
-  { key: "noWorryingControl",  label: "Uncontrollable worry" },
-  { key: "worrying",           label: "Worrying too much" },
-  { key: "troubleRelaxing",    label: "Trouble relaxing" },
-  { key: "restless",           label: "Restless" },
-  { key: "easilyAnnoyed",      label: "Easily annoyed" },
-  { key: "afraid",             label: "Feeling afraid" },
-];
+const GAD7_KEYS = ["feelingNervous","noWorryingControl","worrying","troubleRelaxing","restless","easilyAnnoyed","afraid"];
+const PHQ9_KEYS = ["noPleasureDoingThings","depressed","stayingAsleep","noEnergy","noAppetite","selfPity","troubleConcentration","slowMovingSpeeking","suicidal"];
 
-const PHQ9_FIELDS = [
-  { key: "noPleasureDoingThings", label: "No pleasure" },
-  { key: "depressed",             label: "Depressed / hopeless" },
-  { key: "stayingAsleep",         label: "Sleep problems" },
-  { key: "noEnergy",              label: "Low energy" },
-  { key: "noAppetite",            label: "Poor appetite" },
-  { key: "selfPity",              label: "Self-criticism" },
-  { key: "troubleConcentration",  label: "Concentration" },
-  { key: "slowMovingSpeeking",    label: "Slow / agitated" },
-  { key: "suicidal",              label: "Suicidal thoughts", alert: true },
-];
-
-function sumFields(obj, fields) {
+function sumKeys(obj, keys) {
   if (!obj) return null;
-  return fields.reduce((s, f) => s + (obj[f.key] ?? 0), 0);
+  return keys.reduce((s, k) => s + (obj[k] ?? 0), 0);
 }
 
-function gad7Sev(s) {
+function gad7Sev(s, t) {
   if (s == null) return { label: "–", color: MU };
-  if (s <= 4)  return { label: "Minimal",  color: OK };
-  if (s <= 9)  return { label: "Mild",     color: WARN };
-  if (s <= 14) return { label: "Moderate", color: "#e07a30" };
-  return            { label: "Severe",     color: DANGER };
+  if (s <= 4)  return { label: t.sSevMinimal  ?? "Minimal",    color: OK };
+  if (s <= 9)  return { label: t.sSevMild     ?? "Mild",       color: WARN };
+  if (s <= 14) return { label: t.sSevModerate ?? "Moderate",   color: "#e07a30" };
+  return            { label: t.sSevSevere    ?? "Severe",      color: DANGER };
 }
 
-function phq9Sev(s) {
+function phq9Sev(s, t) {
   if (s == null) return { label: "–", color: MU };
-  if (s <= 4)  return { label: "None",       color: OK };
-  if (s <= 9)  return { label: "Mild",       color: WARN };
-  if (s <= 14) return { label: "Moderate",   color: "#e07a30" };
-  if (s <= 19) return { label: "Mod-severe", color: DANGER };
-  return            { label: "Severe",       color: DANGER };
+  if (s <= 4)  return { label: t.sSevNone      ?? "None",        color: OK };
+  if (s <= 9)  return { label: t.sSevMild      ?? "Mild",        color: WARN };
+  if (s <= 14) return { label: t.sSevModerate  ?? "Moderate",    color: "#e07a30" };
+  if (s <= 19) return { label: t.sSevModSevere ?? "Mod-severe",  color: DANGER };
+  return            { label: t.sSevSevere     ?? "Severe",       color: DANGER };
 }
-
-// ── lookup tables ─────────────────────────────────────────────────────────────
-
-const SMOKE_LABEL = { 0: "Never", 1: "Ex-smoker", 2: "Current smoker", 3: "Passive" };
-const SMOKE_COLOR = { 0: OK, 1: WARN, 2: DANGER, 3: WARN };
-const VAPE_LABEL  = { 0: "Never", 1: "Ex-vaper", 2: "Current vaper" };
-const VAPE_COLOR  = { 0: OK, 1: WARN, 2: DANGER };
-const NUTR_LABEL  = { 1: "Very poor", 2: "Poor", 3: "Moderate", 4: "Good", 5: "Excellent" };
-const NUTR_COLOR  = (v) => (!v || v <= 2) ? DANGER : v === 3 ? WARN : OK;
-const MED_TYPE    = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
-const MED_REASON  = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
-
-const VAX_FIELDS = [
-  { key: "flue",       label: "Influenza" },
-  { key: "covid",      label: "COVID-19" },
-  { key: "pneumococ",  label: "Pneumococcal" },
-  { key: "herpes",     label: "Herpes zoster" },
-  { key: "rs",         label: "RSV" },
-  { key: "pertussis",  label: "Pertussis" },
-];
-
-const TRAINING_KEYS = [
-  { key: "generalPractitioner",    label: "GP" },
-  { key: "pharmacy",               label: "Pharmacy" },
-  { key: "homeCareNurse",          label: "Home nurse" },
-  { key: "rehabilitationCenter",   label: "Rehab" },
-  { key: "hospitalLungSpecialist", label: "Lung specialist" },
-  { key: "trainingVideo",          label: "Video" },
-];
 
 // ── main ──────────────────────────────────────────────────────────────────────
 
@@ -213,16 +130,16 @@ export default function Sidebar({ patient, t = {} }) {
   const medTrain          = patient.latestMedicineTraining     ?? null;
   const cond              = patient.latestRelevantConditions   ?? null;
 
-  const today       = new Date().toISOString().slice(0, 10);
-  const activeMeds  = userMedicines.filter(m => !m.stoppedUsage || m.stoppedUsage >= today);
-  const latestVax   = vaccinations.length ? vaccinations[vaccinations.length - 1] : null;
-  const latestSpiro = spirometry.length   ? spirometry[spirometry.length - 1]     : null;
-  const latestSpo2v = spo2arr.length      ? spo2arr[spo2arr.length - 1]           : null;
+  const today      = new Date().toISOString().slice(0, 10);
+  const activeMeds = userMedicines.filter(m => !m.stoppedUsage || m.stoppedUsage >= today);
+  const latestVax  = vaccinations.length ? vaccinations[vaccinations.length - 1] : null;
+  const latestSpiro = spirometry.length  ? spirometry[spirometry.length - 1]     : null;
+  const latestSpo2v = spo2arr.length     ? spo2arr[spo2arr.length - 1]           : null;
 
-  const gad7Score = sumFields(latestGad7, GAD7_FIELDS);
-  const phq9Score = sumFields(latestPhq9, PHQ9_FIELDS);
-  const gSev = gad7Sev(gad7Score);
-  const pSev = phq9Sev(phq9Score);
+  const gad7Score = sumKeys(latestGad7, GAD7_KEYS);
+  const phq9Score = sumKeys(latestPhq9, PHQ9_KEYS);
+  const gSev = gad7Sev(gad7Score, t);
+  const pSev = phq9Sev(phq9Score, t);
 
   const satMap = {};
   ((medSat?.medicines) ?? []).forEach(m => { satMap[m.medicineId] = m.satisfaction; });
@@ -233,39 +150,77 @@ export default function Sidebar({ patient, t = {} }) {
     return medicines.find(m => m.id === id)?.name ?? `Med #${id}`;
   };
 
-  // comorbidities that are true
-  const activeConditions = cond ? [
-    { key: "heartFailure",       label: "Heart failure" },
-    { key: "highBloodPressure",  label: "Hypertension" },
-    { key: "kidneyFailure",      label: "Kidney failure" },
-    { key: "cardiacArrhythmia",  label: "Arrhythmia" },
-    { key: "diabetes",           label: "Diabetes" },
-    { key: "osteoporosis",       label: "Osteoporosis" },
-    { key: "anxietyDepression",  label: "Anxiety / Depression" },
-    { key: "acidRefluxGerd",     label: "Acid reflux (GERD)" },
-    { key: "sleepApnea",         label: "Sleep apnea" },
-  ].filter(c => cond[c.key]) : [];
+  // translated lookup tables
+  const SMOKE_LABEL = {
+    0: t.sNever        ?? "Never",
+    1: t.sExSmoker     ?? "Ex-smoker",
+    2: t.sCurrentSmoker ?? "Current smoker",
+    3: t.sPassive      ?? "Passive",
+  };
+  const SMOKE_COLOR = { 0: OK, 1: WARN, 2: DANGER, 3: WARN };
 
-  // vaccinations that are true
-  const activeVax = latestVax
-    ? VAX_FIELDS.filter(f => latestVax[f.key])
-    : [];
+  const VAPE_LABEL = {
+    0: t.sNeverVaped   ?? "Never",
+    1: t.sExVaper      ?? "Ex-vaper",
+    2: t.sCurrentVaper ?? "Current vaper",
+  };
+  const VAPE_COLOR = { 0: OK, 1: WARN, 2: DANGER };
+
+  const NUTR_LABEL = {
+    1: t.sVeryPoor  ?? "Very poor",
+    2: t.sPoor      ?? "Poor",
+    3: t.sModerate  ?? "Moderate",
+    4: t.sGood      ?? "Good",
+    5: t.sExcellent ?? "Excellent",
+  };
+  const NUTR_COLOR = (v) => (!v || v <= 2) ? DANGER : v === 3 ? WARN : OK;
+
+  const MED_TYPE   = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
+  const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
+
+  const VAX_FIELDS = [
+    { key: "flue",      label: t.sInfluenza    ?? "Influenza" },
+    { key: "covid",     label: t.sCovid        ?? "COVID-19" },
+    { key: "pneumococ", label: t.sPneumococcal ?? "Pneumococcal" },
+    { key: "herpes",    label: t.sHerpes       ?? "Herpes zoster" },
+    { key: "rs",        label: t.sRsv          ?? "RSV" },
+    { key: "pertussis", label: t.sPertussis    ?? "Pertussis" },
+  ];
+
+  const TRAINING_KEYS = [
+    { key: "generalPractitioner",    label: t.sGp            ?? "GP" },
+    { key: "pharmacy",               label: t.sPharmacy      ?? "Pharmacy" },
+    { key: "homeCareNurse",          label: t.sHomeCareNurse ?? "Home nurse" },
+    { key: "rehabilitationCenter",   label: t.sRehab         ?? "Rehab" },
+    { key: "hospitalLungSpecialist", label: t.sLungSpecialist ?? "Lung specialist" },
+    { key: "trainingVideo",          label: t.sVideo         ?? "Video" },
+  ];
+
+  const COND_FIELDS = [
+    { key: "heartFailure",      label: t.sHeartFailure      ?? "Heart failure" },
+    { key: "highBloodPressure", label: t.sHighBloodPressure ?? "Hypertension" },
+    { key: "kidneyFailure",     label: t.sKidneyFailure     ?? "Kidney failure" },
+    { key: "cardiacArrhythmia", label: t.sCardiacArrhythmia ?? "Arrhythmia" },
+    { key: "diabetes",          label: t.sDiabetes          ?? "Diabetes" },
+    { key: "osteoporosis",      label: t.sOsteoporosis      ?? "Osteoporosis" },
+    { key: "anxietyDepression", label: t.sAnxietyDepression ?? "Anxiety / Depression" },
+    { key: "acidRefluxGerd",    label: t.sAcidReflux        ?? "Acid reflux (GERD)" },
+    { key: "sleepApnea",        label: t.sSleepApnea        ?? "Sleep apnea" },
+  ];
+
+  const activeConditions = cond ? COND_FIELDS.filter(c => cond[c.key]) : [];
+  const activeVax        = latestVax ? VAX_FIELDS.filter(f => latestVax[f.key]) : [];
 
   return (
     <aside style={{
       width: "100%", maxWidth: "100%", flexShrink: 0,
       paddingBottom: 0, display: "flex", flexDirection: "column", flex: 1,
     }}>
-
-      {/* Single card */}
       <div style={{
-        background: BG,
-        backdropFilter: "blur(14px)",
-        border: `1px solid ${BO}`,
-        borderRadius: 16,
+        background: BG, backdropFilter: "blur(14px)",
+        border: `1px solid ${BO}`, borderRadius: 16,
         padding: "12px 14px 12px",
-        flex: 1,                   // fills remaining height
-        overflowY: "auto",
+        flex: 1, overflowY: "auto",
       }}>
 
         {/* Headline */}
@@ -278,22 +233,28 @@ export default function Sidebar({ patient, t = {} }) {
         </h2>
 
         {/* ── Diagnosis ──────────────────────────────────────────────────── */}
-        <Divider label="Diagnosis" />
+        <Divider label={t.sDiagnosis ?? "Diagnosis"} />
         <Row
-          label="COPD"
-          value={copdDiagnosed ? `Confirmed · ${copdDiagnosedDate ?? ""}` : "Not confirmed"}
+          label={t.sCopd ?? "COPD"}
+          value={copdDiagnosed
+            ? `${t.sConfirmed ?? "Confirmed"} · ${copdDiagnosedDate ?? ""}`
+            : t.sNotConfirmed ?? "Not confirmed"}
           color={copdDiagnosed ? OK : MU}
         />
         {asthma && (
-          <Row label="Asthma" value={`Yes · ${asthmaDate ?? ""}`} color={WARN} />
+          <Row
+            label={t.sAsthma ?? "Asthma"}
+            value={`${t.sYes ?? "Yes"} · ${asthmaDate ?? ""}`}
+            color={WARN}
+          />
         )}
 
         {/* ── Comorbidities ──────────────────────────────────────────────── */}
         {activeConditions.length > 0 && (
           <>
-            <Divider label="Comorbidities" />
+            <Divider label={t.sComorbidities ?? "Comorbidities"} />
             {activeConditions.map(c => (
-              <Row key={c.key} label={c.label} value="Yes" color={DANGER} />
+              <Row key={c.key} label={c.label} value={t.sYes ?? "Yes"} color={DANGER} />
             ))}
           </>
         )}
@@ -301,20 +262,21 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── Spirometry ─────────────────────────────────────────────────── */}
         {latestSpiro && (
           <>
-            <Divider label="Spirometry" />
+            <Divider label={t.sSpirometry ?? "Spirometry"} />
             {latestSpiro.fev1 != null && (
-              <Row label="FEV1 (%pred)" value={`${latestSpiro.fev1}%`}
+              <Row label={t.sFev1 ?? "FEV1 (%pred)"} value={`${latestSpiro.fev1}%`}
                 color={latestSpiro.fev1 < 50 ? DANGER : latestSpiro.fev1 < 80 ? WARN : OK} />
             )}
             {latestSpiro.fvc != null && (
-              <Row label="FVC (%pred)" value={`${latestSpiro.fvc}%`} />
+              <Row label={t.sFvc ?? "FVC (%pred)"} value={`${latestSpiro.fvc}%`} />
             )}
             {latestSpiro.fev1fvc != null && (
-              <Row label="FEV1/FVC" value={`${latestSpiro.fev1fvc}%`}
+              <Row label={t.sFev1Fvc ?? "FEV1/FVC"} value={`${latestSpiro.fev1fvc}%`}
                 color={latestSpiro.fev1fvc < 70 ? DANGER : OK} />
             )}
             {latestSpiro.goldGrade != null && (
-              <Row label="GOLD grade" value={`Grade ${latestSpiro.goldGrade}`}
+              <Row label={t.sGoldGrade ?? "GOLD grade"}
+                value={`${t.sGrade ?? "Grade"} ${latestSpiro.goldGrade}`}
                 color={[OK, WARN, "#e07a30", DANGER, DANGER][latestSpiro.goldGrade] ?? TX} />
             )}
           </>
@@ -323,26 +285,23 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── SPO2 ───────────────────────────────────────────────────────── */}
         {latestSpo2v && (
           <>
-            <Divider label="SPO₂" />
+            <Divider label={t.sSpo2 ?? "SPO₂"} />
             {latestSpo2v.value != null && (
-              <>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
-                  <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                    Saturation
-                  </span>
-                  <Bar value={latestSpo2v.value - 80} max={20}
-                    color={latestSpo2v.value < 90 ? DANGER : latestSpo2v.value < 94 ? WARN : OK} />
-                  <span style={{
-                    fontSize: 11, fontWeight: 700, flexShrink: 0,
-                    color: latestSpo2v.value < 90 ? DANGER : latestSpo2v.value < 94 ? WARN : OK,
-                  }}>
-                    {latestSpo2v.value}%
-                  </span>
-                </div>
-              </>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
+                borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
+                <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
+                  {t.sSaturation ?? "Saturation"}
+                </span>
+                <Bar value={latestSpo2v.value - 80} max={20}
+                  color={latestSpo2v.value < 90 ? DANGER : latestSpo2v.value < 94 ? WARN : OK} />
+                <span style={{ fontSize: 11, fontWeight: 700, flexShrink: 0,
+                  color: latestSpo2v.value < 90 ? DANGER : latestSpo2v.value < 94 ? WARN : OK }}>
+                  {latestSpo2v.value}%
+                </span>
+              </div>
             )}
             {latestSpo2v.pulseRate != null && (
-              <Row label="Pulse rate" value={`${latestSpo2v.pulseRate} bpm`} />
+              <Row label={t.sPulseRate ?? "Pulse rate"} value={`${latestSpo2v.pulseRate} bpm`} />
             )}
           </>
         )}
@@ -350,14 +309,17 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── Smoking ────────────────────────────────────────────────────── */}
         {smoking && (
           <>
-            <Divider label="Smoking" />
-            <Row label="Status" value={SMOKE_LABEL[smoking.smoking] ?? "–"}
+            <Divider label={t.sSmoking ?? "Smoking"} />
+            <Row label={t.sStatus ?? "Status"}
+              value={SMOKE_LABEL[smoking.smoking] ?? "–"}
               color={SMOKE_COLOR[smoking.smoking] ?? MU} />
             {smoking.smoking === 1 && smoking.startAge > 0 && (
-              <Row label="Smoked ages" value={`${smoking.startAge} – ${smoking.endAge}`} />
+              <Row label={t.sSmokedAges ?? "Smoked ages"}
+                value={`${smoking.startAge} – ${smoking.endAge}`} />
             )}
             {smoking.smoking === 2 && smoking.frequency > 0 && (
-              <Row label="Cigarettes / day" value={smoking.frequency} color={DANGER} />
+              <Row label={t.sCigarettesDay ?? "Cigarettes / day"}
+                value={smoking.frequency} color={DANGER} />
             )}
           </>
         )}
@@ -365,8 +327,9 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── Vaping ─────────────────────────────────────────────────────── */}
         {vaping && vaping.vaping !== 0 && (
           <>
-            <Divider label="Vaping" />
-            <Row label="Status" value={VAPE_LABEL[vaping.vaping] ?? "–"}
+            <Divider label={t.sVaping ?? "Vaping"} />
+            <Row label={t.sStatus ?? "Status"}
+              value={VAPE_LABEL[vaping.vaping] ?? "–"}
               color={VAPE_COLOR[vaping.vaping] ?? MU} />
           </>
         )}
@@ -374,7 +337,7 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── Vaccinations ───────────────────────────────────────────────── */}
         {activeVax.length > 0 && (
           <>
-            <Divider label="Vaccinations" />
+            <Divider label={t.sVaccinations ?? "Vaccinations"} />
             {activeVax.map(({ key, label }) => (
               <Row key={key} label={label} value="✓" color={OK} />
             ))}
@@ -384,50 +347,50 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── GAD-7 ──────────────────────────────────────────────────────── */}
         {latestGad7 && (
           <>
-            <Divider label="GAD-7 · Anxiety" />
+            <Divider label={t.sGad7 ?? "GAD-7 · Anxiety"} />
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
-              borderBottom: `1px solid rgba(38,142,134,0.07)` }}>
+              borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
               <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                Score
+                {t.sScore ?? "Score"}
               </span>
               <Bar value={gad7Score} max={21} color={gSev.color} />
               <span style={{ fontSize: 11, fontWeight: 700, color: gSev.color, flexShrink: 0 }}>
-                {gad7Score} <span style={{ fontSize: 10, fontWeight: 500 }}>({gSev.label})</span>
+                {gad7Score}{" "}
+                <span style={{ fontSize: 10, fontWeight: 500 }}>({gSev.label})</span>
               </span>
             </div>
-
           </>
         )}
 
         {/* ── PHQ-9 ──────────────────────────────────────────────────────── */}
         {latestPhq9 && (
           <>
-            <Divider label="PHQ-9 · Depression" />
+            <Divider label={t.sPhq9 ?? "PHQ-9 · Depression"} />
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
-              borderBottom: `1px solid rgba(38,142,134,0.07)` }}>
+              borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
               <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                Score
+                {t.sScore ?? "Score"}
               </span>
               <Bar value={phq9Score} max={27} color={pSev.color} />
               <span style={{ fontSize: 11, fontWeight: 700, color: pSev.color, flexShrink: 0 }}>
-                {phq9Score} <span style={{ fontSize: 10, fontWeight: 500 }}>({pSev.label})</span>
+                {phq9Score}{" "}
+                <span style={{ fontSize: 10, fontWeight: 500 }}>({pSev.label})</span>
               </span>
             </div>
-
           </>
         )}
 
         {/* ── Nutrition ──────────────────────────────────────────────────── */}
         {latestNutrition && (
           <>
-            <Divider label="Nutrition" />
+            <Divider label={t.sNutrition ?? "Nutrition"} />
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
               <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                Status
+                {t.sStatus ?? "Status"}
               </span>
               <Bar value={latestNutrition.value} max={5} color={NUTR_COLOR(latestNutrition.value)} />
-              <span style={{ fontSize: 11, fontWeight: 700,
-                color: NUTR_COLOR(latestNutrition.value), flexShrink: 0, whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, flexShrink: 0, whiteSpace: "nowrap",
+                color: NUTR_COLOR(latestNutrition.value) }}>
                 {NUTR_LABEL[latestNutrition.value] ?? "–"}
               </span>
             </div>
@@ -437,12 +400,15 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── Alpha-1 ────────────────────────────────────────────────────── */}
         {latestAlpha1 && (
           <>
-            <Divider label="Alpha-1 Antitrypsin" />
-            <Row label="Tested" value={latestAlpha1.alpha1Tested ? "Yes" : "Not tested"}
+            <Divider label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"} />
+            <Row label={t.sTested ?? "Tested"}
+              value={latestAlpha1.alpha1Tested ? t.sYes ?? "Yes" : t.sNotTested ?? "Not tested"}
               color={latestAlpha1.alpha1Tested ? TX : MU} />
             {latestAlpha1.alpha1Tested && latestAlpha1.alpha1Result != null && (
-              <Row label="Result"
-                value={latestAlpha1.alpha1Result === 0 ? "Normal" : `Deficient (${latestAlpha1.alpha1Result})`}
+              <Row label={t.sResult ?? "Result"}
+                value={latestAlpha1.alpha1Result === 0
+                  ? t.sNormal ?? "Normal"
+                  : `${t.sDeficient ?? "Deficient"} (${latestAlpha1.alpha1Result})`}
                 color={latestAlpha1.alpha1Result === 0 ? OK : DANGER} />
             )}
           </>
@@ -451,11 +417,11 @@ export default function Sidebar({ patient, t = {} }) {
         {/* ── Medication ─────────────────────────────────────────────────── */}
         {activeMeds.length > 0 && (
           <>
-            <Divider label="Medication" />
+            <Divider label={t.sMedication ?? "Medication"} />
             {activeMeds.map((um) => (
               <div key={um.medicineId} style={{
                 display: "flex", alignItems: "center", gap: 8,
-                padding: "5px 0", borderBottom: `1px solid rgba(38,142,134,0.07)`,
+                padding: "5px 0", borderBottom: "1px solid rgba(38,142,134,0.07)",
               }}>
                 {um.medicine?.image ? (
                   <img src={um.medicine.image} alt={um.medicine.name ?? ""}
@@ -495,10 +461,10 @@ export default function Sidebar({ patient, t = {} }) {
           if (entries.length === 0) return null;
           return (
             <>
-              <Divider label="Training" />
+              <Divider label={t.sTraining ?? "Training"} />
               {entries.map(({ entry, sources }) => (
                 <div key={entry.medicineId} style={{
-                  padding: "4px 0", borderBottom: `1px solid rgba(38,142,134,0.07)`,
+                  padding: "4px 0", borderBottom: "1px solid rgba(38,142,134,0.07)",
                 }}>
                   <span style={{ fontSize: 10, color: MU, fontWeight: 500 }}>
                     {medName(entry.medicineId)}
