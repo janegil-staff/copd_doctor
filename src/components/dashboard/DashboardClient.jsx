@@ -232,8 +232,8 @@ export default function Dashboard() {
       <main style={{
         flex: 1,
         display: "flex",
-        flexWrap: "wrap",          // stacks on small screens
-        alignItems: "flex-start",
+        flexWrap: "wrap",
+        alignItems: "stretch",     // both columns same height
         justifyContent: "center",
         gap: 20,
         padding: "24px 16px 40px",
@@ -273,13 +273,14 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Sidebar — full width on mobile, fixed width on desktop */}
+        {/* Sidebar — matches calendar width on mobile, fixed 280px on desktop */}
         <div style={{
           width: "100%",
-          maxWidth: 480,  // matches calendar on mobile so it doesn't look odd
-          // On wider screens Sidebar's own maxWidth:260 takes over
+          maxWidth: 480,
+          display: "flex",
+          flexDirection: "column",
         }}
-          className="lg:max-w-[260px]"
+          className="lg:max-w-[280px] lg:flex-shrink-0"
         >
           <Sidebar patient={patient} t={t} />
         </div>
