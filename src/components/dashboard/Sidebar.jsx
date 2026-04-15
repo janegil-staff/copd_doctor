@@ -568,9 +568,8 @@ export default function Sidebar({ patient, t = {} }) {
     0: t.sNever         ?? "Never",
     1: t.sExSmoker      ?? "Ex-smoker",
     2: t.sCurrentSmoker ?? "Current smoker",
-    3: t.sPassive       ?? "Passive",
   };
-  const SMOKE_COLOR = { 0: OK, 1: WARN, 2: DANGER, 3: WARN };
+  const SMOKE_COLOR = { 0: OK, 1: WARN, 2: DANGER };
 
   const VAPE_LABEL = {
     0: t.sNeverVaped   ?? "Never",
@@ -777,13 +776,14 @@ export default function Sidebar({ patient, t = {} }) {
                 <Row label={t.sStatus ?? "Status"}
                   value={SMOKE_LABEL[smoking.smoking] ?? "–"}
                   color={SMOKE_COLOR[smoking.smoking] ?? MU} />
-                {smoking.smoking === 1 && smoking.startAge > 0 && (
-                  <Row label={t.sSmokedAges ?? "Smoked ages"}
-                    value={`${smoking.startAge} – ${smoking.endAge}`} />
+                {smoking.startAge > 0 && (
+                  <Row label={t.sSmokingStart ?? "Start"} value={`${t.sAge ?? "Age"} ${smoking.startAge}`} />
                 )}
-                {smoking.smoking === 2 && smoking.frequency > 0 && (
-                  <Row label={t.sCigarettesDay ?? "Cigarettes / day"}
-                    value={smoking.frequency} color={DANGER} />
+                {smoking.endAge > 0 && (
+                  <Row label={t.sSmokingQuit ?? "Quit"} value={`${t.sAge ?? "Age"} ${smoking.endAge}`} color={OK} />
+                )}
+                {smoking.frequency > 0 && (
+                  <Row label={t.sSmokingAverage ?? "Average"} value={`${smoking.frequency} ${t.sCigarettesPerDay ?? "cig/day"}`} color={smoking.smoking === 2 ? DANGER : MU} />
                 )}
               </>
             )}
