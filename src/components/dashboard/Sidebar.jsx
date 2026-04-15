@@ -184,6 +184,180 @@ function SpirometryModal({ entries, t, onClose }) {
   );
 }
 
+// ── SPO₂ modal ───────────────────────────────────────────────────────────────
+
+function Spo2Modal({ entries, t, onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(0,0,0,0.45)", backdropFilter: "blur(3px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: "#fff", borderRadius: 16, padding: 24,
+          width: "100%", maxWidth: 480,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+          maxHeight: "90vh", overflowY: "auto",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+          <h3 style={{
+            margin: 0, fontSize: 18, fontWeight: 700, color: TX,
+            fontFamily: "'Playfair Display', Georgia, serif",
+            letterSpacing: "0.025em",
+          }}>
+            {t.sSpo2 ?? "SPO₂"}
+          </h3>
+          <button onClick={onClose} style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: 18, color: MU, lineHeight: 1, padding: "0 4px",
+          }}>
+            ✕
+          </button>
+        </div>
+
+        {[...entries].reverse().map((entry, i) => {
+          const satColor = entry.value < 90 ? DANGER : entry.value < 94 ? WARN : OK;
+          return (
+            <div key={i} style={{
+              borderRadius: 10,
+              border: "1px solid rgba(38,142,134,0.14)",
+              padding: "10px 14px",
+              marginBottom: 10,
+              background: i === 0 ? "rgba(38,142,134,0.04)" : "#fff",
+            }}>
+              <p style={{ margin: "0 0 6px", fontSize: 11, fontWeight: 700, color: A }}>
+                {entry.date ?? "–"}
+                {i === 0 && (
+                  <span style={{
+                    marginLeft: 8, fontSize: 10, fontWeight: 700,
+                    background: A, color: "#fff", borderRadius: 20, padding: "1px 8px",
+                  }}>
+                    Latest
+                  </span>
+                )}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px", alignItems: "center" }}>
+                {entry.value != null && (
+                  <span style={{ fontSize: 11, color: TX }}>
+                    <span style={{ color: MU, fontWeight: 500 }}>{t.sSaturation ?? "Saturation"}: </span>
+                    <strong style={{ color: satColor }}>{entry.value}%</strong>
+                  </span>
+                )}
+                {entry.pulseRate != null && (
+                  <span style={{ fontSize: 11, color: TX }}>
+                    <span style={{ color: MU, fontWeight: 500 }}>{t.sPulseRate ?? "Pulse rate"}: </span>
+                    <strong>{entry.pulseRate} bpm</strong>
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Nutrition & Weight modal ─────────────────────────────────────────────────
+
+function NutritionWeightModal({ records, t, onClose }) {
+  // Build weight history from records (only those with a weight value)
+  const weightEntries = [...(records ?? [])]
+    .filter(r => r.weight != null)
+    .reverse();
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(0,0,0,0.45)", backdropFilter: "blur(3px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: "#fff", borderRadius: 16, padding: 24,
+          width: "100%", maxWidth: 480,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+          maxHeight: "90vh", overflowY: "auto",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+          <h3 style={{
+            margin: 0, fontSize: 18, fontWeight: 700, color: TX,
+            fontFamily: "'Playfair Display', Georgia, serif",
+            letterSpacing: "0.025em",
+          }}>
+            {t.sNutritionWeight ?? "Nutrition & Weight"}
+          </h3>
+          <button onClick={onClose} style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontSize: 18, color: MU, lineHeight: 1, padding: "0 4px",
+          }}>
+            ✕
+          </button>
+        </div>
+
+        {/* Weight history */}
+        <p style={{
+          margin: "0 0 8px", fontSize: 10, fontWeight: 700, color: A,
+          textTransform: "uppercase", letterSpacing: 0.8,
+        }}>
+          {t.weight ?? "Weight"} ({t.weightLossHistory ?? "History"})
+        </p>
+
+        {weightEntries.length === 0 && (
+          <p style={{ fontSize: 12, color: MU, textAlign: "center", padding: "16px 0" }}>
+            {t.noData ?? "No data recorded."}
+          </p>
+        )}
+
+        {weightEntries.length > 0 && (() => {
+          const hasLoss = weightEntries.some((r, i) => {
+            const prev = weightEntries[i + 1];
+            return prev && r.weight < prev.weight;
+          });
+          if (!hasLoss) return (
+            <p style={{ fontSize: 12, color: MU, textAlign: "center", padding: "16px 0" }}>
+              {t.noWeightLoss ?? "No weight loss"}
+            </p>
+          );
+          return weightEntries.map((r, i) => {
+            const prev = weightEntries[i + 1];
+            const diff = prev ? r.weight - prev.weight : null;
+            const diffColor = diff == null ? MU : diff < 0 ? OK : diff > 0 ? DANGER : MU;
+            const diffLabel = diff == null ? "" : diff > 0 ? `+${diff} kg` : `${diff} kg`;
+            return (
+              <div key={r.date} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "6px 0", borderBottom: "1px solid rgba(38,142,134,0.07)",
+              }}>
+                <span style={{ fontSize: 11, color: MU }}>{r.date}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {diffLabel ? (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: diffColor }}>{diffLabel}</span>
+                  ) : null}
+                  <span style={{ fontSize: 12, fontWeight: 700, color: TX }}>{r.weight} kg</span>
+                </div>
+              </div>
+            );
+          });
+        })()}
+      </div>
+    </div>
+  );
+}
+
 // ── Score modal ───────────────────────────────────────────────────────────────
 
 
@@ -333,6 +507,8 @@ export default function Sidebar({ patient, t = {} }) {
   if (!patient) return null;
 
   const [showSpirometryModal, setShowSpirometryModal] = useState(false);
+  const [showSpo2Modal, setShowSpo2Modal] = useState(false);
+  const [showNutritionModal, setShowNutritionModal] = useState(false);
   const [showGad7Modal, setShowGad7Modal] = useState(false);
   const [showPhq9Modal, setShowPhq9Modal] = useState(false);
 
@@ -349,7 +525,7 @@ export default function Sidebar({ patient, t = {} }) {
   const vaping            = patient.vaping            ?? null;
   const latestGad7        = patient.latestGad7        ?? null;
   const latestPhq9        = patient.latestPhq9        ?? null;
-  const latestNutrition   = patient.latestNutrition   ?? null;
+  const records           = Array.isArray(patient.records) ? patient.records : [];
   const latestAlpha1      = patient.latestAlpha1      ?? null;
   const medSat            = patient.latestMedicineSatisfaction ?? null;
   const medTrain          = patient.latestMedicineTraining     ?? null;
@@ -390,15 +566,6 @@ export default function Sidebar({ patient, t = {} }) {
   };
   const VAPE_COLOR = { 0: OK, 1: WARN, 2: DANGER };
 
-  const NUTR_LABEL = {
-    1: t.sVeryPoor  ?? "Very poor",
-    2: t.sPoor      ?? "Poor",
-    3: t.sModerate  ?? "Moderate",
-    4: t.sGood      ?? "Good",
-    5: t.sExcellent ?? "Excellent",
-  };
-  const NUTR_COLOR = (v) => (!v || v <= 2) ? DANGER : v === 3 ? WARN : OK;
-
   const MED_TYPE   = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
   const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
 
@@ -438,7 +605,21 @@ export default function Sidebar({ patient, t = {} }) {
 
   return (
     <>
-      {showSpirometryModal && spirometry.length > 0 && (
+      {showNutritionModal && (
+        <NutritionWeightModal
+          records={records}
+          t={t}
+          onClose={() => setShowNutritionModal(false)}
+        />
+      )}
+            {showSpo2Modal && spo2arr.length > 0 && (
+        <Spo2Modal
+          entries={spo2arr}
+          t={t}
+          onClose={() => setShowSpo2Modal(false)}
+        />
+      )}
+            {showSpirometryModal && spirometry.length > 0 && (
         <SpirometryModal
           entries={spirometry}
           t={t}
@@ -552,7 +733,7 @@ export default function Sidebar({ patient, t = {} }) {
             {/* ── SPO2 ───────────────────────────────────────────────────────── */}
             {latestSpo2v && (
               <>
-                <Divider label={t.sSpo2 ?? "SPO₂"} />
+                <Divider label={t.sSpo2 ?? "SPO₂"} onReadMore={() => setShowSpo2Modal(true)} readMoreLabel={readMoreLabel} />
                 {latestSpo2v.value != null && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
                     borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
@@ -611,20 +792,26 @@ export default function Sidebar({ patient, t = {} }) {
               </>
             )}
 
-            {/* ── Nutrition ──────────────────────────────────────────────────── */}
-            {latestNutrition && (
+            {/* ── Nutrition & Weight ─────────────────────────────────────────── */}
+            {records.some(r => r.weight != null) && (
               <>
-                <Divider label={t.sNutrition ?? "Nutrition"} />
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}>
-                  <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                    {t.sStatus ?? "Status"}
-                  </span>
-                  <Bar value={latestNutrition.value} max={5} color={NUTR_COLOR(latestNutrition.value)} />
-                  <span style={{ fontSize: 11, fontWeight: 700, flexShrink: 0, whiteSpace: "nowrap",
-                    color: NUTR_COLOR(latestNutrition.value) }}>
-                    {NUTR_LABEL[latestNutrition.value] ?? "–"}
-                  </span>
-                </div>
+                <Divider label={t.sNutritionWeight ?? "Nutrition & Weight"} onReadMore={() => setShowNutritionModal(true)} readMoreLabel={readMoreLabel} />
+                {(() => {
+                  const withWeight = records.filter(r => r.weight != null);
+                  if (!withWeight.length) return null;
+                  const latestW = withWeight[withWeight.length - 1];
+                  const prevW   = withWeight.length > 1 ? withWeight[withWeight.length - 2] : null;
+                  const diff    = prevW ? latestW.weight - prevW.weight : null;
+                  const diffStr = diff == null ? "" : diff < 0 ? ` (${diff} kg)` : diff > 0 ? ` (+${diff} kg)` : "";
+                  const color   = diff == null ? undefined : diff < 0 ? OK : diff > 0 ? DANGER : undefined;
+                  return (
+                    <Row
+                      label={t.weight ?? "Weight"}
+                      value={`${latestW.weight} kg${diffStr}`}
+                      color={color}
+                    />
+                  );
+                })()}
               </>
             )}
 
@@ -632,16 +819,20 @@ export default function Sidebar({ patient, t = {} }) {
             {latestAlpha1 && (
               <>
                 <Divider label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"} />
-                <Row label={t.sTested ?? "Tested"}
-                  value={latestAlpha1.alpha1Tested ? t.sYes ?? "Yes" : t.sNotTested ?? "Not tested"}
-                  color={latestAlpha1.alpha1Tested ? TX : MU} />
-                {latestAlpha1.alpha1Tested && latestAlpha1.alpha1Result != null && (
-                  <Row label={t.sResult ?? "Result"}
-                    value={latestAlpha1.alpha1Result === 0
-                      ? t.sNormal ?? "Normal"
-                      : `${t.sDeficient ?? "Deficient"} (${latestAlpha1.alpha1Result})`}
-                    color={latestAlpha1.alpha1Result === 0 ? OK : DANGER} />
-                )}
+                <Row
+                  label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"}
+                  value={(() => {
+                    if (!latestAlpha1.alpha1Tested) return t.sNotTested ?? "Not tested";
+                    if (latestAlpha1.alpha1Result == null) return t.sTested ?? "Tested";
+                    return latestAlpha1.alpha1Result === 0
+                      ? t.sNegative ?? "Negative"
+                      : t.sPositive ?? "Positive";
+                  })()}
+                  color={(() => {
+                    if (!latestAlpha1.alpha1Tested) return DANGER;
+                    return OK;
+                  })()}
+                />
               </>
             )}
 
