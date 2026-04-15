@@ -7,41 +7,28 @@ import Headline from "@/components/home/Headline";
 import ImportCard from "@/components/home/ImportCard";
 import PhoneShowcase from "@/components/home/PhoneShowcase";
 import HomeFooter from "@/components/home/HomeFooter";
-import no from "./messages/no.json";
-import en from "./messages/en.json";
-import nl from "./messages/nl.json";
-import fr from "./messages/fr.json";
-import de from "./messages/de.json";
-import it from "./messages/it.json";
-import sv from "./messages/sv.json";
-import da from "./messages/da.json";
-import fi from "./messages/fi.json";
-import es from "./messages/es.json";
-import pl from "./messages/pl.json";
-import pt from "./messages/pt.json";
-
-const translations = { no, en, nl, fr, de, it, sv, da, fi, es, pl, pt };
+import { getT } from "@/app/messages/translations";
 
 const COUNTRIES = [
-  { code: "no", label: "Norway", flag: "🇳🇴" },
-  { code: "en", label: "UK", flag: "🇬🇧" },
+  { code: "no", label: "Norway",      flag: "🇳🇴" },
+  { code: "en", label: "UK",          flag: "🇬🇧" },
   { code: "nl", label: "Netherlands", flag: "🇳🇱" },
-  { code: "fr", label: "France", flag: "🇫🇷" },
-  { code: "de", label: "Germany", flag: "🇩🇪" },
-  { code: "it", label: "Italy", flag: "🇮🇹" },
-  { code: "sv", label: "Sweden", flag: "🇸🇪" },
-  { code: "da", label: "Denmark", flag: "🇩🇰" },
-  { code: "fi", label: "Finland", flag: "🇫🇮" },
-  { code: "es", label: "Spain", flag: "🇪🇸" },
-  { code: "pl", label: "Poland", flag: "🇵🇱" },
-  { code: "pt", label: "Portugal", flag: "🇵🇹" },
+  { code: "fr", label: "France",      flag: "🇫🇷" },
+  { code: "de", label: "Germany",     flag: "🇩🇪" },
+  { code: "it", label: "Italy",       flag: "🇮🇹" },
+  { code: "sv", label: "Sweden",      flag: "🇸🇪" },
+  { code: "da", label: "Denmark",     flag: "🇩🇰" },
+  { code: "fi", label: "Finland",     flag: "🇫🇮" },
+  { code: "es", label: "Spain",       flag: "🇪🇸" },
+  { code: "pl", label: "Poland",      flag: "🇵🇱" },
+  { code: "pt", label: "Portugal",    flag: "🇵🇹" },
 ];
 
 export default function Home() {
   const { lang, setLang } = useLang();
   const router = useRouter();
   const [error, setError] = useState(false);
-  const t = translations[lang];
+  const t = getT(lang);
   const { input: code, handleChange } = useSecretCode();
 
   const handleClick = async (e) => {
@@ -88,18 +75,8 @@ export default function Home() {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </div>

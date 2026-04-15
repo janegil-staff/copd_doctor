@@ -3,19 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
-
-import no from "@/app/messages/no.json";
-import en from "@/app/messages/en.json";
-import nl from "@/app/messages/nl.json";
-import fr from "@/app/messages/fr.json";
-import de from "@/app/messages/de.json";
-import it from "@/app/messages/it.json";
-import sv from "@/app/messages/sv.json";
-import da from "@/app/messages/da.json";
-import fi from "@/app/messages/fi.json";
-import es from "@/app/messages/es.json";
-import pl from "@/app/messages/pl.json";
-import pt from "@/app/messages/pt.json";
+import { getT } from "@/app/messages/translations";
 
 import { filterRecords } from "@/lib/log/logHelpers";
 import { LogHeader } from "@/components/log/LogHeader";
@@ -23,16 +11,13 @@ import { LogSearch } from "@/components/log/LogSearch";
 import { RecordList } from "@/components/log/RecordList";
 import CopdSummaryPdfModal from "@/components/CopdSummaryPdfModal";
 
-const translations = { no, en, nl, fr, de, it, sv, da, fi, es, pl, pt };
 const PAGE_SIZE = 20;
 
 export default function LogPage() {
   const router = useRouter();
   const { lang } = useLang();
-  const t = translations[lang] ?? translations.en;
+  const t = getT(lang);
 
-  // Read sessionStorage in lazy initializer — safe on client, returns null on server.
-  // suppressHydrationWarning on the wrapper div handles the SSR/CSR diff.
   const [patient] = useState(() => {
     if (typeof window === "undefined") return null;
     const raw = sessionStorage.getItem("patientData");
@@ -64,12 +49,10 @@ export default function LogPage() {
         typeof updater === "function" ? updater(prev.visibleCount) : updater,
     }));
 
-  // Redirect to home if no patient data after mount
   useEffect(() => {
     if (mounted && !patient) router.replace("/");
   }, [mounted, patient, router]);
 
-  // Infinite scroll sentinel
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
@@ -84,7 +67,6 @@ export default function LogPage() {
     return () => observer.disconnect();
   }, [patient]);
 
-  // Don't render until client has mounted — prevents hydration mismatch
   if (!mounted) return null;
   if (!patient) return null;
 
@@ -97,7 +79,6 @@ export default function LogPage() {
     setExpandedDate((prev) => (prev === date ? null : date));
 
   return (
-    // suppressHydrationWarning absorbs the SSR/CSR diff from sessionStorage reads
     <div
       suppressHydrationWarning
       className="min-h-screen flex flex-col"

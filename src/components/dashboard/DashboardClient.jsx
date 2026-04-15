@@ -5,24 +5,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
+import { getT } from "@/app/messages/translations";
 import CalendarPanel from "@/components/dashboard/CalendarPanel";
 import DayDetailDrawer from "@/components/dashboard/DayDetailDrawer";
 import Sidebar from "@/components/dashboard/Sidebar";
-
-import no from "@/app/messages/no.json";
-import en from "@/app/messages/en.json";
-import nl from "@/app/messages/nl.json";
-import fr from "@/app/messages/fr.json";
-import de from "@/app/messages/de.json";
-import it from "@/app/messages/it.json";
-import sv from "@/app/messages/sv.json";
-import da from "@/app/messages/da.json";
-import fi from "@/app/messages/fi.json";
-import es from "@/app/messages/es.json";
-import pl from "@/app/messages/pl.json";
-import pt from "@/app/messages/pt.json";
-
-const translations = { no, en, nl, fr, de, it, sv, da, fi, es, pl, pt };
 
 function parsePatientData() {
   if (typeof window === "undefined") return { patient: null, selectedRecord: null };
@@ -41,7 +27,7 @@ function parsePatientData() {
 export default function Dashboard() {
   const router = useRouter();
   const { lang } = useLang();
-  const t = translations[lang] ?? translations.en;
+  const t = getT(lang);
 
   const [patient, setPatient]               = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -71,7 +57,6 @@ export default function Dashboard() {
     setDrawerOpen(true);
   };
 
-  // Don't render anything until mounted (avoids SSR mismatch)
   if (!mounted || !patient) return null;
 
   return (
@@ -224,16 +209,11 @@ export default function Dashboard() {
       </header>
 
       {/* ── Main content ───────────────────────────────────────────────────── */}
-      {/*
-        Layout:
-        - mobile  (<1024px): single column, calendar first, sidebar below
-        - desktop (≥1024px): two columns, calendar left, sidebar right (sticky)
-      */}
       <main style={{
         flex: 1,
         display: "flex",
         flexWrap: "wrap",
-        alignItems: "stretch",     // both columns same height
+        alignItems: "stretch",
         justifyContent: "center",
         gap: 20,
         padding: "24px 16px 40px",
@@ -273,7 +253,7 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Sidebar — matches calendar width on mobile, fixed 280px on desktop */}
+        {/* Sidebar */}
         <div style={{
           width: "100%",
           maxWidth: 480,
