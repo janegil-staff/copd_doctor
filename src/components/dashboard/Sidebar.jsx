@@ -69,16 +69,29 @@ function Bar({ value, max, color }) {
   );
 }
 
-function SatDots({ value = 0 }) {
+function SatDice({ value = 0 }) {
+  const color = value <= 1 ? DANGER : value <= 2 ? WARN : value <= 3 ? "#e07a30" : value === 4 ? A : OK;
+  // Dot positions for each face value (1-5), as [cx, cy] pairs in a 18x18 grid
+  const dots = {
+    1: [[9,9]],
+    2: [[5,5],[13,13]],
+    3: [[5,5],[9,9],[13,13]],
+    4: [[5,5],[13,5],[5,13],[13,13]],
+    5: [[5,5],[13,5],[9,9],[5,13],[13,13]],
+  };
+  const v = Math.min(5, Math.max(1, Math.round(value)));
+  const positions = dots[v] ?? dots[1];
   return (
-    <span style={{ display: "inline-flex", gap: 2, flexShrink: 0 }}>
-      {[0,1,2,3,4].map(i => (
-        <span key={i} style={{
-          width: 7, height: 7, borderRadius: "50%",
-          background: i < value ? A : "rgba(38,142,134,0.15)",
-        }} />
+    <svg
+      width="22" height="22" viewBox="0 0 22 22"
+      style={{ flexShrink: 0 }}
+    >
+      <rect x="1" y="1" width="20" height="20" rx="4" ry="4"
+        fill={color} />
+      {positions.map(([cx, cy], i) => (
+        <circle key={i} cx={cx + 2} cy={cy + 2} r="2" fill="#fff" />
       ))}
-    </span>
+    </svg>
   );
 }
 
@@ -734,6 +747,9 @@ export default function Sidebar({ patient, t = {} }) {
             {latestSpo2v && (
               <>
                 <Divider label={t.sSpo2 ?? "SPO₂"} onReadMore={() => setShowSpo2Modal(true)} readMoreLabel={readMoreLabel} />
+                {latestSpo2v.date && (
+                  <Row label={t.reportDate ?? "Date"} value={latestSpo2v.date} />
+                )}
                 {latestSpo2v.value != null && (
                   <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
                     borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
@@ -920,9 +936,19 @@ export default function Sidebar({ patient, t = {} }) {
                         {um.reason != null ? ` · ${MED_REASON[um.reason]}` : ""}
                         {um.startedUsage ? ` · ${um.startedUsage}` : ""}
                       </p>
+                      {(() => {
+                        const trainEntry = (medTrain?.medicines ?? []).find(m => m.medicineId === um.medicineId);
+                        const hasTrain = trainEntry && Object.values(trainEntry).some(v => v === true);
+                        return (
+                          <p style={{ fontSize: 10, margin: "1px 0 0", fontWeight: 600,
+                            color: hasTrain ? OK : DANGER }}>
+                            {hasTrain ? (t.sTrainingReceived ?? "✓ Training received") : (t.sNoTraining ?? "✗ No training")}
+                          </p>
+                        );
+                      })()}
                     </div>
                     {satMap[um.medicineId] != null && (
-                      <SatDots value={satMap[um.medicineId]} />
+                      <SatDice value={satMap[um.medicineId]} />
                     )}
                   </div>
                 ))}
