@@ -575,8 +575,9 @@ export default function Sidebar({ patient, t = {} }) {
     0: t.sNeverVaped   ?? "Never",
     1: t.sExVaper      ?? "Ex-vaper",
     2: t.sCurrentVaper ?? "Current vaper",
+    3: t.sNeverVaped   ?? "Never",
   };
-  const VAPE_COLOR = { 0: OK, 1: WARN, 2: DANGER };
+  const VAPE_COLOR = { 0: OK, 1: WARN, 2: DANGER, 3: OK };
 
   const MED_TYPE   = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
   const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
@@ -789,12 +790,15 @@ export default function Sidebar({ patient, t = {} }) {
             )}
 
             {/* ── Vaping ─────────────────────────────────────────────────────── */}
-            {vaping && vaping.vaping !== 0 && (
+            {vaping && (
               <>
                 <Divider label={t.sVaping ?? "Vaping"} />
                 <Row label={t.sStatus ?? "Status"}
                   value={VAPE_LABEL[vaping.vaping] ?? "–"}
                   color={VAPE_COLOR[vaping.vaping] ?? MU} />
+                {vaping.vaping === 1 && vaping.date && (
+                  <Row label={t.sSmokingQuit ?? "Quit"} value={vaping.date} color={OK} />
+                )}
               </>
             )}
 
@@ -805,6 +809,50 @@ export default function Sidebar({ patient, t = {} }) {
                 {activeVax.map(({ key, label }) => (
                   <Row key={key} label={label} value="✓" color={OK} />
                 ))}
+              </>
+            )}
+
+            {/* ── GAD-7 ──────────────────────────────────────────────────────── */}
+            {latestGad7 && (
+              <>
+                <Divider
+                  label={t.sGad7 ?? "GAD-7 · Anxiety"}
+                  onReadMore={() => setShowGad7Modal(true)}
+                  readMoreLabel={readMoreLabel}
+                />
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
+                  borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
+                  <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
+                    {t.sScore ?? "Score"}
+                  </span>
+                  <Bar value={gad7Score} max={21} color={gSev.color} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: gSev.color, flexShrink: 0 }}>
+                    {gad7Score}{" "}
+                    <span style={{ fontSize: 10, fontWeight: 500 }}>({gSev.label})</span>
+                  </span>
+                </div>
+              </>
+            )}
+
+            {/* ── PHQ-9 ──────────────────────────────────────────────────────── */}
+            {latestPhq9 && (
+              <>
+                <Divider
+                  label={t.sPhq9 ?? "PHQ-9 · Depression"}
+                  onReadMore={() => setShowPhq9Modal(true)}
+                  readMoreLabel={readMoreLabel}
+                />
+                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
+                  borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
+                  <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
+                    {t.sScore ?? "Score"}
+                  </span>
+                  <Bar value={phq9Score} max={27} color={pSev.color} />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: pSev.color, flexShrink: 0 }}>
+                    {phq9Score}{" "}
+                    <span style={{ fontSize: 10, fontWeight: 500 }}>({pSev.label})</span>
+                  </span>
+                </div>
               </>
             )}
 
@@ -859,50 +907,6 @@ export default function Sidebar({ patient, t = {} }) {
                 {activeConditions.map(c => (
                   <Row key={c.key} label={c.label} value={t.sYes ?? "Yes"} color={DANGER} />
                 ))}
-              </>
-            )}
-
-            {/* ── GAD-7 ──────────────────────────────────────────────────────── */}
-            {latestGad7 && (
-              <>
-                <Divider
-                  label={t.sGad7 ?? "GAD-7 · Anxiety"}
-                  onReadMore={() => setShowGad7Modal(true)}
-                  readMoreLabel={readMoreLabel}
-                />
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
-                  borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
-                  <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                    {t.sScore ?? "Score"}
-                  </span>
-                  <Bar value={gad7Score} max={21} color={gSev.color} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: gSev.color, flexShrink: 0 }}>
-                    {gad7Score}{" "}
-                    <span style={{ fontSize: 10, fontWeight: 500 }}>({gSev.label})</span>
-                  </span>
-                </div>
-              </>
-            )}
-
-            {/* ── PHQ-9 ──────────────────────────────────────────────────────── */}
-            {latestPhq9 && (
-              <>
-                <Divider
-                  label={t.sPhq9 ?? "PHQ-9 · Depression"}
-                  onReadMore={() => setShowPhq9Modal(true)}
-                  readMoreLabel={readMoreLabel}
-                />
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0",
-                  borderBottom: "1px solid rgba(38,142,134,0.07)" }}>
-                  <span style={{ fontSize: 11, color: MU, fontWeight: 500, flexShrink: 0, paddingRight: 10 }}>
-                    {t.sScore ?? "Score"}
-                  </span>
-                  <Bar value={phq9Score} max={27} color={pSev.color} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: pSev.color, flexShrink: 0 }}>
-                    {phq9Score}{" "}
-                    <span style={{ fontSize: 10, fontWeight: 500 }}>({pSev.label})</span>
-                  </span>
-                </div>
               </>
             )}
 
