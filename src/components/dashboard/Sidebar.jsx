@@ -1513,133 +1513,116 @@ export default function Sidebar({ patient, t = {} }) {
             {activeMeds.length > 0 && (
               <>
                 <Divider label={t.sMedication ?? "Medication"} />
-                {activeMeds.map((um) => (
-                  <div
-                    key={um.medicineId}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      padding: "5px 0",
-                      borderBottom: "1px solid rgba(38,142,134,0.07)",
-                    }}
-                  >
-                    {um.medicine?.image ? (
-                      <img
-                        src={um.medicine.image}
-                        alt={um.medicine.name ?? ""}
-                        style={{
-                          width: 26,
-                          height: 26,
-                          objectFit: "contain",
-                          borderRadius: 6,
-                          border: `1px solid ${BO}`,
-                          background: "#fff",
-                          flexShrink: 0,
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: 26,
-                          height: 26,
-                          borderRadius: 6,
-                          flexShrink: 0,
-                          background: "rgba(38,142,134,0.1)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 13,
-                        }}
-                      >
-                        💊
-                      </div>
-                    )}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: TX,
-                          margin: 0,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {medName(um.medicineId)}
-                      </p>
-                      <p style={{ fontSize: 10, color: MU, margin: 0 }}>
-                        {MED_TYPE[um.medicine?.type] ?? ""}
-                        {um.reason != null ? ` · ${MED_REASON[um.reason]}` : ""}
-                        {um.startedUsage ? ` · ${um.startedUsage}` : ""}
-                      </p>
-                      {(() => {
-                        const trainEntry = (medTrain?.medicines ?? []).find(
-                          (m) => m.medicineId === um.medicineId,
-                        );
-                        const hasTrain =
-                          trainEntry &&
-                          Object.values(trainEntry).some((v) => v === true);
-                        return (
-                          <p
-                            style={{
-                              fontSize: 10,
-                              margin: "1px 0 0",
-                              fontWeight: 600,
-                              color: hasTrain ? OK : DANGER,
-                            }}
-                          >
-                            {hasTrain
-                              ? (t.sTrainingReceived ?? "✓ Training received")
-                              : (t.sNoTraining ?? "✗ No training")}
-                          </p>
-                        );
-                      })()}
-                    </div>
-                    {satMap[um.medicineId] != null && (
-                      <SatDice value={satMap[um.medicineId]} />
-                    )}
-                  </div>
-                ))}
-              </>
-            )}
+                {activeMeds.map((um) => {
+                  const trainEntry = (medTrain?.medicines ?? []).find(
+                    (m) => m.medicineId === um.medicineId,
+                  );
+                  const trainSources = trainEntry
+                    ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
+                    : [];
+                  const hasTrain = trainSources.length > 0;
 
-            {/* ── Medication Training ────────────────────────────────────────── */}
-            {(() => {
-              const entries = (medTrain?.medicines ?? [])
-                .map((entry) => ({
-                  entry,
-                  sources: TRAINING_KEYS.filter((k) => entry[k.key] === true),
-                }))
-                .filter(({ sources }) => sources.length > 0);
-              if (entries.length === 0) return null;
-              return (
-                <>
-                  <Divider label={t.sTraining ?? "Training"} />
-                  {entries.map(({ entry, sources }) => (
+                  return (
                     <div
-                      key={entry.medicineId}
+                      key={um.medicineId}
                       style={{
-                        padding: "4px 0",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 8,
+                        padding: "5px 0",
                         borderBottom: "1px solid rgba(38,142,134,0.07)",
                       }}
                     >
-                      <span
-                        style={{ fontSize: 10, color: MU, fontWeight: 500 }}
-                      >
-                        {medName(entry.medicineId)}
-                      </span>
-                      <div style={{ marginTop: 2 }}>
-                        {sources.map((s) => (
-                          <Chip key={s.key} label={s.label} />
-                        ))}
+                      {um.medicine?.image ? (
+                        <img
+                          src={um.medicine.image}
+                          alt={um.medicine.name ?? ""}
+                          style={{
+                            width: 26,
+                            height: 26,
+                            objectFit: "contain",
+                            borderRadius: 6,
+                            border: `1px solid ${BO}`,
+                            background: "#fff",
+                            flexShrink: 0,
+                            marginTop: 2,
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: 26,
+                            height: 26,
+                            borderRadius: 6,
+                            flexShrink: 0,
+                            marginTop: 2,
+                            background: "rgba(38,142,134,0.1)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 13,
+                          }}
+                        >
+                          💊
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: TX,
+                            margin: 0,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {medName(um.medicineId)}
+                        </p>
+                        <p style={{ fontSize: 10, color: MU, margin: 0 }}>
+                          {MED_TYPE[um.medicine?.type] ?? ""}
+                          {um.reason != null
+                            ? ` · ${MED_REASON[um.reason]}`
+                            : ""}
+                          {um.startedUsage ? ` · ${um.startedUsage}` : ""}
+                        </p>
+
+                        {/* Training: inline badges if received, small red marker if not */}
+                        {hasTrain ? (
+                          <div
+                            style={{
+                              marginTop: 3,
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 2,
+                            }}
+                          >
+                            {trainSources.map((s) => (
+                              <Chip key={s.key} label={s.label} />
+                            ))}
+                          </div>
+                        ) : (
+                          <p
+                            style={{
+                              fontSize: 10,
+                              margin: "2px 0 0",
+                              fontWeight: 600,
+                              color: DANGER,
+                            }}
+                          >
+                            {t.sNoTraining ?? "✗ No training"}
+                          </p>
+                        )}
                       </div>
+                      {satMap[um.medicineId] != null && (
+                        <SatDice value={satMap[um.medicineId]} />
+                      )}
                     </div>
-                  ))}
-                </>
-              );
-            })()}
+                  );
+                })}
+              </>
+            )}
           </div>
         </div>
       </aside>
