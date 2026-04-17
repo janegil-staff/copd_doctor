@@ -1471,7 +1471,6 @@ export default function Sidebar({ patient, t = {} }) {
               </>
             )}
 
-            {/* ── Alpha-1 ────────────────────────────────────────────────────── */}
             {latestAlpha1 && (
               <>
                 <Divider label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"} />
@@ -1487,8 +1486,9 @@ export default function Sidebar({ patient, t = {} }) {
                       : (t.sPositive ?? "Positive");
                   })()}
                   color={(() => {
-                    if (!latestAlpha1.alpha1Tested) return DANGER;
-                    return OK;
+                    if (!latestAlpha1.alpha1Tested) return WARN; // not tested = amber (neutral cue)
+                    if (latestAlpha1.alpha1Result == null) return MU; // tested, no result yet
+                    return latestAlpha1.alpha1Result === 0 ? OK : DANGER; // negative = green, positive = red
                   })()}
                 />
               </>
