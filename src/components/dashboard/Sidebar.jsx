@@ -564,12 +564,16 @@ export default function Sidebar({ patient, t = {} }) {
     return medicines.find(m => m.id === id)?.name ?? `Med #${id}`;
   };
 
-  const SMOKE_LABEL = {
-    0: t.sNever         ?? "Never",
-    1: t.sExSmoker      ?? "Ex-smoker",
-    2: t.sCurrentSmoker ?? "Current smoker",
-  };
-  const SMOKE_COLOR = { 0: OK, 1: WARN, 2: DANGER };
+const SMOKE_LABEL = {
+  1: t.sCurrentSmoker ?? "Current smoker",
+  2: t.sNever         ?? "Never smoked",
+  3: t.sExSmoker      ?? "Ex-smoker",
+};
+const SMOKE_COLOR = {
+  1: DANGER,
+  2: OK,
+  3: WARN,
+};
 
   const VAPE_LABEL = {
     0: t.sNeverVaped   ?? "Never",
@@ -770,25 +774,27 @@ export default function Sidebar({ patient, t = {} }) {
               </>
             )}
 
-            {/* ── Smoking ────────────────────────────────────────────────────── */}
-            {smoking && (
-              <>
-                <Divider label={t.sSmoking ?? "Smoking"} />
-                <Row label={t.sStatus ?? "Status"}
-                  value={SMOKE_LABEL[smoking.smoking] ?? "–"}
-                  color={SMOKE_COLOR[smoking.smoking] ?? MU} />
-                {smoking.startAge > 0 && (
-                  <Row label={t.sSmokingStart ?? "Start"} value={`${t.sAge ?? "Age"} ${smoking.startAge}`} />
-                )}
-                {smoking.endAge > 0 && (
-                  <Row label={t.sSmokingQuit ?? "Quit"} value={`${t.sAge ?? "Age"} ${smoking.endAge}`} color={OK} />
-                )}
-                {smoking.frequency > 0 && (
-                  <Row label={t.sSmokingAverage ?? "Average"} value={`${smoking.frequency} ${t.sCigarettesPerDay ?? "cig/day"}`} color={smoking.smoking === 2 ? DANGER : MU} />
-                )}
-              </>
-            )}
-
+{/* ── Smoking ────────────────────────────────────────────────────── */}
+{smoking && (
+  <>
+    <Divider label={t.sSmoking ?? "Smoking"} />
+    <Row label={t.sStatus ?? "Status"}
+      value={SMOKE_LABEL[smoking.smoking] ?? "–"}
+      color={SMOKE_COLOR[smoking.smoking] ?? MU} />
+    {/* Start age: only for ex-smokers (1) and current smokers (2) */}
+    {smoking.smoking > 0 && smoking.startAge > 0 && (
+      <Row label={t.sSmokingStart ?? "Start"} value={`${t.sAge ?? "Age"} ${smoking.startAge}`} />
+    )}
+    {/* Quit age: only for ex-smokers (1) */}
+    {smoking.smoking === 1 && smoking.endAge > 0 && (
+      <Row label={t.sSmokingQuit ?? "Quit"} value={`${t.sAge ?? "Age"} ${smoking.endAge}`} color={OK} />
+    )}
+    {/* Frequency: only for current smokers (2) */}
+    {smoking.smoking === 2 && smoking.frequency > 0 && (
+      <Row label={t.sSmokingAverage ?? "Average"} value={`${smoking.frequency} ${t.sCigarettesPerDay ?? "cig/day"}`} color={DANGER} />
+    )}
+  </>
+)}
             {/* ── Vaping ─────────────────────────────────────────────────────── */}
             {vaping && (
               <>
