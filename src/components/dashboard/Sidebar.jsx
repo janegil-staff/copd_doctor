@@ -983,12 +983,15 @@ export default function Sidebar({ patient, t = {} }) {
   };
 
   const VAPE_LABEL = {
-    0: t.sNeverVaped ?? "Never",
-    1: t.sExVaper ?? "Ex-vaper",
-    2: t.sCurrentVaper ?? "Current vaper",
-    3: t.sNeverVaped ?? "Never",
+    1: t.sCurrentVaper ?? "Current vaper",
+    2: t.sNeverVaped ?? "Never",
+    3: t.sExVaper ?? "Ex-vaper",
   };
-  const VAPE_COLOR = { 0: OK, 1: WARN, 2: DANGER, 3: OK };
+  const VAPE_COLOR = {
+    1: DANGER,
+    2: OK,
+    3: WARN,
+  };
 
   const MED_TYPE = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
   const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
