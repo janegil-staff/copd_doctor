@@ -147,6 +147,7 @@ export default function CalendarPanel({
   t,
   records,
   medicines,
+  userMedicines = [],
   onDayClick,
   selectedDate,
   show,
@@ -563,6 +564,196 @@ export default function CalendarPanel({
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Previously used medications */}
+      <StoppedMedicationsList t={t} userMedicines={userMedicines} />
+    </div>
+  );
+}
+
+// ─── StoppedMedicationsList ───────────────────────────────────────────────────
+// Reason integer mapping matches the app:
+//   0 = side effects, 1 = ineffective, 2 = doctor change,
+//   3 = cost, 4 = completed course, 5 = other
+const REASON_CONFIG = {
+  0: { key: "sideEffects",     color: { bg: "#fde8e8", text: "#b42525", border: "#f5b5b5" } },
+  1: { key: "ineffective",     color: { bg: "#fff4e8", text: "#a35400", border: "#f5c9a0" } },
+  2: { key: "doctorChange",    color: { bg: "#e8f0fd", text: "#1a4ea3", border: "#a8c5f0" } },
+  3: { key: "cost",            color: { bg: "#fdf8e8", text: "#8a6a00", border: "#e8d580" } },
+  4: { key: "completedCourse", color: { bg: "#e8f5ec", text: "#1a6b33", border: "#a5d5b3" } },
+  5: { key: "otherReason",     color: { bg: "#f0f0f0", text: "#555",    border: "#cecece" } },
+};
+const DEFAULT_REASON_COLOR = { bg: "#f0f0f0", text: "#555", border: "#cecece" };
+
+function StoppedMedicationsList({ t, userMedicines }) {
+  const stopped = (userMedicines || [])
+    .filter((m) => m.stoppedUsage)
+    .sort((a, b) => new Date(b.stoppedUsage) - new Date(a.stoppedUsage));
+
+  if (stopped.length === 0) return null;
+
+  const fmtDate = (d) => {
+    if (!d) return "";
+    return new Date(d).toLocaleDateString();
+  };
+
+  const daysBetween = (start, end) => {
+    if (!start || !end) return null;
+    const ms = new Date(end).getTime() - new Date(start).getTime();
+    return Math.max(0, Math.floor(ms / (1000 * 60 * 60 * 24)));
+  };
+
+  const reasonLabel = (reason) => {
+    if (reason == null) return t.notSpecified ?? "Not specified";
+    const cfg = REASON_CONFIG[reason];
+    if (!cfg) return t.otherReason ?? "Other";
+    const fallbacks = {
+      sideEffects:     "Side effects",
+      ineffective:     "Not effective",
+      doctorChange:    "Doctor changed medication",
+      cost:            "Too expensive",
+      completedCourse: "Completed course",
+      otherReason:     "Other",
+    };
+    return t[cfg.key] ?? fallbacks[cfg.key];
+  };
+
+  const reasonColor = (reason) =>
+    REASON_CONFIG[reason]?.color ?? DEFAULT_REASON_COLOR;
+
+  return (
+    <div
+      className="mt-5 rounded-xl overflow-hidden"
+      style={{
+        background: "#fff",
+        border: "1px solid rgba(38,142,134,0.14)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
+      }}
+    >
+      {/* Header */}
+      <div
+        className="px-4 pt-3 pb-2"
+        style={{ borderBottom: "1px solid rgba(38,142,134,0.08)" }}
+      >
+        <p
+          className="text-xs font-semibold tracking-widest uppercase"
+          style={{ color: "#268E86" }}
+        >
+          {t.stoppedMedications ?? "Previously used medications"}
+        </p>
+      </div>
+
+      {/* List */}
+      <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+        {stopped.map((um) => {
+          const med = um.medicine ?? {};
+          const color = reasonColor(um.reason);
+          const days = daysBetween(um.startedUsage, um.stoppedUsage);
+
+          return (
+            <div
+              key={`${um.medicineId}-${um.stoppedUsage}`}
+              style={{
+                padding: "10px 12px",
+                background: "rgba(38,142,134,0.03)",
+                borderRadius: 10,
+                border: "1px solid rgba(38,142,134,0.08)",
+                borderLeft: `3px solid ${color.text}`,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+              }}
+            >
+              {/* Medicine image or pill emoji */}
+              {med.image ? (
+                <img
+                  src={med.image}
+                  alt=""
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    objectFit: "cover",
+                    flexShrink: 0,
+                    background: "#e8f5f3",
+                    opacity: 0.8,
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: "#e8f5f3",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 15,
+                    flexShrink: 0,
+                    opacity: 0.7,
+                  }}
+                >
+                  💊
+                </div>
+              )}
+
+              {/* Name + dates */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#1a6b65",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {med.name ?? `#${um.medicineId}`}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: "#7a9a98",
+                    marginTop: 3,
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "2px 8px",
+                  }}
+                >
+                  <span>
+                    {um.startedUsage ? fmtDate(um.startedUsage) : "?"} →{" "}
+                    {fmtDate(um.stoppedUsage)}
+                  </span>
+                  {days != null && (
+                    <span>
+                      · {days} {t.days ?? "days"}
+                    </span>
+                  )}
+                  {med.atcCode && <span>· {med.atcCode}</span>}
+                </div>
+              </div>
+
+              {/* Reason chip */}
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  background: color.bg,
+                  color: color.text,
+                  border: `1px solid ${color.border}`,
+                  borderRadius: 20,
+                  padding: "3px 10px",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                  alignSelf: "center",
+                }}
+              >
+                {reasonLabel(um.reason)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
