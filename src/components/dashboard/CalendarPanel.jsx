@@ -67,7 +67,7 @@ function MedicineIcon() {
       style={{
         position: "absolute",
         right: -4,
-        top: 0,
+        top: -3,
         width: 13,
         height: 13,
         zIndex: 10,
@@ -92,7 +92,7 @@ function ExerciseIcon() {
       style={{
         position: "absolute",
         right: -4,
-        bottom: 0,
+        bottom: -3,
         width: 13,
         height: 13,
         zIndex: 10,
@@ -283,7 +283,7 @@ export default function CalendarPanel({
       </div>
 
       {/* Week rows — add left+right padding so triangles and icons have space */}
-      <div style={{ paddingLeft: 26, paddingRight: 8, display: "flex", flexDirection: "column", gap: 2 }}>
+      <div style={{ paddingLeft: 26, paddingRight: 10, display: "flex", flexDirection: "column", gap: 8 }}>
         {(() => {
           const rows = [];
           const seen = new Set();
