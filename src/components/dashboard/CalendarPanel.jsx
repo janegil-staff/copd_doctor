@@ -20,6 +20,95 @@ function buildCalendar(year, month) {
   return cells;
 }
 
+// ─── Exacerbation triangle icon ────────────────────────────────────────────
+function ExacerbationTriangle({ level }) {
+  // level: "moderate" | "serious"
+  const fill = level === "serious" ? "#E53935" : "#FFB300";
+  const stroke = level === "serious" ? "#B71C1C" : "#E69500";
+  const title =
+    level === "serious"
+      ? "Serious exacerbation this week"
+      : "Moderate exacerbation this week";
+
+  return (
+    <div
+      title={title}
+      style={{
+        position: "absolute",
+        left: -24,
+        top: "50%",
+        transform: "translateY(-50%)",
+        width: 20,
+        height: 20,
+        zIndex: 10,
+        pointerEvents: "none",
+      }}
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20">
+        <polygon
+          points="12,2.5 22,21 2,21"
+          fill={fill}
+          stroke={stroke}
+          strokeWidth="0.8"
+          strokeLinejoin="round"
+        />
+        <rect x="11" y="8.5" width="2" height="7" fill="#fff" rx="0.5" />
+        <circle cx="12" cy="17.5" r="1.2" fill="#fff" />
+      </svg>
+    </div>
+  );
+}
+
+// ─── Medicine icon (top-right) ─────────────────────────────────────────────
+function MedicineIcon() {
+  return (
+    <div
+      title="Medicine used this week"
+      style={{
+        position: "absolute",
+        right: -6,
+        top: -5,
+        width: 16,
+        height: 16,
+        zIndex: 10,
+        pointerEvents: "none",
+        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
+      }}
+    >
+      <img
+        src="/icons/ico_medicine.png"
+        alt=""
+        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+      />
+    </div>
+  );
+}
+
+// ─── Exercise icon (bottom-right) ──────────────────────────────────────────
+function ExerciseIcon() {
+  return (
+    <div
+      title="Physical activity this week"
+      style={{
+        position: "absolute",
+        right: -6,
+        bottom: -5,
+        width: 16,
+        height: 16,
+        zIndex: 10,
+        pointerEvents: "none",
+        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
+      }}
+    >
+      <img
+        src="/icons/ico_exercise.png"
+        alt=""
+        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+      />
+    </div>
+  );
+}
+
 function Checkbox({ checked, onChange, label, color }) {
   return (
     <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -192,8 +281,8 @@ export default function CalendarPanel({
         </button>
       </div>
 
-      {/* Week rows */}
-      <div className="space-y-1">
+      {/* Week rows — add left+right padding so triangles and icons have space */}
+      <div style={{ paddingLeft: 26, paddingRight: 10, display: "flex", flexDirection: "column", gap: 7 }}>
         {(() => {
           const rows = [];
           const seen = new Set();
@@ -213,6 +302,15 @@ export default function CalendarPanel({
 
             const record = weekMap[monKey];
             const isSelected = record && selectedDate === record.date;
+
+            // ─── Determine exacerbation level for this week ────────────
+            // Serious trumps moderate if both are present
+            let exLevel = null;
+            if (record?.seriousExacerbations) {
+              exLevel = "serious";
+            } else if (record?.moderateExacerbations) {
+              exLevel = "moderate";
+            }
 
             const showExDot =
               show.exacerbation &&
@@ -254,84 +352,97 @@ export default function CalendarPanel({
             rows.push(
               <div
                 key={monKey}
-                role="button"
-                tabIndex={record ? 0 : -1}
-                onClick={() => record && onDayClick(record)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && record && onDayClick(record)
-                }
-                className="w-full flex flex-col rounded-xl transition-all overflow-hidden"
-                style={{
-                  background: bgColor,
-                  border: "none",
-                  cursor: record ? "pointer" : "default",
-                  boxShadow: record ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
-                  paddingLeft: 8,
-                  paddingRight: 10,
-                  paddingTop: 3,
-                  paddingBottom: 3,
-                  gap: 1,
-                  color: record ? "#1a1a1a" : "#a0b8b6",
-                  WebkitTextFillColor: record ? "#1a1a1a" : "#a0b8b6",
-                }}
+                style={{ position: "relative" }}
               >
+                {/* Exacerbation triangle on the left */}
+                {exLevel && <ExacerbationTriangle level={exLevel} />}
+
+                {/* Medicine icon on the top right */}
+                {record?.medicines?.length > 0 && <MedicineIcon />}
+
+                {/* Exercise icon on the bottom right */}
+                {record?.physicalActivity > 0 && <ExerciseIcon />}
+
                 <div
-                  className="flex items-center justify-between w-full"
-                  style={{ direction: "ltr" }}
+                  role="button"
+                  tabIndex={record ? 0 : -1}
+                  onClick={() => record && onDayClick(record)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && record && onDayClick(record)
+                  }
+                  className="w-full flex flex-col rounded-xl transition-all overflow-hidden"
+                  style={{
+                    background: bgColor,
+                    border: "none",
+                    cursor: record ? "pointer" : "default",
+                    boxShadow: record ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
+                    paddingLeft: 8,
+                    paddingRight: 10,
+                    paddingTop: 3,
+                    paddingBottom: 3,
+                    gap: 1,
+                    color: record ? "#1a1a1a" : "#a0b8b6",
+                    WebkitTextFillColor: record ? "#1a1a1a" : "#a0b8b6",
+                  }}
                 >
-                  {Array.from({ length: 7 }).map((_, di) => {
-                    const dd = new Date(
-                      mon.getFullYear(),
-                      mon.getMonth(),
-                      mon.getDate() + di,
-                    );
-                    const inMonth = dd.getMonth() === viewMonth;
-                    const dayNum = dd.getDate();
-                    const isToday = dd.toDateString() === now.toDateString();
-                    return (
-                      <div
-                        key={di}
-                        style={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                          background:
-                            isToday && record
-                              ? "rgba(0,0,0,0.12)"
-                              : "transparent",
-                          border:
-                            isToday && record
-                              ? "1.5px solid rgba(0,0,0,0.5)"
-                              : "none",
-                        }}
-                      >
-                        <span
+                  <div
+                    className="flex items-center justify-between w-full"
+                    style={{ direction: "ltr" }}
+                  >
+                    {Array.from({ length: 7 }).map((_, di) => {
+                      const dd = new Date(
+                        mon.getFullYear(),
+                        mon.getMonth(),
+                        mon.getDate() + di,
+                      );
+                      const inMonth = dd.getMonth() === viewMonth;
+                      const dayNum = dd.getDate();
+                      const isToday = dd.toDateString() === now.toDateString();
+                      return (
+                        <div
+                          key={di}
                           style={{
-                            fontSize: 10,
-                            fontWeight: isToday ? 900 : 700,
-                            color: record
-                              ? record.cat8 == null
-                                ? inMonth
-                                  ? "rgba(38,142,134,0.5)"
-                                  : "rgba(38,142,134,0.25)"
-                                : inMonth
-                                  ? "#1a1a1a"
-                                  : "rgba(0,0,0,0.3)"
-                              : inMonth
-                                ? "#a0b8b6"
-                                : "#d0e0de",
-                            lineHeight: 1,
+                            width: 18,
+                            height: 18,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            background:
+                              isToday && record
+                                ? "rgba(0,0,0,0.12)"
+                                : "transparent",
+                            border:
+                              isToday && record
+                                ? "1.5px solid rgba(0,0,0,0.5)"
+                                : "none",
                           }}
                         >
-                          {dayNum}
-                        </span>
-                      </div>
-                    );
-                  })}
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: isToday ? 900 : 700,
+                              color: record
+                                ? record.cat8 == null
+                                  ? inMonth
+                                    ? "rgba(38,142,134,0.5)"
+                                    : "rgba(38,142,134,0.25)"
+                                  : inMonth
+                                    ? "#1a1a1a"
+                                    : "rgba(0,0,0,0.3)"
+                                : inMonth
+                                  ? "#a0b8b6"
+                                  : "#d0e0de",
+                              lineHeight: 1,
+                            }}
+                          >
+                            {dayNum}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>,
             );
