@@ -1,244 +1,276 @@
 #!/usr/bin/env node
 /**
  * patch_translations.js
- * Adds pdfSymptomsPast12 key to all 12 language JSON files.
- * Also removes old pdfExacerbationsPast12 key if present.
  *
- * Usage: node patch_translations.js [messages_dir]
- * Default messages_dir: src/app/messages
+ * Adds stopped-medication keys to all 12 language blocks in src/translations.js.
+ * Skips keys that are already present. Safe to run multiple times.
+ *
+ * Usage:
+ *   node patch_translations.js                     # defaults to src/translations.js
+ *   node patch_translations.js path/to/translations.js
  */
 
 const fs   = require("fs");
 const path = require("path");
 
-const MESSAGES_DIR = process.argv[2] ?? path.join(__dirname, "src", "app", "messages");
+const TRANSLATIONS_PATH =
+  process.argv[2] ?? path.join(__dirname, "src", "app", "messages", "translations.js");
 
-const NEW_KEY = "pdfSymptomsPast12";
-const OLD_KEY = "pdfExacerbationsPast12";
-
-// Extra keys needed for the exacerbation calendar section
-const EXTRA_KEYS = {
-  pdfExacerbationsPast12: {
-    no: "Eksaserbasjoner siste 12 måneder",
-    en: "Exacerbations past 12 months",
-    nl: "Exacerbaties afgelopen 12 maanden",
-    fr: "Exacerbations au cours des 12 derniers mois",
-    de: "Exazerbationen der letzten 12 Monate",
-    it: "Riacutizzazioni negli ultimi 12 mesi",
-    sv: "Exacerbationer de senaste 12 månaderna",
-    da: "Eksacerbationer de seneste 12 måneder",
-    fi: "Pahenemisvaiheet viimeisen 12 kuukauden aikana",
-    es: "Exacerbaciones en los últimos 12 meses",
-    pl: "Zaostrzenia w ciągu ostatnich 12 miesięcy",
-    pt: "Exacerbações nos últimos 12 meses",
+// ── Keys to add, per language ────────────────────────────────────────────────
+const NEW_KEYS = {
+  no: {
+    stoppedMedications:   "Tidligere brukte medisiner",
+    noStoppedMedications: "Ingen sluttede medisiner registrert",
+    sideEffects:          "Bivirkninger",
+    ineffective:          "Ikke effektiv",
+    doctorChange:         "Lege endret medisin",
+    cost:                 "For dyrt",
+    completedCourse:      "Fullført kur",
+    otherReason:          "Annet",
+    notSpecified:         "Ikke spesifisert",
+    started:              "Startet",
+    days:                 "dager",
+    dose:                 "Dose",
+    timesLogged:          "ganger logget",
   },
-  pdfExacModerate: {
-    no: "Moderat eksaserbasjon",
-    en: "Moderate exacerbation",
-    nl: "Matige exacerbatie",
-    fr: "Exacerbation modérée",
-    de: "Moderate Exazerbation",
-    it: "Riacutizzazione moderata",
-    sv: "Måttlig exacerbation",
-    da: "Moderat eksacerbation",
-    fi: "Kohtalainen paheneminen",
-    es: "Exacerbación moderada",
-    pl: "Umiarkowane zaostrzenie",
-    pt: "Exacerbação moderada",
+  en: {
+    stoppedMedications:   "Previously used medications",
+    noStoppedMedications: "No stopped medications recorded",
+    sideEffects:          "Side effects",
+    ineffective:          "Not effective",
+    doctorChange:         "Doctor changed medication",
+    cost:                 "Too expensive",
+    completedCourse:      "Completed course",
+    otherReason:          "Other",
+    notSpecified:         "Not specified",
+    started:              "Started",
+    days:                 "days",
+    dose:                 "Dose",
+    timesLogged:          "times logged",
   },
-  pdfExacSerious: {
-    no: "Alvorlig eksaserbasjon (sykehusinnleggelse)",
-    en: "Serious exacerbation (hospitalization)",
-    nl: "Ernstige exacerbatie (ziekenhuisopname)",
-    fr: "Exacerbation sévère (hospitalisation)",
-    de: "Schwere Exazerbation (Krankenhausaufnahme)",
-    it: "Riacutizzazione grave (ospedalizzazione)",
-    sv: "Allvarlig exacerbation (sjukhusvistelse)",
-    da: "Alvorlig eksacerbation (indlæggelse)",
-    fi: "Vakava paheneminen (sairaalahoito)",
-    es: "Exacerbación grave (hospitalización)",
-    pl: "Poważne zaostrzenie (hospitalizacja)",
-    pt: "Exacerbação grave (hospitalização)",
+  nl: {
+    stoppedMedications:   "Eerder gebruikte medicijnen",
+    noStoppedMedications: "Geen gestopte medicijnen geregistreerd",
+    sideEffects:          "Bijwerkingen",
+    ineffective:          "Niet effectief",
+    doctorChange:         "Arts veranderde medicatie",
+    cost:                 "Te duur",
+    completedCourse:      "Kuur voltooid",
+    otherReason:          "Anders",
+    notSpecified:         "Niet gespecificeerd",
+    started:              "Gestart",
+    days:                 "dagen",
+    dose:                 "Dosis",
+    timesLogged:          "keer geregistreerd",
   },
-  pdfHospitalization: {
-    no: "sykehusinnleggelse",
-    en: "hospitalization",
-    nl: "ziekenhuisopname",
-    fr: "hospitalisation",
-    de: "Krankenhausaufnahme",
-    it: "ospedalizzazione",
-    sv: "sjukhusvistelse",
-    da: "indlæggelse",
-    fi: "sairaalahoito",
-    es: "hospitalización",
-    pl: "hospitalizacja",
-    pt: "hospitalização",
+  fr: {
+    stoppedMedications:   "Médicaments précédemment utilisés",
+    noStoppedMedications: "Aucun médicament arrêté enregistré",
+    sideEffects:          "Effets secondaires",
+    ineffective:          "Inefficace",
+    doctorChange:         "Médecin a changé le médicament",
+    cost:                 "Trop cher",
+    completedCourse:      "Cure terminée",
+    otherReason:          "Autre",
+    notSpecified:         "Non spécifié",
+    started:              "Commencé",
+    days:                 "jours",
+    dose:                 "Dose",
+    timesLogged:          "fois enregistré",
   },
-  pdfAsthmaStatus: {
-    no: "Astmastatus",
-    en: "Asthma status",
-    nl: "Astmastatus",
-    fr: "Statut asthme",
-    de: "Asthmastatus",
-    it: "Stato asma",
-    sv: "Astmastatus",
-    da: "Astmastatus",
-    fi: "Astmatila",
-    es: "Estado del asma",
-    pl: "Status astmy",
-    pt: "Estado da asma",
+  de: {
+    stoppedMedications:   "Zuvor verwendete Medikamente",
+    noStoppedMedications: "Keine abgesetzten Medikamente erfasst",
+    sideEffects:          "Nebenwirkungen",
+    ineffective:          "Nicht wirksam",
+    doctorChange:         "Arzt hat Medikament geändert",
+    cost:                 "Zu teuer",
+    completedCourse:      "Kur abgeschlossen",
+    otherReason:          "Sonstiges",
+    notSpecified:         "Nicht angegeben",
+    started:              "Begonnen",
+    days:                 "Tage",
+    dose:                 "Dosis",
+    timesLogged:          "mal protokolliert",
   },
-  pdfAsthmaDiagnosed: {
-    no: "Diagnostisert med astma av lege",
-    en: "Diagnosed with asthma by a doctor",
-    nl: "Gediagnosticeerd met astma door een arts",
-    fr: "Diagnostiqué asthmatique par un médecin",
-    de: "Vom Arzt mit Asthma diagnostiziert",
-    it: "Diagnosticato asmatico da un medico",
-    sv: "Diagnostiserad med astma av läkare",
-    da: "Diagnosticeret med astma af læge",
-    fi: "Lääkärin diagnosoima astma",
-    es: "Diagnosticado con asma por un médico",
-    pl: "Zdiagnozowana astma przez lekarza",
-    pt: "Diagnosticado com asma por um médico",
+  it: {
+    stoppedMedications:   "Farmaci precedentemente utilizzati",
+    noStoppedMedications: "Nessun farmaco interrotto registrato",
+    sideEffects:          "Effetti collaterali",
+    ineffective:          "Non efficace",
+    doctorChange:         "Il medico ha cambiato farmaco",
+    cost:                 "Troppo costoso",
+    completedCourse:      "Ciclo completato",
+    otherReason:          "Altro",
+    notSpecified:         "Non specificato",
+    started:              "Iniziato",
+    days:                 "giorni",
+    dose:                 "Dose",
+    timesLogged:          "volte registrato",
   },
-  pdfAsthmaNotDiagnosed: {
-    no: "Ikke diagnostisert med astma",
-    en: "Not diagnosed with asthma",
-    nl: "Niet gediagnosticeerd met astma",
-    fr: "Non diagnostiqué asthmatique",
-    de: "Kein Asthma diagnostiziert",
-    it: "Non diagnosticato asmatico",
-    sv: "Inte diagnostiserad med astma",
-    da: "Ikke diagnosticeret med astma",
-    fi: "Ei diagnosoitua astmaa",
-    es: "No diagnosticado con asma",
-    pl: "Brak diagnozy astmy",
-    pt: "Sem diagnóstico de asma",
+  sv: {
+    stoppedMedications:   "Tidigare använda mediciner",
+    noStoppedMedications: "Inga avslutade mediciner registrerade",
+    sideEffects:          "Biverkningar",
+    ineffective:          "Inte effektiv",
+    doctorChange:         "Läkare bytte medicin",
+    cost:                 "För dyrt",
+    completedCourse:      "Kur avslutad",
+    otherReason:          "Annat",
+    notSpecified:         "Inte angivet",
+    started:              "Påbörjad",
+    days:                 "dagar",
+    dose:                 "Dos",
+    timesLogged:          "gånger loggad",
   },
-  pdfVapingStatus: {
-    no: "Dampestatus",
-    en: "Vaping status",
-    nl: "Dampstatus",
-    fr: "Statut vapotage",
-    de: "Dampferstatus",
-    it: "Stato svapo",
-    sv: "Dampningsstatus",
-    da: "Dampestatus",
-    fi: "Höyrytystila",
-    es: "Estado del vapeo",
-    pl: "Status vapowania",
-    pt: "Estado do vaporizador",
+  da: {
+    stoppedMedications:   "Tidligere anvendte medicin",
+    noStoppedMedications: "Ingen stoppede medicin registreret",
+    sideEffects:          "Bivirkninger",
+    ineffective:          "Ikke effektiv",
+    doctorChange:         "Lægen ændrede medicin",
+    cost:                 "For dyrt",
+    completedCourse:      "Kur gennemført",
+    otherReason:          "Andet",
+    notSpecified:         "Ikke specificeret",
+    started:              "Startet",
+    days:                 "dage",
+    dose:                 "Dosis",
+    timesLogged:          "gange logget",
   },
-  pdfNonVaper: {
-    no: "Aldri dampet",
-    en: "Non-vaper",
-    nl: "Niet-damper",
-    fr: "Non-vapoteur",
-    de: "Nicht-Dampfer",
-    it: "Non svapatore",
-    sv: "Aldrig dampat",
-    da: "Aldrig dampet",
-    fi: "Ei höyryttele",
-    es: "No vapea",
-    pl: "Nie wapuje",
-    pt: "Não vaporiza",
+  fi: {
+    stoppedMedications:   "Aiemmin käytetyt lääkkeet",
+    noStoppedMedications: "Lopetettuja lääkkeitä ei ole rekisteröity",
+    sideEffects:          "Sivuvaikutukset",
+    ineffective:          "Ei tehokas",
+    doctorChange:         "Lääkäri vaihtoi lääkkeen",
+    cost:                 "Liian kallis",
+    completedCourse:      "Kuuri suoritettu",
+    otherReason:          "Muu",
+    notSpecified:         "Ei määritelty",
+    started:              "Aloitettu",
+    days:                 "päivää",
+    dose:                 "Annos",
+    timesLogged:          "kertaa kirjattu",
   },
-  pdfExVaper: {
-    no: "Tidligere dampet",
-    en: "Ex-vaper",
-    nl: "Ex-damper",
-    fr: "Ex-vapoteur",
-    de: "Ex-Dampfer",
-    it: "Ex svapatore",
-    sv: "Tidigare dampat",
-    da: "Tidligere dampet",
-    fi: "Entinen höyryttelijä",
-    es: "Ex-vapeador",
-    pl: "Były vaper",
-    pt: "Ex-vaporizador",
+  es: {
+    stoppedMedications:   "Medicamentos usados anteriormente",
+    noStoppedMedications: "No hay medicamentos suspendidos registrados",
+    sideEffects:          "Efectos secundarios",
+    ineffective:          "No efectivo",
+    doctorChange:         "El médico cambió el medicamento",
+    cost:                 "Demasiado caro",
+    completedCourse:      "Tratamiento completado",
+    otherReason:          "Otro",
+    notSpecified:         "No especificado",
+    started:              "Iniciado",
+    days:                 "días",
+    dose:                 "Dosis",
+    timesLogged:          "veces registrado",
   },
-  pdfCurrentVaper: {
-    no: "Damper nå",
-    en: "Current vaper",
-    nl: "Huidige damper",
-    fr: "Vapoteur actuel",
-    de: "Aktiver Dampfer",
-    it: "Svapatore attuale",
-    sv: "Dampar nu",
-    da: "Damper nu",
-    fi: "Höyryttää tällä hetkellä",
-    es: "Vapeador actual",
-    pl: "Aktualny vaper",
-    pt: "Vaporizador atual",
+  pl: {
+    stoppedMedications:   "Wcześniej stosowane leki",
+    noStoppedMedications: "Brak zarejestrowanych odstawionych leków",
+    sideEffects:          "Skutki uboczne",
+    ineffective:          "Nieskuteczny",
+    doctorChange:         "Lekarz zmienił lek",
+    cost:                 "Zbyt drogi",
+    completedCourse:      "Kuracja zakończona",
+    otherReason:          "Inne",
+    notSpecified:         "Nie określono",
+    started:              "Rozpoczęto",
+    days:                 "dni",
+    dose:                 "Dawka",
+    timesLogged:          "razy zarejestrowano",
   },
-  pdfHospitalizations: {
-    no: "sykehusinnleggelser",
-    en: "hospitalizations",
-    nl: "ziekenhuisopnames",
-    fr: "hospitalisations",
-    de: "Krankenhausaufnahmen",
-    it: "ospedalizzazioni",
-    sv: "sjukhusvistelser",
-    da: "indlæggelser",
-    fi: "sairaalahoidot",
-    es: "hospitalizaciones",
-    pl: "hospitalizacje",
-    pt: "hospitalizações",
+  pt: {
+    stoppedMedications:   "Medicamentos usados anteriormente",
+    noStoppedMedications: "Nenhum medicamento interrompido registado",
+    sideEffects:          "Efeitos secundários",
+    ineffective:          "Não eficaz",
+    doctorChange:         "Médico mudou o medicamento",
+    cost:                 "Demasiado caro",
+    completedCourse:      "Tratamento concluído",
+    otherReason:          "Outro",
+    notSpecified:         "Não especificado",
+    started:              "Iniciado",
+    days:                 "dias",
+    dose:                 "Dose",
+    timesLogged:          "vezes registado",
   },
 };
 
-const VALUES = {
-  no: "Symptomer siste 12 måneder",
-  en: "Symptoms last 12 months",
-  nl: "Symptomen afgelopen 12 maanden",
-  fr: "Symptômes au cours des 12 derniers mois",
-  de: "Symptome der letzten 12 Monate",
-  it: "Sintomi negli ultimi 12 mesi",
-  sv: "Symtom de senaste 12 månaderna",
-  da: "Symptomer de seneste 12 måneder",
-  fi: "Oireet viimeisen 12 kuukauden aikana",
-  es: "Síntomas en los últimos 12 meses",
-  pl: "Objawy w ciągu ostatnich 12 miesięcy",
-  pt: "Sintomas nos últimos 12 meses",
-};
+// ── Patch logic ──────────────────────────────────────────────────────────────
+function escapeValue(val) {
+  // Escape backslashes and single quotes; preserve literal newlines
+  return val.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n");
+}
 
-let updated = 0;
+function buildInsertBlock(keys) {
+  return Object.entries(keys)
+    .map(([k, v]) => `    ${k}: '${escapeValue(v)}',`)
+    .join("\n");
+}
 
-for (const [lang, value] of Object.entries(VALUES)) {
-  const filePath = path.join(MESSAGES_DIR, `${lang}.json`);
+if (!fs.existsSync(TRANSLATIONS_PATH)) {
+  console.error(`✗  File not found: ${TRANSLATIONS_PATH}`);
+  process.exit(1);
+}
 
-  if (!fs.existsSync(filePath)) {
-    console.warn(`⚠️  Not found: ${filePath} — skipping`);
+let content = fs.readFileSync(TRANSLATIONS_PATH, "utf8");
+let injected = 0;
+let skipped  = 0;
+
+for (const [lang, keys] of Object.entries(NEW_KEYS)) {
+  // Find the opening of this language block: "  en: {" or "  en:{"
+  const langRegex = new RegExp(`(\\n  ${lang}:\\s*\\{)`);
+  const match = langRegex.exec(content);
+  if (!match) {
+    console.warn(`⚠️  Language block '${lang}' not found — skipping`);
     continue;
   }
 
-  const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-  // Add new key
-  data[NEW_KEY] = value;
-
-  // Remove old key if it exists
-  if (OLD_KEY in data) {
-    delete data[OLD_KEY];
-    console.log(`  removed old key "${OLD_KEY}" from ${lang}.json`);
+  // Find the matching closing brace for this language block
+  const blockStart = match.index;
+  let depth = 0, blockEnd = -1, inBlock = false;
+  for (let i = blockStart; i < content.length; i++) {
+    if (content[i] === "{") { depth++; inBlock = true; }
+    else if (content[i] === "}") {
+      depth--;
+      if (inBlock && depth === 0) { blockEnd = i; break; }
+    }
+  }
+  if (blockEnd === -1) {
+    console.warn(`⚠️  Could not find closing brace for '${lang}' — skipping`);
+    continue;
   }
 
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
-  console.log(`✓  ${lang}.json  →  "${value}"`);
-  updated++;
-}
+  const blockContent = content.slice(blockStart, blockEnd);
 
-// Apply extra keys to all language files
-for (const [key, langMap] of Object.entries(EXTRA_KEYS)) {
-  for (const [lang, value] of Object.entries(langMap)) {
-    const filePath = path.join(MESSAGES_DIR, `${lang}.json`);
-    if (!fs.existsSync(filePath)) continue;
-    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    data[key] = value;
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
+  // Filter out keys that already exist in this block
+  const newKeys = Object.fromEntries(
+    Object.entries(keys).filter(([k]) => {
+      const exists = new RegExp(`\\b${k}\\s*:`).test(blockContent);
+      if (exists) skipped++;
+      return !exists;
+    })
+  );
+
+  if (Object.keys(newKeys).length === 0) {
+    console.log(`✓  ${lang}: all keys already present`);
+    continue;
   }
-}
-console.log(`Added extra exacerbation keys to all language files.`);
 
-console.log(`\nDone. Updated ${updated} files.`);
+  const insertBlock = "\n" + buildInsertBlock(newKeys);
+  // Insert just before the closing brace of this language block
+  content =
+    content.slice(0, blockEnd) +
+    insertBlock +
+    "\n  " +
+    content.slice(blockEnd);
+  injected += Object.keys(newKeys).length;
+  console.log(`✓  ${lang}: added ${Object.keys(newKeys).length} keys`);
+}
+
+fs.writeFileSync(TRANSLATIONS_PATH, content, "utf8");
+console.log(`\nDone — ${injected} keys injected, ${skipped} already existed.`);

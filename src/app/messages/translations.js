@@ -332,6 +332,19 @@ const translations = {
     pdfAsthmaStatus: "Asthma status",
     pdfAsthmaDiagnosed: "Diagnosed with asthma by a doctor",
     pdfAsthmaNotDiagnosed: "Not diagnosed with asthma",
+  
+    stoppedMedications: 'Previously used medications',
+    noStoppedMedications: 'No stopped medications recorded',
+    sideEffects: 'Side effects',
+    ineffective: 'Not effective',
+    doctorChange: 'Doctor changed medication',
+    cost: 'Too expensive',
+    completedCourse: 'Completed course',
+    otherReason: 'Other',
+    notSpecified: 'Not specified',
+    started: 'Started',
+    dose: 'Dose',
+    timesLogged: 'times logged',
   },
 
   no: {
@@ -662,6 +675,19 @@ const translations = {
     pdfAsthmaStatus: "Astmastatus",
     pdfAsthmaDiagnosed: "Diagnostisert med astma av lege",
     pdfAsthmaNotDiagnosed: "Ikke diagnostisert med astma",
+  
+    stoppedMedications: 'Tidligere brukte medisiner',
+    noStoppedMedications: 'Ingen sluttede medisiner registrert',
+    sideEffects: 'Bivirkninger',
+    ineffective: 'Ikke effektiv',
+    doctorChange: 'Lege endret medisin',
+    cost: 'For dyrt',
+    completedCourse: 'Fullført kur',
+    otherReason: 'Annet',
+    notSpecified: 'Ikke spesifisert',
+    started: 'Startet',
+    dose: 'Dose',
+    timesLogged: 'ganger logget',
   },
 
   nl: {
@@ -817,6 +843,19 @@ const translations = {
     now: "nu",
     current: "nu",
     downloadPdf: "PDF downloaden",
+  
+    stoppedMedications: 'Eerder gebruikte medicijnen',
+    noStoppedMedications: 'Geen gestopte medicijnen geregistreerd',
+    sideEffects: 'Bijwerkingen',
+    ineffective: 'Niet effectief',
+    doctorChange: 'Arts veranderde medicatie',
+    cost: 'Te duur',
+    completedCourse: 'Kuur voltooid',
+    otherReason: 'Anders',
+    notSpecified: 'Niet gespecificeerd',
+    started: 'Gestart',
+    dose: 'Dosis',
+    timesLogged: 'keer geregistreerd',
   },
 
   fr: {
@@ -972,6 +1011,19 @@ const translations = {
     now: "maintenant",
     current: "maintenant",
     downloadPdf: "Télécharger PDF",
+  
+    stoppedMedications: 'Médicaments précédemment utilisés',
+    noStoppedMedications: 'Aucun médicament arrêté enregistré',
+    sideEffects: 'Effets secondaires',
+    ineffective: 'Inefficace',
+    doctorChange: 'Médecin a changé le médicament',
+    cost: 'Trop cher',
+    completedCourse: 'Cure terminée',
+    otherReason: 'Autre',
+    notSpecified: 'Non spécifié',
+    started: 'Commencé',
+    dose: 'Dose',
+    timesLogged: 'fois enregistré',
   },
 
   de: {
@@ -1127,6 +1179,19 @@ const translations = {
     now: "jetzt",
     current: "jetzt",
     downloadPdf: "PDF herunterladen",
+  
+    stoppedMedications: 'Zuvor verwendete Medikamente',
+    noStoppedMedications: 'Keine abgesetzten Medikamente erfasst',
+    sideEffects: 'Nebenwirkungen',
+    ineffective: 'Nicht wirksam',
+    doctorChange: 'Arzt hat Medikament geändert',
+    cost: 'Zu teuer',
+    completedCourse: 'Kur abgeschlossen',
+    otherReason: 'Sonstiges',
+    notSpecified: 'Nicht angegeben',
+    started: 'Begonnen',
+    dose: 'Dosis',
+    timesLogged: 'mal protokolliert',
   },
 
   it: {
@@ -1282,6 +1347,19 @@ const translations = {
     now: "ora",
     current: "ora",
     downloadPdf: "Scarica PDF",
+  
+    stoppedMedications: 'Farmaci precedentemente utilizzati',
+    noStoppedMedications: 'Nessun farmaco interrotto registrato',
+    sideEffects: 'Effetti collaterali',
+    ineffective: 'Non efficace',
+    doctorChange: 'Il medico ha cambiato farmaco',
+    cost: 'Troppo costoso',
+    completedCourse: 'Ciclo completato',
+    otherReason: 'Altro',
+    notSpecified: 'Non specificato',
+    started: 'Iniziato',
+    dose: 'Dose',
+    timesLogged: 'volte registrato',
   },
 
   sv: {
@@ -1437,6 +1515,19 @@ const translations = {
     now: "nu",
     current: "nu",
     downloadPdf: "Ladda ner PDF",
+  
+    stoppedMedications: 'Tidigare använda mediciner',
+    noStoppedMedications: 'Inga avslutade mediciner registrerade',
+    sideEffects: 'Biverkningar',
+    ineffective: 'Inte effektiv',
+    doctorChange: 'Läkare bytte medicin',
+    cost: 'För dyrt',
+    completedCourse: 'Kur avslutad',
+    otherReason: 'Annat',
+    notSpecified: 'Inte angivet',
+    started: 'Påbörjad',
+    dose: 'Dos',
+    timesLogged: 'gånger loggad',
   },
 
   da: {
@@ -1592,6 +1683,19 @@ const translations = {
     now: "nu",
     current: "nu",
     downloadPdf: "Download PDF",
+  
+    stoppedMedications: 'Tidligere anvendte medicin',
+    noStoppedMedications: 'Ingen stoppede medicin registreret',
+    sideEffects: 'Bivirkninger',
+    ineffective: 'Ikke effektiv',
+    doctorChange: 'Lægen ændrede medicin',
+    cost: 'For dyrt',
+    completedCourse: 'Kur gennemført',
+    otherReason: 'Andet',
+    notSpecified: 'Ikke specificeret',
+    started: 'Startet',
+    dose: 'Dosis',
+    timesLogged: 'gange logget',
   },
 
   fi: {
@@ -1747,6 +1851,19 @@ const translations = {
     now: "nyt",
     current: "nyt",
     downloadPdf: "Lataa PDF",
+  
+    stoppedMedications: 'Aiemmin käytetyt lääkkeet',
+    noStoppedMedications: 'Lopetettuja lääkkeitä ei ole rekisteröity',
+    sideEffects: 'Sivuvaikutukset',
+    ineffective: 'Ei tehokas',
+    doctorChange: 'Lääkäri vaihtoi lääkkeen',
+    cost: 'Liian kallis',
+    completedCourse: 'Kuuri suoritettu',
+    otherReason: 'Muu',
+    notSpecified: 'Ei määritelty',
+    started: 'Aloitettu',
+    dose: 'Annos',
+    timesLogged: 'kertaa kirjattu',
   },
 
   es: {
@@ -1902,6 +2019,19 @@ const translations = {
     now: "ahora",
     current: "ahora",
     downloadPdf: "Descargar PDF",
+  
+    stoppedMedications: 'Medicamentos usados anteriormente',
+    noStoppedMedications: 'No hay medicamentos suspendidos registrados',
+    sideEffects: 'Efectos secundarios',
+    ineffective: 'No efectivo',
+    doctorChange: 'El médico cambió el medicamento',
+    cost: 'Demasiado caro',
+    completedCourse: 'Tratamiento completado',
+    otherReason: 'Otro',
+    notSpecified: 'No especificado',
+    started: 'Iniciado',
+    dose: 'Dosis',
+    timesLogged: 'veces registrado',
   },
 
   pl: {
@@ -2057,6 +2187,19 @@ const translations = {
     now: "teraz",
     current: "teraz",
     downloadPdf: "Pobierz PDF",
+  
+    stoppedMedications: 'Wcześniej stosowane leki',
+    noStoppedMedications: 'Brak zarejestrowanych odstawionych leków',
+    sideEffects: 'Skutki uboczne',
+    ineffective: 'Nieskuteczny',
+    doctorChange: 'Lekarz zmienił lek',
+    cost: 'Zbyt drogi',
+    completedCourse: 'Kuracja zakończona',
+    otherReason: 'Inne',
+    notSpecified: 'Nie określono',
+    started: 'Rozpoczęto',
+    dose: 'Dawka',
+    timesLogged: 'razy zarejestrowano',
   },
 
   pt: {
@@ -2212,6 +2355,19 @@ const translations = {
     now: "agora",
     current: "agora",
     downloadPdf: "Descarregar PDF",
+  
+    stoppedMedications: 'Medicamentos usados anteriormente',
+    noStoppedMedications: 'Nenhum medicamento interrompido registado',
+    sideEffects: 'Efeitos secundários',
+    ineffective: 'Não eficaz',
+    doctorChange: 'Médico mudou o medicamento',
+    cost: 'Demasiado caro',
+    completedCourse: 'Tratamento concluído',
+    otherReason: 'Outro',
+    notSpecified: 'Não especificado',
+    started: 'Iniciado',
+    dose: 'Dose',
+    timesLogged: 'vezes registado',
   },
 };
 

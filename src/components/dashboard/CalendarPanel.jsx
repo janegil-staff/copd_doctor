@@ -66,10 +66,10 @@ function MedicineIcon() {
       title="Medicine used this week"
       style={{
         position: "absolute",
-        right: -6,
-        top: -5,
-        width: 16,
-        height: 16,
+        right: -4,
+        top: 0,
+        width: 13,
+        height: 13,
         zIndex: 10,
         pointerEvents: "none",
         filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
@@ -91,10 +91,10 @@ function ExerciseIcon() {
       title="Physical activity this week"
       style={{
         position: "absolute",
-        right: -6,
-        bottom: -5,
-        width: 16,
-        height: 16,
+        right: -4,
+        bottom: 0,
+        width: 13,
+        height: 13,
         zIndex: 10,
         pointerEvents: "none",
         filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
@@ -282,7 +282,7 @@ export default function CalendarPanel({
       </div>
 
       {/* Week rows — add left+right padding so triangles and icons have space */}
-      <div style={{ paddingLeft: 26, paddingRight: 10, display: "flex", flexDirection: "column", gap: 7 }}>
+      <div style={{ paddingLeft: 26, paddingRight: 8, display: "flex", flexDirection: "column", gap: 2 }}>
         {(() => {
           const rows = [];
           const seen = new Set();
