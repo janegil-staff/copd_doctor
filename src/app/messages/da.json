@@ -203,7 +203,15 @@
     "November",
     "December"
   ],
-  "days": ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"],
+  "days": [
+    "Man",
+    "Tir",
+    "Ons",
+    "Tor",
+    "Fre",
+    "Lør",
+    "Søn"
+  ],
   "downloadSummaryPdf": "Download oversigt PDF",
   "summaryReport": "KOL oversigt",
   "generating": "Genererer…",
@@ -310,5 +318,18 @@
   "pdfExacerbationsPast12": "Eksacerbationer de seneste 12 måneder",
   "pdfAsthmaStatus": "Astmastatus",
   "pdfAsthmaDiagnosed": "Diagnosticeret med astma af læge",
-  "pdfAsthmaNotDiagnosed": "Ikke diagnosticeret med astma"
+  "pdfAsthmaNotDiagnosed": "Ikke diagnosticeret med astma",
+  "stoppedMedications": "Tidligere anvendt medicin",
+  "noStoppedMedications": "Ingen stoppede medicin registreret",
+  "sideEffects": "Bivirkninger",
+  "ineffective": "Ikke effektiv",
+  "doctorChange": "Lægen ændrede medicin",
+  "cost": "For dyrt",
+  "completedCourse": "Kur gennemført",
+  "otherReason": "Andet",
+  "notSpecified": "Ikke specificeret",
+  "started": "Startet",
+  "daysLabel": "dage",
+  "dose": "Dosis",
+  "timesLogged": "gange logget"
 }

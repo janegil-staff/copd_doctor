@@ -727,7 +727,7 @@ function StoppedMedicationsList({ t, userMedicines }) {
                   </span>
                   {days != null && (
                     <span>
-                      · {days} {t.days ?? "days"}
+                      · {days} {t.daysLabel ?? "days"}
                     </span>
                   )}
                   {med.atcCode && <span>· {med.atcCode}</span>}

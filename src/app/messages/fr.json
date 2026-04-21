@@ -318,5 +318,18 @@
   "pdfExacerbationsPast12": "Exacerbations au cours des 12 derniers mois",
   "pdfAsthmaStatus": "Statut asthme",
   "pdfAsthmaDiagnosed": "Diagnostiqué asthmatique par un médecin",
-  "pdfAsthmaNotDiagnosed": "Non diagnostiqué asthmatique"
+  "pdfAsthmaNotDiagnosed": "Non diagnostiqué asthmatique",
+  "stoppedMedications": "Médicaments précédemment utilisés",
+  "noStoppedMedications": "Aucun médicament arrêté enregistré",
+  "sideEffects": "Effets secondaires",
+  "ineffective": "Inefficace",
+  "doctorChange": "Médecin a changé le médicament",
+  "cost": "Trop cher",
+  "completedCourse": "Cure terminée",
+  "otherReason": "Autre",
+  "notSpecified": "Non spécifié",
+  "started": "Commencé",
+  "daysLabel": "jours",
+  "dose": "Dose",
+  "timesLogged": "fois enregistré"
 }

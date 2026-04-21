@@ -203,7 +203,15 @@
     "Novembre",
     "Dicembre"
   ],
-  "days": ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"],
+  "days": [
+    "Lun",
+    "Mar",
+    "Mer",
+    "Gio",
+    "Ven",
+    "Sab",
+    "Dom"
+  ],
   "downloadSummaryPdf": "Scarica PDF riepilogo",
   "summaryReport": "Riepilogo BPCO",
   "generating": "Generazione…",
@@ -310,5 +318,18 @@
   "pdfExacerbationsPast12": "Riacutizzazioni negli ultimi 12 mesi",
   "pdfAsthmaStatus": "Stato asma",
   "pdfAsthmaDiagnosed": "Diagnosticato asmatico da un medico",
-  "pdfAsthmaNotDiagnosed": "Non diagnosticato asmatico"
+  "pdfAsthmaNotDiagnosed": "Non diagnosticato asmatico",
+  "stoppedMedications": "Farmaci precedentemente utilizzati",
+  "noStoppedMedications": "Nessun farmaco interrotto registrato",
+  "sideEffects": "Effetti collaterali",
+  "ineffective": "Non efficace",
+  "doctorChange": "Il medico ha cambiato farmaco",
+  "cost": "Troppo costoso",
+  "completedCourse": "Ciclo completato",
+  "otherReason": "Altro",
+  "notSpecified": "Non specificato",
+  "started": "Iniziato",
+  "daysLabel": "giorni",
+  "dose": "Dose",
+  "timesLogged": "volte registrato"
 }

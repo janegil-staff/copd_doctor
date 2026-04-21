@@ -318,5 +318,18 @@
   "pdfAsthmaStatus": "Astmastatus",
   "pdfAsthmaDiagnosed": "Diagnostisert med astma av lege",
   "pdfAsthmaNotDiagnosed": "Ikke diagnostisert med astma",
-  "patientInformation": "Pasientinformasjon"
+  "patientInformation": "Pasientinformasjon",
+  "stoppedMedications": "Tidligere brukte medisiner",
+  "noStoppedMedications": "Ingen sluttede medisiner registrert",
+  "sideEffects": "Bivirkninger",
+  "ineffective": "Ikke effektiv",
+  "doctorChange": "Lege endret medisin",
+  "cost": "For dyrt",
+  "completedCourse": "Fullført kur",
+  "otherReason": "Annet",
+  "notSpecified": "Ikke spesifisert",
+  "started": "Startet",
+  "daysLabel": "dager",
+  "dose": "Dose",
+  "timesLogged": "ganger logget"
 }

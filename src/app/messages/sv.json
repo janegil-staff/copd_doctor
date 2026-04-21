@@ -318,5 +318,18 @@
   "pdfExacerbationsPast12": "Exacerbationer de senaste 12 månaderna",
   "pdfAsthmaStatus": "Astmastatus",
   "pdfAsthmaDiagnosed": "Diagnostiserad med astma av läkare",
-  "pdfAsthmaNotDiagnosed": "Inte diagnostiserad med astma"
+  "pdfAsthmaNotDiagnosed": "Inte diagnostiserad med astma",
+  "stoppedMedications": "Tidigare använda mediciner",
+  "noStoppedMedications": "Inga avslutade mediciner registrerade",
+  "sideEffects": "Biverkningar",
+  "ineffective": "Inte effektiv",
+  "doctorChange": "Läkare bytte medicin",
+  "cost": "För dyrt",
+  "completedCourse": "Kur avslutad",
+  "otherReason": "Annat",
+  "notSpecified": "Inte angivet",
+  "started": "Påbörjad",
+  "daysLabel": "dagar",
+  "dose": "Dos",
+  "timesLogged": "gånger loggad"
 }

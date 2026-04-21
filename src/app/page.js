@@ -7,7 +7,7 @@ import Headline from "@/components/home/Headline";
 import ImportCard from "@/components/home/ImportCard";
 import PhoneShowcase from "@/components/home/PhoneShowcase";
 import HomeFooter from "@/components/home/HomeFooter";
-import { getT } from "@/app/messages/translations";
+import { getT } from "@/translations/translations-old";
 
 const COUNTRIES = [
   { code: "no", label: "Norway",      flag: "🇳🇴" },

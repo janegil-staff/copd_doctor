@@ -318,5 +318,18 @@
   "pdfExacerbationsPast12": "Pahenemisvaiheet viimeisen 12 kuukauden aikana",
   "pdfAsthmaStatus": "Astmatila",
   "pdfAsthmaDiagnosed": "Lääkärin diagnosoima astma",
-  "pdfAsthmaNotDiagnosed": "Ei diagnosoitua astmaa"
+  "pdfAsthmaNotDiagnosed": "Ei diagnosoitua astmaa",
+  "stoppedMedications": "Aiemmin käytetyt lääkkeet",
+  "noStoppedMedications": "Lopetettuja lääkkeitä ei ole rekisteröity",
+  "sideEffects": "Sivuvaikutukset",
+  "ineffective": "Ei tehokas",
+  "doctorChange": "Lääkäri vaihtoi lääkkeen",
+  "cost": "Liian kallis",
+  "completedCourse": "Kuuri suoritettu",
+  "otherReason": "Muu",
+  "notSpecified": "Ei määritelty",
+  "started": "Aloitettu",
+  "daysLabel": "päivää",
+  "dose": "Annos",
+  "timesLogged": "kertaa kirjattu"
 }

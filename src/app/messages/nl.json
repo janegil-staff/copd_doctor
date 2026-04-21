@@ -318,5 +318,18 @@
   "pdfExacerbationsPast12": "Exacerbaties afgelopen 12 maanden",
   "pdfAsthmaStatus": "Astmastatus",
   "pdfAsthmaDiagnosed": "Gediagnosticeerd met astma door een arts",
-  "pdfAsthmaNotDiagnosed": "Niet gediagnosticeerd met astma"
+  "pdfAsthmaNotDiagnosed": "Niet gediagnosticeerd met astma",
+  "stoppedMedications": "Eerder gebruikte medicijnen",
+  "noStoppedMedications": "Geen gestopte medicijnen geregistreerd",
+  "sideEffects": "Bijwerkingen",
+  "ineffective": "Niet effectief",
+  "doctorChange": "Arts veranderde medicatie",
+  "cost": "Te duur",
+  "completedCourse": "Kuur voltooid",
+  "otherReason": "Anders",
+  "notSpecified": "Niet gespecificeerd",
+  "started": "Gestart",
+  "daysLabel": "dagen",
+  "dose": "Dosis",
+  "timesLogged": "keer geregistreerd"
 }

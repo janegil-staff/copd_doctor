@@ -2,19 +2,24 @@
 /**
  * patch_translations.js
  *
- * Adds stopped-medication keys to all 12 language blocks in src/translations.js.
- * Skips keys that are already present. Safe to run multiple times.
+ * Adds stopped-medication keys to the 12 language JSON files in
+ * src/app/messages (or the directory you pass as the first arg).
+ *
+ * - Skips keys that already exist (idempotent — safe to re-run)
+ * - Preserves existing key order (new keys are appended to the end)
+ * - Writes pretty-printed JSON with 2-space indent + trailing newline
  *
  * Usage:
- *   node patch_translations.js                     # defaults to src/translations.js
- *   node patch_translations.js path/to/translations.js
+ *   node patch_translations.js                         # default src/app/messages
+ *   node patch_translations.js src/app/messages        # custom directory
+ *   node patch_translations.js public/locales          # alternate layout
  */
 
 const fs   = require("fs");
 const path = require("path");
 
-const TRANSLATIONS_PATH =
-  process.argv[2] ?? path.join(__dirname, "src", "app", "messages", "translations.js");
+const MESSAGES_DIR =
+  process.argv[2] ?? path.join(__dirname, "src", "app", "messages");
 
 // ── Keys to add, per language ────────────────────────────────────────────────
 const NEW_KEYS = {
@@ -29,7 +34,7 @@ const NEW_KEYS = {
     otherReason:          "Annet",
     notSpecified:         "Ikke spesifisert",
     started:              "Startet",
-    days:                 "dager",
+    daysLabel:            "dager",
     dose:                 "Dose",
     timesLogged:          "ganger logget",
   },
@@ -44,7 +49,7 @@ const NEW_KEYS = {
     otherReason:          "Other",
     notSpecified:         "Not specified",
     started:              "Started",
-    days:                 "days",
+    daysLabel:            "days",
     dose:                 "Dose",
     timesLogged:          "times logged",
   },
@@ -59,7 +64,7 @@ const NEW_KEYS = {
     otherReason:          "Anders",
     notSpecified:         "Niet gespecificeerd",
     started:              "Gestart",
-    days:                 "dagen",
+    daysLabel:            "dagen",
     dose:                 "Dosis",
     timesLogged:          "keer geregistreerd",
   },
@@ -74,7 +79,7 @@ const NEW_KEYS = {
     otherReason:          "Autre",
     notSpecified:         "Non spécifié",
     started:              "Commencé",
-    days:                 "jours",
+    daysLabel:            "jours",
     dose:                 "Dose",
     timesLogged:          "fois enregistré",
   },
@@ -89,7 +94,7 @@ const NEW_KEYS = {
     otherReason:          "Sonstiges",
     notSpecified:         "Nicht angegeben",
     started:              "Begonnen",
-    days:                 "Tage",
+    daysLabel:            "Tage",
     dose:                 "Dosis",
     timesLogged:          "mal protokolliert",
   },
@@ -104,7 +109,7 @@ const NEW_KEYS = {
     otherReason:          "Altro",
     notSpecified:         "Non specificato",
     started:              "Iniziato",
-    days:                 "giorni",
+    daysLabel:            "giorni",
     dose:                 "Dose",
     timesLogged:          "volte registrato",
   },
@@ -119,12 +124,12 @@ const NEW_KEYS = {
     otherReason:          "Annat",
     notSpecified:         "Inte angivet",
     started:              "Påbörjad",
-    days:                 "dagar",
+    daysLabel:            "dagar",
     dose:                 "Dos",
     timesLogged:          "gånger loggad",
   },
   da: {
-    stoppedMedications:   "Tidligere anvendte medicin",
+    stoppedMedications:   "Tidligere anvendt medicin",
     noStoppedMedications: "Ingen stoppede medicin registreret",
     sideEffects:          "Bivirkninger",
     ineffective:          "Ikke effektiv",
@@ -134,7 +139,7 @@ const NEW_KEYS = {
     otherReason:          "Andet",
     notSpecified:         "Ikke specificeret",
     started:              "Startet",
-    days:                 "dage",
+    daysLabel:            "dage",
     dose:                 "Dosis",
     timesLogged:          "gange logget",
   },
@@ -149,7 +154,7 @@ const NEW_KEYS = {
     otherReason:          "Muu",
     notSpecified:         "Ei määritelty",
     started:              "Aloitettu",
-    days:                 "päivää",
+    daysLabel:            "päivää",
     dose:                 "Annos",
     timesLogged:          "kertaa kirjattu",
   },
@@ -164,7 +169,7 @@ const NEW_KEYS = {
     otherReason:          "Otro",
     notSpecified:         "No especificado",
     started:              "Iniciado",
-    days:                 "días",
+    daysLabel:            "días",
     dose:                 "Dosis",
     timesLogged:          "veces registrado",
   },
@@ -179,7 +184,7 @@ const NEW_KEYS = {
     otherReason:          "Inne",
     notSpecified:         "Nie określono",
     started:              "Rozpoczęto",
-    days:                 "dni",
+    daysLabel:            "dni",
     dose:                 "Dawka",
     timesLogged:          "razy zarejestrowano",
   },
@@ -194,83 +199,68 @@ const NEW_KEYS = {
     otherReason:          "Outro",
     notSpecified:         "Não especificado",
     started:              "Iniciado",
-    days:                 "dias",
+    daysLabel:            "dias",
     dose:                 "Dose",
     timesLogged:          "vezes registado",
   },
 };
 
 // ── Patch logic ──────────────────────────────────────────────────────────────
-function escapeValue(val) {
-  // Escape backslashes and single quotes; preserve literal newlines
-  return val.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n");
-}
-
-function buildInsertBlock(keys) {
-  return Object.entries(keys)
-    .map(([k, v]) => `    ${k}: '${escapeValue(v)}',`)
-    .join("\n");
-}
-
-if (!fs.existsSync(TRANSLATIONS_PATH)) {
-  console.error(`✗  File not found: ${TRANSLATIONS_PATH}`);
+if (!fs.existsSync(MESSAGES_DIR)) {
+  console.error(`✗  Directory not found: ${MESSAGES_DIR}`);
+  console.error(`   Pass the correct path as the first argument, e.g.:`);
+  console.error(`   node patch_translations.js src/app/messages`);
   process.exit(1);
 }
 
-let content = fs.readFileSync(TRANSLATIONS_PATH, "utf8");
-let injected = 0;
-let skipped  = 0;
+let totalInjected = 0;
+let totalSkipped  = 0;
+let filesUpdated  = 0;
 
 for (const [lang, keys] of Object.entries(NEW_KEYS)) {
-  // Find the opening of this language block: "  en: {" or "  en:{"
-  const langRegex = new RegExp(`(\\n  ${lang}:\\s*\\{)`);
-  const match = langRegex.exec(content);
-  if (!match) {
-    console.warn(`⚠️  Language block '${lang}' not found — skipping`);
+  const filePath = path.join(MESSAGES_DIR, `${lang}.json`);
+
+  if (!fs.existsSync(filePath)) {
+    console.warn(`⚠️  ${lang}.json not found — skipping`);
     continue;
   }
 
-  // Find the matching closing brace for this language block
-  const blockStart = match.index;
-  let depth = 0, blockEnd = -1, inBlock = false;
-  for (let i = blockStart; i < content.length; i++) {
-    if (content[i] === "{") { depth++; inBlock = true; }
-    else if (content[i] === "}") {
-      depth--;
-      if (inBlock && depth === 0) { blockEnd = i; break; }
+  let data;
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    data = JSON.parse(raw);
+  } catch (err) {
+    console.error(`✗  ${lang}.json is not valid JSON — ${err.message}`);
+    continue;
+  }
+
+  let addedCount   = 0;
+  let skippedCount = 0;
+
+  for (const [key, value] of Object.entries(keys)) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      skippedCount++;
+    } else {
+      data[key] = value;
+      addedCount++;
     }
   }
-  if (blockEnd === -1) {
-    console.warn(`⚠️  Could not find closing brace for '${lang}' — skipping`);
+
+  if (addedCount === 0) {
+    console.log(`✓  ${lang}.json: all keys already present`);
+    totalSkipped += skippedCount;
     continue;
   }
 
-  const blockContent = content.slice(blockStart, blockEnd);
+  // Write back with stable 2-space indent + trailing newline
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
+  console.log(`✓  ${lang}.json: added ${addedCount} keys${skippedCount ? ` (${skippedCount} already present)` : ""}`);
 
-  // Filter out keys that already exist in this block
-  const newKeys = Object.fromEntries(
-    Object.entries(keys).filter(([k]) => {
-      const exists = new RegExp(`\\b${k}\\s*:`).test(blockContent);
-      if (exists) skipped++;
-      return !exists;
-    })
-  );
-
-  if (Object.keys(newKeys).length === 0) {
-    console.log(`✓  ${lang}: all keys already present`);
-    continue;
-  }
-
-  const insertBlock = "\n" + buildInsertBlock(newKeys);
-  // Insert just before the closing brace of this language block
-  content =
-    content.slice(0, blockEnd) +
-    insertBlock +
-    "\n  " +
-    content.slice(blockEnd);
-  injected += Object.keys(newKeys).length;
-  console.log(`✓  ${lang}: added ${Object.keys(newKeys).length} keys`);
+  totalInjected += addedCount;
+  totalSkipped  += skippedCount;
+  filesUpdated++;
 }
 
-fs.writeFileSync(TRANSLATIONS_PATH, content, "utf8");
-console.log(`\nDone — ${injected} keys injected, ${skipped} already existed.`);
+console.log(
+  `\nDone — ${totalInjected} keys injected across ${filesUpdated} files, ${totalSkipped} already existed.`
+);

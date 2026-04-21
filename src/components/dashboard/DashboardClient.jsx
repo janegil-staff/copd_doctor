@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
-import { getT } from "@/app/messages/translations";
+import { getT } from "@/translations/translations-old";
 import CalendarPanel from "@/components/dashboard/CalendarPanel";
 import DayDetailDrawer from "@/components/dashboard/DayDetailDrawer";
 import Sidebar from "@/components/dashboard/Sidebar";

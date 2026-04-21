@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
-import { getT } from "@/app/messages/translations";
+import { getT } from "@/translations/translations-old";
 
 import { filterRecords } from "@/lib/log/logHelpers";
 import { LogHeader } from "@/components/log/LogHeader";
