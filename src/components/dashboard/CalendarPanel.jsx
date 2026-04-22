@@ -20,11 +20,10 @@ function buildCalendar(year, month) {
   return cells;
 }
 
-// ─── Exacerbation triangle icon ────────────────────────────────────────────
+// ─── Exacerbation icon (left of week row) ──────────────────────────────────
 function ExacerbationTriangle({ level }) {
   // level: "moderate" | "serious"
-  const fill = level === "serious" ? "#E53935" : "#FFB300";
-  const stroke = level === "serious" ? "#B71C1C" : "#E69500";
+  const color = level === "serious" ? "#E53935" : "#FFB300";
   const title =
     level === "serious"
       ? "Serious exacerbation this week"
@@ -42,19 +41,16 @@ function ExacerbationTriangle({ level }) {
         height: 20,
         zIndex: 10,
         pointerEvents: "none",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 16,
+        lineHeight: 1,
+        color,
+        textShadow: "0 1px 2px rgba(0,0,0,0.2)",
       }}
     >
-      <svg viewBox="0 0 24 24" width="20" height="20">
-        <polygon
-          points="12,2.5 22,21 2,21"
-          fill={fill}
-          stroke={stroke}
-          strokeWidth="0.8"
-          strokeLinejoin="round"
-        />
-        <rect x="11" y="8.5" width="2" height="7" fill="#fff" rx="0.5" />
-        <circle cx="12" cy="17.5" r="1.2" fill="#fff" />
-      </svg>
+      ⚠
     </div>
   );
 }
@@ -91,20 +87,21 @@ function ExerciseIcon() {
       title="Physical activity this week"
       style={{
         position: "absolute",
-        right: -4,
-        bottom: -3,
-        width: 13,
-        height: 13,
+        right: -2,
+        bottom: -4,
+        width: 16,
+        height: 16,
         zIndex: 10,
         pointerEvents: "none",
-        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 13,
+        lineHeight: 1,
+        filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))",
       }}
     >
-      <img
-        src="/icons/ico_exercise.png"
-        alt=""
-        style={{ width: "100%", height: "100%", objectFit: "contain" }}
-      />
+      🏃
     </div>
   );
 }
@@ -579,10 +576,7 @@ export default function CalendarPanel({
 const REASON_CONFIG = {
   0: { key: "sideEffects",     color: { bg: "#fde8e8", text: "#b42525", border: "#f5b5b5" } },
   1: { key: "ineffective",     color: { bg: "#fff4e8", text: "#a35400", border: "#f5c9a0" } },
-  2: { key: "doctorChange",    color: { bg: "#e8f0fd", text: "#1a4ea3", border: "#a8c5f0" } },
-  3: { key: "cost",            color: { bg: "#fdf8e8", text: "#8a6a00", border: "#e8d580" } },
-  4: { key: "completedCourse", color: { bg: "#e8f5ec", text: "#1a6b33", border: "#a5d5b3" } },
-  5: { key: "otherReason",     color: { bg: "#f0f0f0", text: "#555",    border: "#cecece" } },
+  2: { key: "otherReason",     color: { bg: "#f0f0f0", text: "#555",    border: "#cecece" } },
 };
 const DEFAULT_REASON_COLOR = { bg: "#f0f0f0", text: "#555", border: "#cecece" };
 
@@ -611,9 +605,6 @@ function StoppedMedicationsList({ t, userMedicines }) {
     const fallbacks = {
       sideEffects:     "Side effects",
       ineffective:     "Not effective",
-      doctorChange:    "Doctor changed medication",
-      cost:            "Too expensive",
-      completedCourse: "Completed course",
       otherReason:     "Other",
     };
     return t[cfg.key] ?? fallbacks[cfg.key];
