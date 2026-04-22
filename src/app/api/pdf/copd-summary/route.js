@@ -10,7 +10,7 @@ const execFileAsync = promisify(execFile);
 
 const SCRIPT_PATH  = join(process.cwd(), "scripts",           "generate_copd_pdf.py");
 const ICON_PATH    = join(process.cwd(), "public",            "ico_intensity_medicine.png");
-const MESSAGES_DIR = join(process.cwd(), "src", "app", "messages");
+const MESSAGES_DIR = join(process.cwd(), "src", "locales");
 
 export async function POST(request) {
   let inputPath  = null;

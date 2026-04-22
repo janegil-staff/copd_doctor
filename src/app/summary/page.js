@@ -2,7 +2,7 @@
 import { useEffect, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
-import { getT } from "@/translations/translations-old";
+import { getT } from "@/translations";
 
 import { parseInitialState } from "@/lib/summary/dateHelpers";
 import {

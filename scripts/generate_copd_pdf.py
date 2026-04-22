@@ -311,7 +311,8 @@ def draw_dice(c, x, y, value, size=20):
 # ─── GENERATE ────────────────────────────────────────────────────────────────
 def generate_pdf(data, out_path, icon_path=None, lang="en", translations_dir=None):
     _script_dir = os.path.dirname(os.path.abspath(__file__))
-    _default_trans_dir = os.path.join(_script_dir, "..", "src", "app", "messages")
+    # Translations live at <project_root>/src/locales/{lang}.json
+    _default_trans_dir = os.path.join(_script_dir, "..", "src", "locales")
     trans_dir = translations_dir or _default_trans_dir
 
     tr = load_translations(lang, trans_dir)
