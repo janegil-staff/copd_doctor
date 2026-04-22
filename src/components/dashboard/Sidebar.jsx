@@ -1587,34 +1587,43 @@ export default function Sidebar({ patient, t = {} }) {
                             : ""}
                           {um.startedUsage ? ` · ${um.startedUsage}` : ""}
                         </p>
-
                         {/* Training: only shown for inhalers (type 1). Badges if received, red marker if not. */}
-                        {um.medicine?.type === 1 &&
-                          (hasTrain ? (
-                            <div
-                              style={{
-                                marginTop: 3,
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: 2,
-                              }}
-                            >
-                              {trainSources.map((s) => (
-                                <Chip key={s.key} label={s.label} />
-                              ))}
-                            </div>
-                          ) : (
-                            <p
+                        {um.medicine?.type === 1 && (
+                          <div
+                            style={{
+                              marginTop: 3,
+                              display: "flex",
+                              flexWrap: "wrap",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <span
                               style={{
                                 fontSize: 10,
-                                margin: "2px 0 0",
                                 fontWeight: 600,
-                                color: DANGER,
+                                color: MU,
                               }}
                             >
-                              {t.sNoTraining ?? "✗ No training"}
-                            </p>
-                          ))}
+                              {t.sTrainingLabel ?? "Training:"}
+                            </span>
+                            {hasTrain ? (
+                              trainSources.map((s) => (
+                                <Chip key={s.key} label={s.label} />
+                              ))
+                            ) : (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 600,
+                                  color: DANGER,
+                                }}
+                              >
+                                {t.sNoTraining ?? "✗ No training"}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                       {satMap[um.medicineId] != null && (
                         <SatDice value={satMap[um.medicineId]} />
