@@ -1588,32 +1588,33 @@ export default function Sidebar({ patient, t = {} }) {
                           {um.startedUsage ? ` · ${um.startedUsage}` : ""}
                         </p>
 
-                        {/* Training: inline badges if received, small red marker if not */}
-                        {hasTrain ? (
-                          <div
-                            style={{
-                              marginTop: 3,
-                              display: "flex",
-                              flexWrap: "wrap",
-                              gap: 2,
-                            }}
-                          >
-                            {trainSources.map((s) => (
-                              <Chip key={s.key} label={s.label} />
-                            ))}
-                          </div>
-                        ) : (
-                          <p
-                            style={{
-                              fontSize: 10,
-                              margin: "2px 0 0",
-                              fontWeight: 600,
-                              color: DANGER,
-                            }}
-                          >
-                            {t.sNoTraining ?? "✗ No training"}
-                          </p>
-                        )}
+                        {/* Training: only shown for inhalers (type 1). Badges if received, red marker if not. */}
+                        {um.medicine?.type === 1 &&
+                          (hasTrain ? (
+                            <div
+                              style={{
+                                marginTop: 3,
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 2,
+                              }}
+                            >
+                              {trainSources.map((s) => (
+                                <Chip key={s.key} label={s.label} />
+                              ))}
+                            </div>
+                          ) : (
+                            <p
+                              style={{
+                                fontSize: 10,
+                                margin: "2px 0 0",
+                                fontWeight: 600,
+                                color: DANGER,
+                              }}
+                            >
+                              {t.sNoTraining ?? "✗ No training"}
+                            </p>
+                          ))}
                       </div>
                       {satMap[um.medicineId] != null && (
                         <SatDice value={satMap[um.medicineId]} />
