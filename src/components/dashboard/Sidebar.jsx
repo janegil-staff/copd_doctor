@@ -413,9 +413,9 @@ function Spo2Modal({ entries, t, onClose }) {
   );
 }
 
-// ── Nutrition & Weight modal ─────────────────────────────────────────────────
+// ── Weight modal ─────────────────────────────────────────────────────────────
 
-function NutritionWeightModal({ records, t, onClose }) {
+function WeightModal({ records, t, onClose }) {
   const weightEntries = [...(records ?? [])]
     .filter((r) => r.weight != null)
     .reverse();
@@ -466,7 +466,7 @@ function NutritionWeightModal({ records, t, onClose }) {
               letterSpacing: "0.025em",
             }}
           >
-            {t.sNutritionWeight ?? "Nutrition & Weight"}
+            {t.sWeight ?? t.weight ?? "Weight"}
           </h3>
           <button
             onClick={onClose}
@@ -484,20 +484,7 @@ function NutritionWeightModal({ records, t, onClose }) {
           </button>
         </div>
 
-        <p
-          style={{
-            margin: "0 0 8px",
-            fontSize: 10,
-            fontWeight: 700,
-            color: A,
-            textTransform: "uppercase",
-            letterSpacing: 0.8,
-          }}
-        >
-          {t.weight ?? "Weight"} ({t.weightLossHistory ?? "History"})
-        </p>
-
-        {weightEntries.length === 0 && (
+        {weightEntries.length === 0 ? (
           <p
             style={{
               fontSize: 12,
@@ -508,68 +495,190 @@ function NutritionWeightModal({ records, t, onClose }) {
           >
             {t.noData ?? "No data recorded."}
           </p>
+        ) : (
+          <WeightChart entries={weightEntries} t={t} />
         )}
+      </div>
+    </div>
+  );
+}
 
-        {weightEntries.length > 0 &&
-          (() => {
-            const hasLoss = weightEntries.some((r, i) => {
-              const prev = weightEntries[i + 1];
-              return prev && r.weight < prev.weight;
-            });
-            if (!hasLoss)
-              return (
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: MU,
-                    textAlign: "center",
-                    padding: "16px 0",
-                  }}
-                >
-                  {t.noWeightLoss ?? "No weight loss"}
-                </p>
-              );
-            return weightEntries.map((r, i) => {
-              const prev = weightEntries[i + 1];
-              const diff = prev ? r.weight - prev.weight : null;
-              const diffColor =
-                diff == null ? MU : diff < 0 ? OK : diff > 0 ? DANGER : MU;
-              const diffLabel =
-                diff == null ? "" : diff > 0 ? `+${diff} kg` : `${diff} kg`;
-              return (
-                <div
-                  key={r.date}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "6px 0",
-                    borderBottom: "1px solid rgba(38,142,134,0.07)",
-                  }}
-                >
-                  <span style={{ fontSize: 11, color: MU }}>{r.date}</span>
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 8 }}
-                  >
-                    {diffLabel ? (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: diffColor,
-                        }}
-                      >
-                        {diffLabel}
-                      </span>
-                    ) : null}
-                    <span style={{ fontSize: 12, fontWeight: 700, color: TX }}>
-                      {r.weight} kg
-                    </span>
-                  </div>
-                </div>
-              );
-            });
-          })()}
+// ── Weight chart (inline SVG line chart) ─────────────────────────────────────
+
+function WeightChart({ entries, t }) {
+  // `entries` arrives latest-first; chart needs chronological
+  const points = [...entries].reverse();
+  if (points.length === 0) return null;
+
+  const weights = points.map((p) => p.weight);
+  const minW = Math.min(...weights);
+  const maxW = Math.max(...weights);
+  const rangeW = maxW - minW || 1; // avoid divide-by-zero for single/flat data
+  const padW = rangeW * 0.15 || 1; // breathing room on y-axis
+  const yMin = minW - padW;
+  const yMax = maxW + padW;
+
+  // Overall trend: compare first vs last
+  const first = points[0].weight;
+  const last = points[points.length - 1].weight;
+  const trendColor = last < first ? OK : last > first ? DANGER : MU;
+
+  // SVG dimensions
+  const W = 420;
+  const H = 160;
+  const padL = 36;
+  const padR = 12;
+  const padT = 12;
+  const padB = 28;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+
+  const xFor = (i) =>
+    points.length === 1
+      ? padL + chartW / 2
+      : padL + (i / (points.length - 1)) * chartW;
+  const yFor = (w) =>
+    padT + chartH - ((w - yMin) / (yMax - yMin)) * chartH;
+
+  // Polyline path
+  const pathD = points
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${xFor(i)} ${yFor(p.weight)}`)
+    .join(" ");
+
+  // Area fill under the line
+  const areaD = `${pathD} L ${xFor(points.length - 1)} ${padT + chartH} L ${xFor(0)} ${padT + chartH} Z`;
+
+  // Y-axis labels: show min/max
+  const yTicks = [yMax, (yMin + yMax) / 2, yMin];
+
+  // X-axis labels: first, middle, last (to avoid crowding)
+  const fmt = (d) => {
+    try {
+      return new Date(d).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return d;
+    }
+  };
+  const xLabelIdx =
+    points.length <= 3
+      ? points.map((_, i) => i)
+      : [0, Math.floor(points.length / 2), points.length - 1];
+
+  return (
+    <div style={{ width: "100%", overflow: "hidden" }}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        width="100%"
+        height="auto"
+        style={{ display: "block" }}
+      >
+        {/* Grid lines */}
+        {yTicks.map((v, i) => (
+          <line
+            key={i}
+            x1={padL}
+            x2={W - padR}
+            y1={yFor(v)}
+            y2={yFor(v)}
+            stroke="rgba(38,142,134,0.12)"
+            strokeWidth="1"
+            strokeDasharray={i === 1 ? "2 3" : "none"}
+          />
+        ))}
+
+        {/* Y-axis labels */}
+        {yTicks.map((v, i) => (
+          <text
+            key={i}
+            x={padL - 6}
+            y={yFor(v) + 3}
+            textAnchor="end"
+            fontSize="9"
+            fill={MU}
+            fontWeight="600"
+          >
+            {v.toFixed(1)}
+          </text>
+        ))}
+
+        {/* Area fill */}
+        <path d={areaD} fill={trendColor} fillOpacity="0.10" />
+
+        {/* Line */}
+        <path
+          d={pathD}
+          fill="none"
+          stroke={trendColor}
+          strokeWidth="2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+
+        {/* Data points */}
+        {points.map((p, i) => (
+          <g key={i}>
+            <circle
+              cx={xFor(i)}
+              cy={yFor(p.weight)}
+              r="3.5"
+              fill="#fff"
+              stroke={trendColor}
+              strokeWidth="2"
+            />
+            {/* Tooltip on hover via <title> — simple native browser tooltip */}
+            <circle
+              cx={xFor(i)}
+              cy={yFor(p.weight)}
+              r="10"
+              fill="transparent"
+              style={{ cursor: "pointer" }}
+            >
+              <title>
+                {p.date}: {p.weight} kg
+              </title>
+            </circle>
+          </g>
+        ))}
+
+        {/* X-axis labels */}
+        {xLabelIdx.map((i) => (
+          <text
+            key={i}
+            x={xFor(i)}
+            y={H - 8}
+            textAnchor={i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"}
+            fontSize="9"
+            fill={MU}
+            fontWeight="600"
+          >
+            {fmt(points[i].date)}
+          </text>
+        ))}
+      </svg>
+
+      {/* Legend */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: 6,
+          fontSize: 10,
+          color: MU,
+        }}
+      >
+        <span>
+          {points.length} {t.registrations ?? "entries"}
+        </span>
+        <span style={{ color: trendColor, fontWeight: 700 }}>
+          {first.toFixed(1)} → {last.toFixed(1)} kg
+          {last !== first && (
+            <> ({last < first ? "-" : "+"}{Math.abs(last - first).toFixed(1)})</>
+          )}
+        </span>
       </div>
     </div>
   );
@@ -843,7 +952,7 @@ export default function Sidebar({ patient, t = {} }) {
 
   const [showSpirometryModal, setShowSpirometryModal] = useState(false);
   const [showSpo2Modal, setShowSpo2Modal] = useState(false);
-  const [showNutritionModal, setShowNutritionModal] = useState(false);
+  const [showWeightModal, setShowWeightModal] = useState(false);
   const [showGad7Modal, setShowGad7Modal] = useState(false);
   const [showPhq9Modal, setShowPhq9Modal] = useState(false);
 
@@ -932,11 +1041,11 @@ export default function Sidebar({ patient, t = {} }) {
 
   return (
     <>
-      {showNutritionModal && (
-        <NutritionWeightModal
+      {showWeightModal && (
+        <WeightModal
           records={records}
           t={t}
-          onClose={() => setShowNutritionModal(false)}
+          onClose={() => setShowWeightModal(false)}
         />
       )}
       {showSpo2Modal && spo2arr.length > 0 && (
@@ -1319,12 +1428,25 @@ export default function Sidebar({ patient, t = {} }) {
               </>
             )}
 
-            {/* ── Nutrition & Weight ─────────────────────────────────────────── */}
+            {/* ── Nutrition ──────────────────────────────────────────────────── */}
+            <Divider label={t.sNutrition ?? "Nutrition"} />
+            <p
+              style={{
+                fontSize: 11,
+                color: MU,
+                fontStyle: "italic",
+                padding: "4px 0",
+              }}
+            >
+              {t.noData ?? "No data recorded."}
+            </p>
+
+            {/* ── Weight ─────────────────────────────────────────────────────── */}
             {records.some((r) => r.weight != null) && (
               <>
                 <Divider
-                  label={t.sNutritionWeight ?? "Nutrition & Weight"}
-                  onReadMore={() => setShowNutritionModal(true)}
+                  label={t.sWeight ?? t.weight ?? "Weight"}
+                  onReadMore={() => setShowWeightModal(true)}
                   readMoreLabel={readMoreLabel}
                 />
                 {(() => {

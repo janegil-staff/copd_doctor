@@ -627,14 +627,20 @@ function ActiveMedicationsList({
       }}
     >
       <div
-        className="px-4 pt-3 pb-2"
+        className="px-4 pt-3 pb-2 flex items-center justify-between"
         style={{ borderBottom: "1px solid rgba(38,142,134,0.08)" }}
       >
         <p
           className="text-xs font-semibold tracking-widest uppercase"
-          style={{ color: A }}
+          style={{ color: A, margin: 0 }}
         >
           {t.sMedication ?? "Medication"}
+        </p>
+        <p
+          className="text-xs font-semibold tracking-widest uppercase"
+          style={{ color: A, margin: 0 }}
+        >
+          {t.sSatisfaction ?? "Satisfaction"}
         </p>
       </div>
 
@@ -707,11 +713,11 @@ function ActiveMedicationsList({
                 >
                   {medName(um.medicineId)}
                 </p>
-                <p style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}>
-                  {MED_TYPE[um.medicine?.type] ?? ""}
-                  {um.reason != null ? ` · ${MED_REASON[um.reason]}` : ""}
-                  {um.startedUsage ? ` · ${um.startedUsage}` : ""}
-                </p>
+                {um.startedUsage && (
+                  <p style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}>
+                    {um.startedUsage}
+                  </p>
+                )}
                 {/* Training: only shown for inhalers (type 1) */}
                 {um.medicine?.type === 1 && (
                   <div
