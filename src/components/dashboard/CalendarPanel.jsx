@@ -528,19 +528,31 @@ export default function CalendarPanel({
             })(),
           },
           {
+            iconSrc: "/icons/ico_medicine.png",
             icon: "💊",
             iconColor: "#0ea5e9",
             label: t.weeksWithMedicine ?? t.medicines,
             value: monthRecords.filter((r) => r.medicines?.length > 0).length,
           },
-        ].map(({ icon, iconColor, label, value }) => (
+        ].map(({ icon, iconSrc, iconColor, label, value }) => (
           <div
             key={label}
             className="flex items-center px-4 py-2.5"
             style={{ borderBottom: "1px solid rgba(38,142,134,0.06)" }}
           >
-            <span className="w-6 text-base" style={{ color: iconColor }}>
-              {icon}
+            <span
+              className="w-6 text-base flex items-center"
+              style={{ color: iconColor }}
+            >
+              {iconSrc ? (
+                <img
+                  src={iconSrc}
+                  alt=""
+                  style={{ width: 18, height: 18, objectFit: "contain" }}
+                />
+              ) : (
+                icon
+              )}
             </span>
             <span className="flex-1 text-sm ml-2" style={{ color: "#4a7a78" }}>
               {label}
