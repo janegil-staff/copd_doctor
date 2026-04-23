@@ -36,17 +36,6 @@ export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const [show, setShow] = useState({
-    catScore: true,
-    exacerbation: true,
-    medicine: true,
-    note: true,
-    activity: true,
-    weight: true,
-  });
-  const toggleShow = (key) =>
-    setShow((prev) => ({ ...prev, [key]: !prev[key] }));
-
   useEffect(() => {
     const { patient: p, selectedRecord: r } = parsePatientData();
     setPatient(p);
@@ -328,11 +317,11 @@ export default function Dashboard() {
             t={t}
             records={patient.records}
             medicines={patient.medicines}
-            userMedicines={patient.userMedicines} // ← legg til denne
+            userMedicines={patient.userMedicines}
+            latestMedicineTraining={patient.latestMedicineTraining}
+            latestMedicineSatisfaction={patient.latestMedicineSatisfaction}
             onDayClick={handleDayClick}
             selectedDate={selectedRecord?.date}
-            show={show}
-            onToggleShow={toggleShow}
           />
         </div>
 
@@ -358,7 +347,6 @@ export default function Dashboard() {
         record={selectedRecord}
         medicines={patient.medicines}
         userMedicines={patient.userMedicines}
-        show={show}
       />
     </div>
   );

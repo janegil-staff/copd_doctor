@@ -17,7 +17,14 @@ function Bar({ value, max = 5 }) {
 }
 
 
-export default function DrawerContent({ t, record, catColor, usedMedicines, onClose, show }) {
+export default function DrawerContent({ t, record, catColor, usedMedicines, onClose }) {
+  const hasCat = record.cat8 != null;
+  const noteText =
+    record.note?.trim() ||
+    record.notes?.trim() ||
+    record.noteText?.trim() ||
+    record.comment?.trim();
+
   return (
     <div className="p-6">
 
@@ -42,7 +49,7 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {show.catScore && (
+          {hasCat && (
             <div
               className="text-2xl font-black px-4 py-2 rounded-xl"
               style={{ background: catColor.bg, color: catColor.text, border: `1px solid ${catColor.border}` }}
@@ -62,7 +69,7 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
       </div>
 
       {/* ── Exacerbation alert ── */}
-      {show.exacerbation && (record.moderateExacerbations || record.seriousExacerbations) && (
+      {(record.moderateExacerbations || record.seriousExacerbations) && (
         <div
           className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-4"
           style={{ background: "#fff0f0", border: "1px solid #fca5a5" }}
@@ -75,7 +82,7 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
       )}
 
       {/* ── CAT sub-scores ── */}
-      {show.catScore && (
+      {hasCat && (
         <>
           <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#a0b8b6" }}>
             {t.catSubScores}
@@ -92,9 +99,9 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
       )}
 
       {/* ── Weight + Activity ── */}
-      {(show.weight || show.activity) && (
+      {(record.weight != null || record.physicalActivity != null) && (
         <div className="flex gap-3 mb-5">
-          {show.weight && record.weight != null && (
+          {record.weight != null && (
             <div
               className="flex-1 px-3 py-2.5 rounded-xl text-center"
               style={{ background: "rgba(38,142,134,0.06)", border: "1px solid rgba(38,142,134,0.15)" }}
@@ -103,7 +110,7 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
               <p className="text-sm font-bold" style={{ color: "#268E86" }}>{record.weight} kg</p>
             </div>
           )}
-          {show.activity && record.physicalActivity != null && (
+          {record.physicalActivity != null && (
             <div
               className="flex-1 px-3 py-2.5 rounded-xl text-center"
               style={{ background: "rgba(38,142,134,0.06)", border: "1px solid rgba(38,142,134,0.15)" }}
@@ -116,7 +123,7 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
       )}
 
       {/* ── Medicines ── */}
-      {show.medicine && usedMedicines.length > 0 && (
+      {usedMedicines.length > 0 && (
         <>
           <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#a0b8b6" }}>
             {t.usedMedicines}
@@ -157,19 +164,16 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
       )}
 
       {/* ── Note ── */}
-      {show.note && (() => {
-        const noteText = record.note?.trim() || record.notes?.trim() || record.noteText?.trim() || record.comment?.trim();
-        return noteText ? (
-          <>
-            <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "#a0b8b6" }}>
-              {t.note}
-            </p>
-            <div className="px-4 py-3 rounded-xl" style={{ background: "#f5f3ff", border: "1px solid #c4b5fd" }}>
-              <p className="text-sm" style={{ color: "#6d28d9" }}>{noteText}</p>
-            </div>
-          </>
-        ) : null;
-      })()}
+      {noteText && (
+        <>
+          <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "#a0b8b6" }}>
+            {t.note}
+          </p>
+          <div className="px-4 py-3 rounded-xl" style={{ background: "#f5f3ff", border: "1px solid #c4b5fd" }}>
+            <p className="text-sm" style={{ color: "#6d28d9" }}>{noteText}</p>
+          </div>
+        </>
+      )}
 
     </div>
   );

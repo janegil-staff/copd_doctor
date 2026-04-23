@@ -128,75 +128,6 @@ function Bar({ value, max, color }) {
   );
 }
 
-function SatDice({ value = 0 }) {
-  const color =
-    value <= 1
-      ? DANGER
-      : value <= 2
-        ? WARN
-        : value <= 3
-          ? "#e07a30"
-          : value === 4
-            ? A
-            : OK;
-  // Dot positions for each face value (1-5), as [cx, cy] pairs in a 18x18 grid
-  const dots = {
-    1: [[9, 9]],
-    2: [
-      [5, 5],
-      [13, 13],
-    ],
-    3: [
-      [5, 5],
-      [9, 9],
-      [13, 13],
-    ],
-    4: [
-      [5, 5],
-      [13, 5],
-      [5, 13],
-      [13, 13],
-    ],
-    5: [
-      [5, 5],
-      [13, 5],
-      [9, 9],
-      [5, 13],
-      [13, 13],
-    ],
-  };
-  const v = Math.min(5, Math.max(1, Math.round(value)));
-  const positions = dots[v] ?? dots[1];
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" style={{ flexShrink: 0 }}>
-      <rect x="1" y="1" width="20" height="20" rx="4" ry="4" fill={color} />
-      {positions.map(([cx, cy], i) => (
-        <circle key={i} cx={cx + 2} cy={cy + 2} r="2" fill="#fff" />
-      ))}
-    </svg>
-  );
-}
-
-function Chip({ label }) {
-  return (
-    <span
-      style={{
-        display: "inline-block",
-        padding: "1px 6px",
-        borderRadius: 20,
-        fontSize: 10,
-        fontWeight: 700,
-        marginRight: 3,
-        marginBottom: 2,
-        background: A,
-        color: "#fff",
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
 // ── Spirometry modal ─────────────────────────────────────────────────────────
 
 function SpirometryModal({ entries, t, onClose }) {
@@ -485,7 +416,6 @@ function Spo2Modal({ entries, t, onClose }) {
 // ── Nutrition & Weight modal ─────────────────────────────────────────────────
 
 function NutritionWeightModal({ records, t, onClose }) {
-  // Build weight history from records (only those with a weight value)
   const weightEntries = [...(records ?? [])]
     .filter((r) => r.weight != null)
     .reverse();
@@ -554,7 +484,6 @@ function NutritionWeightModal({ records, t, onClose }) {
           </button>
         </div>
 
-        {/* Weight history */}
         <p
           style={{
             margin: "0 0 8px",
@@ -929,24 +858,14 @@ export default function Sidebar({ patient, t = {} }) {
   const vaccinations = Array.isArray(patient.vaccinations)
     ? patient.vaccinations
     : [];
-  const userMedicines = Array.isArray(patient.userMedicines)
-    ? patient.userMedicines
-    : [];
-  const medicines = Array.isArray(patient.medicines) ? patient.medicines : [];
   const smoking = patient.smoking ?? null;
   const vaping = patient.vaping ?? null;
   const latestGad7 = patient.latestGad7 ?? null;
   const latestPhq9 = patient.latestPhq9 ?? null;
   const records = Array.isArray(patient.records) ? patient.records : [];
   const latestAlpha1 = patient.latestAlpha1 ?? null;
-  const medSat = patient.latestMedicineSatisfaction ?? null;
-  const medTrain = patient.latestMedicineTraining ?? null;
   const cond = patient.latestRelevantConditions ?? null;
 
-  const today = new Date().toISOString().slice(0, 10);
-  const activeMeds = userMedicines.filter(
-    (m) => !m.stoppedUsage || m.stoppedUsage >= today,
-  );
   const latestVax = vaccinations.length
     ? vaccinations[vaccinations.length - 1]
     : null;
@@ -960,16 +879,6 @@ export default function Sidebar({ patient, t = {} }) {
   const gSev = gad7Sev(gad7Score, t);
   const pSev = phq9Sev(phq9Score, t);
   const fmt1 = (n) => (n == null ? "–" : Number(n).toFixed(1));
-  const satMap = {};
-  (medSat?.medicines ?? []).forEach((m) => {
-    satMap[m.medicineId] = m.satisfaction;
-  });
-
-  const medName = (id) => {
-    const um = userMedicines.find((m) => m.medicineId === id);
-    if (um?.medicine?.name) return um.medicine.name;
-    return medicines.find((m) => m.id === id)?.name ?? `Med #${id}`;
-  };
 
   const SMOKE_LABEL = {
     1: t.sCurrentSmoker ?? "Current smoker",
@@ -993,9 +902,6 @@ export default function Sidebar({ patient, t = {} }) {
     3: WARN,
   };
 
-  const MED_TYPE = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
-  const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
-
   const VAX_FIELDS = [
     { key: "flue", label: t.sInfluenza ?? "Influenza" },
     { key: "covid", label: t.sCovid ?? "COVID-19" },
@@ -1003,18 +909,6 @@ export default function Sidebar({ patient, t = {} }) {
     { key: "herpes", label: t.sHerpes ?? "Herpes zoster" },
     { key: "rs", label: t.sRsv ?? "RSV" },
     { key: "pertussis", label: t.sPertussis ?? "Pertussis" },
-  ];
-
-  const TRAINING_KEYS = [
-    { key: "generalPractitioner", label: t.sGp ?? "GP" },
-    { key: "pharmacy", label: t.sPharmacy ?? "Pharmacy" },
-    { key: "homeCareNurse", label: t.sHomeCareNurse ?? "Home nurse" },
-    { key: "rehabilitationCenter", label: t.sRehab ?? "Rehab" },
-    {
-      key: "hospitalLungSpecialist",
-      label: t.sLungSpecialist ?? "Lung specialist",
-    },
-    { key: "trainingVideo", label: t.sVideo ?? "Video" },
   ];
 
   const COND_FIELDS = [
@@ -1281,14 +1175,12 @@ export default function Sidebar({ patient, t = {} }) {
                   value={SMOKE_LABEL[smoking.smoking] ?? "–"}
                   color={SMOKE_COLOR[smoking.smoking] ?? MU}
                 />
-                {/* Start age: only for ex-smokers (1) and current smokers (2) */}
                 {smoking.smoking > 0 && smoking.startAge > 0 && (
                   <Row
                     label={t.sSmokingStart ?? "Start"}
                     value={`${t.sAge ?? "Age"} ${smoking.startAge}`}
                   />
                 )}
-                {/* Quit age: only for ex-smokers (1) */}
                 {smoking.smoking === 1 && smoking.endAge > 0 && (
                   <Row
                     label={t.sSmokingQuit ?? "Quit"}
@@ -1296,7 +1188,6 @@ export default function Sidebar({ patient, t = {} }) {
                     color={OK}
                   />
                 )}
-                {/* Frequency: only for current smokers (2) */}
                 {smoking.smoking === 2 && smoking.frequency > 0 && (
                   <Row
                     label={t.sSmokingAverage ?? "Average"}
@@ -1306,6 +1197,7 @@ export default function Sidebar({ patient, t = {} }) {
                 )}
               </>
             )}
+
             {/* ── Vaping ─────────────────────────────────────────────────────── */}
             {vaping && (
               <>
@@ -1471,6 +1363,7 @@ export default function Sidebar({ patient, t = {} }) {
               </>
             )}
 
+            {/* ── Alpha-1 ────────────────────────────────────────────────────── */}
             {latestAlpha1 && (
               <>
                 <Divider label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"} />
@@ -1486,9 +1379,9 @@ export default function Sidebar({ patient, t = {} }) {
                       : (t.sPositive ?? "Positive");
                   })()}
                   color={(() => {
-                    if (!latestAlpha1.alpha1Tested) return WARN; // not tested = amber (neutral cue)
-                    if (latestAlpha1.alpha1Result == null) return MU; // tested, no result yet
-                    return latestAlpha1.alpha1Result === 0 ? OK : DANGER; // negative = green, positive = red
+                    if (!latestAlpha1.alpha1Tested) return WARN;
+                    if (latestAlpha1.alpha1Result == null) return MU;
+                    return latestAlpha1.alpha1Result === 0 ? OK : DANGER;
                   })()}
                 />
               </>
@@ -1506,131 +1399,6 @@ export default function Sidebar({ patient, t = {} }) {
                     color={DANGER}
                   />
                 ))}
-              </>
-            )}
-
-            {/* ── Medication ─────────────────────────────────────────────────── */}
-            {activeMeds.length > 0 && (
-              <>
-                <Divider label={t.sMedication ?? "Medication"} />
-                {activeMeds.map((um) => {
-                  const trainEntry = (medTrain?.medicines ?? []).find(
-                    (m) => m.medicineId === um.medicineId,
-                  );
-                  const trainSources = trainEntry
-                    ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
-                    : [];
-                  const hasTrain = trainSources.length > 0;
-
-                  return (
-                    <div
-                      key={um.medicineId}
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 8,
-                        padding: "5px 0",
-                        borderBottom: "1px solid rgba(38,142,134,0.07)",
-                      }}
-                    >
-                      {um.medicine?.image ? (
-                        <img
-                          src={um.medicine.image}
-                          alt={um.medicine.name ?? ""}
-                          style={{
-                            width: 26,
-                            height: 26,
-                            objectFit: "contain",
-                            borderRadius: 6,
-                            border: `1px solid ${BO}`,
-                            background: "#fff",
-                            flexShrink: 0,
-                            marginTop: 2,
-                          }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: 26,
-                            height: 26,
-                            borderRadius: 6,
-                            flexShrink: 0,
-                            marginTop: 2,
-                            background: "rgba(38,142,134,0.1)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 13,
-                          }}
-                        >
-                          💊
-                        </div>
-                      )}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: TX,
-                            margin: 0,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {medName(um.medicineId)}
-                        </p>
-                        <p style={{ fontSize: 10, color: MU, margin: 0 }}>
-                          {MED_TYPE[um.medicine?.type] ?? ""}
-                          {um.reason != null
-                            ? ` · ${MED_REASON[um.reason]}`
-                            : ""}
-                          {um.startedUsage ? ` · ${um.startedUsage}` : ""}
-                        </p>
-                        {/* Training: only shown for inhalers (type 1). Badges if received, red marker if not. */}
-                        {um.medicine?.type === 1 && (
-                          <div
-                            style={{
-                              marginTop: 3,
-                              display: "flex",
-                              flexWrap: "wrap",
-                              alignItems: "center",
-                              gap: 4,
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 600,
-                                color: MU,
-                              }}
-                            >
-                              {t.sTrainingLabel ?? "Training:"}
-                            </span>
-                            {hasTrain ? (
-                              trainSources.map((s) => (
-                                <Chip key={s.key} label={s.label} />
-                              ))
-                            ) : (
-                              <span
-                                style={{
-                                  fontSize: 10,
-                                  fontWeight: 600,
-                                  color: DANGER,
-                                }}
-                              >
-                                {t.sNoTraining ?? "✗ No training"}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      {satMap[um.medicineId] != null && (
-                        <SatDice value={satMap[um.medicineId]} />
-                      )}
-                    </div>
-                  );
-                })}
               </>
             )}
           </div>

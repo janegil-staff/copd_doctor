@@ -1,6 +1,14 @@
 "use client";
 import { useState, useMemo } from "react";
 
+const A = "#268E86";
+const BO = "rgba(38,142,134,0.14)";
+const TX = "#1a3a38";
+const MU = "#7a9a98";
+const WARN = "#e8a838";
+const DANGER = "#e05050";
+const OK = "#4aba7a";
+
 const CAT_COLOR = (score) => {
   if (score === null || score === undefined)
     return { bg: "transparent", text: "#b0c4c2", border: "transparent" };
@@ -22,7 +30,6 @@ function buildCalendar(year, month) {
 
 // ─── Exacerbation icon (left of week row) ──────────────────────────────────
 function ExacerbationTriangle({ level }) {
-  // level: "moderate" | "serious"
   const color = level === "serious" ? "#E53935" : "#FFB300";
   const title =
     level === "serious"
@@ -106,37 +113,73 @@ function ExerciseIcon() {
   );
 }
 
-function Checkbox({ checked, onChange, label, color }) {
+// ─── Satisfaction dice ─────────────────────────────────────────────────────
+function SatDice({ value = 0 }) {
+  const color =
+    value <= 1
+      ? DANGER
+      : value <= 2
+        ? WARN
+        : value <= 3
+          ? "#e07a30"
+          : value === 4
+            ? A
+            : OK;
+  const dots = {
+    1: [[9, 9]],
+    2: [
+      [5, 5],
+      [13, 13],
+    ],
+    3: [
+      [5, 5],
+      [9, 9],
+      [13, 13],
+    ],
+    4: [
+      [5, 5],
+      [13, 5],
+      [5, 13],
+      [13, 13],
+    ],
+    5: [
+      [5, 5],
+      [13, 5],
+      [9, 9],
+      [5, 13],
+      [13, 13],
+    ],
+  };
+  const v = Math.min(5, Math.max(1, Math.round(value)));
+  const positions = dots[v] ?? dots[1];
   return (
-    <label className="flex items-center gap-2 cursor-pointer select-none">
-      <div
-        onClick={onChange}
-        className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all"
-        style={{
-          background: checked ? color : "transparent",
-          border: `1.5px solid ${checked ? color : "#c8dedd"}`,
-          boxShadow: checked ? `0 0 0 2px ${color}22` : "none",
-        }}
-      >
-        {checked && (
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-            <path
-              d="M1 3.5L3.5 6L8 1"
-              stroke="white"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-      </div>
-      <span
-        className="text-xs font-medium"
-        style={{ color: checked ? "#1a3a38" : "#a0b8b6" }}
-      >
-        {label}
-      </span>
-    </label>
+    <svg width="22" height="22" viewBox="0 0 22 22" style={{ flexShrink: 0 }}>
+      <rect x="1" y="1" width="20" height="20" rx="4" ry="4" fill={color} />
+      {positions.map(([cx, cy], i) => (
+        <circle key={i} cx={cx + 2} cy={cy + 2} r="2" fill="#fff" />
+      ))}
+    </svg>
+  );
+}
+
+// ─── Training chip ─────────────────────────────────────────────────────────
+function Chip({ label }) {
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "1px 6px",
+        borderRadius: 20,
+        fontSize: 10,
+        fontWeight: 700,
+        marginRight: 3,
+        marginBottom: 2,
+        background: A,
+        color: "#fff",
+      }}
+    >
+      {label}
+    </span>
   );
 }
 
@@ -145,10 +188,10 @@ export default function CalendarPanel({
   records,
   medicines,
   userMedicines = [],
+  latestMedicineTraining = null,
+  latestMedicineSatisfaction = null,
   onDayClick,
   selectedDate,
-  show,
-  onToggleShow,
 }) {
   const recordMap = useMemo(() => {
     const map = {};
@@ -218,13 +261,11 @@ export default function CalendarPanel({
   };
 
   // FIX: strict date filter — matches exactly what SummaryPage uses
-  // Previously used weekMap which pulled in records from adjacent months
   const monthRecords = useMemo(() => {
     const monthKey = `${viewYear}-${pad(viewMonth + 1)}`;
     return (records || []).filter((r) => r.date.startsWith(monthKey));
   }, [viewYear, viewMonth, records]);
 
-  // Only average records that actually have a cat8 value — skip nulls
   const catRecords = monthRecords.filter((r) => r.cat8 != null);
   const avgCat = catRecords.length
     ? Math.round(catRecords.reduce((s, r) => s + r.cat8, 0) / catRecords.length)
@@ -242,13 +283,6 @@ export default function CalendarPanel({
     seriousExacerbations:  monthRecords.filter((r) => r.seriousExacerbations).length,
     filled:                monthRecords.length,
   };
-
-  const checkboxes = [
-    { key: "medicine", label: t.showMedicine, color: "#0ea5e9" },
-    { key: "note",     label: t.showNote,     color: "#8b5cf6" },
-    { key: "activity", label: t.showActivity, color: "#0f8a6a" },
-    { key: "weight",   label: t.showWeight,   color: "#a16200" },
-  ];
 
   return (
     <div>
@@ -279,7 +313,7 @@ export default function CalendarPanel({
         </button>
       </div>
 
-      {/* Week rows — add left+right padding so triangles and icons have space */}
+      {/* Week rows */}
       <div style={{ paddingLeft: 26, paddingRight: 10, display: "flex", flexDirection: "column", gap: 8 }}>
         {(() => {
           const rows = [];
@@ -301,25 +335,12 @@ export default function CalendarPanel({
             const record = weekMap[monKey];
             const isSelected = record && selectedDate === record.date;
 
-            // ─── Determine exacerbation level for this week ────────────
-            // Serious trumps moderate if both are present
             let exLevel = null;
             if (record?.seriousExacerbations) {
               exLevel = "serious";
             } else if (record?.moderateExacerbations) {
               exLevel = "moderate";
             }
-
-            const showExDot =
-              show.exacerbation &&
-              record &&
-              (record.moderateExacerbations || record.seriousExacerbations);
-            const showNoteDot = show.note && record?.note?.trim();
-            const showMedDot  = show.medicine && record?.medicines?.length > 0;
-            const showActDot  = show.activity && record?.physicalActivity > 0;
-            const showWtDot   = show.weight && record?.weight != null;
-            const anyDot =
-              showExDot || showNoteDot || showMedDot || showActDot || showWtDot;
 
             const bgColor = record
               ? record.cat8 == null
@@ -352,13 +373,8 @@ export default function CalendarPanel({
                 key={monKey}
                 style={{ position: "relative" }}
               >
-                {/* Exacerbation triangle on the left */}
                 {exLevel && <ExacerbationTriangle level={exLevel} />}
-
-                {/* Medicine icon on the top right */}
                 {record?.medicines?.length > 0 && <MedicineIcon />}
-
-                {/* Exercise icon on the bottom right */}
                 {record?.physicalActivity > 0 && <ExerciseIcon />}
 
                 <div
@@ -449,33 +465,6 @@ export default function CalendarPanel({
         })()}
       </div>
 
-      {/* Visibility checkboxes */}
-      <div
-        className="mt-4 rounded-xl px-4 py-3"
-        style={{
-          background: "rgba(38,142,134,0.03)",
-          border: "1px solid rgba(38,142,134,0.1)",
-        }}
-      >
-        <p
-          className="text-xs font-semibold tracking-widest uppercase mb-3"
-          style={{ color: "#7a9a98" }}
-        >
-          {t.showIn}
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
-          {checkboxes.map(({ key, label, color }) => (
-            <Checkbox
-              key={key}
-              checked={show[key]}
-              onChange={() => onToggleShow(key)}
-              label={label}
-              color={color}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Monthly summary */}
       <div
         className="mt-5 rounded-xl overflow-hidden"
@@ -563,16 +552,204 @@ export default function CalendarPanel({
         ))}
       </div>
 
+      {/* Active medications */}
+      <ActiveMedicationsList
+        t={t}
+        userMedicines={userMedicines}
+        medicines={medicines}
+        latestMedicineTraining={latestMedicineTraining}
+        latestMedicineSatisfaction={latestMedicineSatisfaction}
+      />
+
       {/* Previously used medications */}
       <StoppedMedicationsList t={t} userMedicines={userMedicines} />
     </div>
   );
 }
 
+// ─── ActiveMedicationsList ────────────────────────────────────────────────────
+function ActiveMedicationsList({
+  t,
+  userMedicines,
+  medicines,
+  latestMedicineTraining,
+  latestMedicineSatisfaction,
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+  const activeMeds = (userMedicines || []).filter(
+    (m) => !m.stoppedUsage || m.stoppedUsage >= today,
+  );
+
+  if (activeMeds.length === 0) return null;
+
+  const MED_TYPE = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
+  const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
+
+  const TRAINING_KEYS = [
+    { key: "generalPractitioner", label: t.sGp ?? "GP" },
+    { key: "pharmacy", label: t.sPharmacy ?? "Pharmacy" },
+    { key: "homeCareNurse", label: t.sHomeCareNurse ?? "Home nurse" },
+    { key: "rehabilitationCenter", label: t.sRehab ?? "Rehab" },
+    { key: "hospitalLungSpecialist", label: t.sLungSpecialist ?? "Lung specialist" },
+    { key: "trainingVideo", label: t.sVideo ?? "Video" },
+  ];
+
+  const satMap = {};
+  (latestMedicineSatisfaction?.medicines ?? []).forEach((m) => {
+    satMap[m.medicineId] = m.satisfaction;
+  });
+
+  const medName = (id) => {
+    const um = (userMedicines || []).find((m) => m.medicineId === id);
+    if (um?.medicine?.name) return um.medicine.name;
+    return (medicines || []).find((m) => m.id === id)?.name ?? `Med #${id}`;
+  };
+
+  return (
+    <div
+      className="mt-5 rounded-xl overflow-hidden"
+      style={{
+        background: "#fff",
+        border: "1px solid rgba(38,142,134,0.14)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
+      }}
+    >
+      <div
+        className="px-4 pt-3 pb-2"
+        style={{ borderBottom: "1px solid rgba(38,142,134,0.08)" }}
+      >
+        <p
+          className="text-xs font-semibold tracking-widest uppercase"
+          style={{ color: A }}
+        >
+          {t.sMedication ?? "Medication"}
+        </p>
+      </div>
+
+      <div style={{ padding: "4px 14px 8px" }}>
+        {activeMeds.map((um) => {
+          const trainEntry = (latestMedicineTraining?.medicines ?? []).find(
+            (m) => m.medicineId === um.medicineId,
+          );
+          const trainSources = trainEntry
+            ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
+            : [];
+          const hasTrain = trainSources.length > 0;
+
+          return (
+            <div
+              key={um.medicineId}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                padding: "8px 0",
+                borderBottom: "1px solid rgba(38,142,134,0.07)",
+              }}
+            >
+              {um.medicine?.image ? (
+                <img
+                  src={um.medicine.image}
+                  alt={um.medicine.name ?? ""}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    objectFit: "contain",
+                    borderRadius: 6,
+                    border: `1px solid ${BO}`,
+                    background: "#fff",
+                    flexShrink: 0,
+                    marginTop: 2,
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 6,
+                    flexShrink: 0,
+                    marginTop: 2,
+                    background: "rgba(38,142,134,0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 15,
+                  }}
+                >
+                  💊
+                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: TX,
+                    margin: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {medName(um.medicineId)}
+                </p>
+                <p style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}>
+                  {MED_TYPE[um.medicine?.type] ?? ""}
+                  {um.reason != null ? ` · ${MED_REASON[um.reason]}` : ""}
+                  {um.startedUsage ? ` · ${um.startedUsage}` : ""}
+                </p>
+                {/* Training: only shown for inhalers (type 1) */}
+                {um.medicine?.type === 1 && (
+                  <div
+                    style={{
+                      marginTop: 4,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        color: MU,
+                      }}
+                    >
+                      {t.sTrainingLabel ?? "Training:"}
+                    </span>
+                    {hasTrain ? (
+                      trainSources.map((s) => (
+                        <Chip key={s.key} label={s.label} />
+                      ))
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 600,
+                          color: DANGER,
+                        }}
+                      >
+                        {t.sNoTraining ?? "✗ No training"}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+              {satMap[um.medicineId] != null && (
+                <SatDice value={satMap[um.medicineId]} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── StoppedMedicationsList ───────────────────────────────────────────────────
-// Reason integer mapping matches the app:
-//   0 = side effects, 1 = ineffective, 2 = doctor change,
-//   3 = cost, 4 = completed course, 5 = other
 const REASON_CONFIG = {
   0: { key: "sideEffects",     color: { bg: "#fde8e8", text: "#b42525", border: "#f5b5b5" } },
   1: { key: "ineffective",     color: { bg: "#fff4e8", text: "#a35400", border: "#f5c9a0" } },
@@ -581,6 +758,8 @@ const REASON_CONFIG = {
 const DEFAULT_REASON_COLOR = { bg: "#f0f0f0", text: "#555", border: "#cecece" };
 
 function StoppedMedicationsList({ t, userMedicines }) {
+  const [expanded, setExpanded] = useState(false);
+
   const stopped = (userMedicines || [])
     .filter((m) => m.stoppedUsage)
     .sort((a, b) => new Date(b.stoppedUsage) - new Date(a.stoppedUsage));
@@ -622,21 +801,54 @@ function StoppedMedicationsList({ t, userMedicines }) {
         boxShadow: "0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
       }}
     >
-      {/* Header */}
-      <div
-        className="px-4 pt-3 pb-2"
-        style={{ borderBottom: "1px solid rgba(38,142,134,0.08)" }}
+      <button
+        onClick={() => setExpanded((e) => !e)}
+        className="w-full px-4 pt-3 pb-2 flex items-center justify-between"
+        style={{
+          borderBottom: expanded ? "1px solid rgba(38,142,134,0.08)" : "none",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
       >
         <p
           className="text-xs font-semibold tracking-widest uppercase"
-          style={{ color: "#268E86" }}
+          style={{ color: "#268E86", margin: 0 }}
         >
           {t.stoppedMedications ?? "Previously used medications"}
         </p>
-      </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#fff",
+              background: "#268E86",
+              borderRadius: 20,
+              padding: "2px 8px",
+              minWidth: 18,
+              textAlign: "center",
+            }}
+          >
+            {stopped.length}
+          </span>
+          <span
+            style={{
+              fontSize: 14,
+              color: "#268E86",
+              transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s",
+              display: "inline-block",
+            }}
+          >
+            ▾
+          </span>
+        </div>
+      </button>
 
-      {/* List */}
-      <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+      {expanded && (
+        <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
         {stopped.map((um) => {
           const med = um.medicine ?? {};
           const color = reasonColor(um.reason);
@@ -656,7 +868,6 @@ function StoppedMedicationsList({ t, userMedicines }) {
                 gap: 10,
               }}
             >
-              {/* Medicine image or pill emoji */}
               {med.image ? (
                 <img
                   src={med.image}
@@ -690,7 +901,6 @@ function StoppedMedicationsList({ t, userMedicines }) {
                 </div>
               )}
 
-              {/* Name + dates */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
@@ -725,7 +935,6 @@ function StoppedMedicationsList({ t, userMedicines }) {
                 </div>
               </div>
 
-              {/* Reason chip */}
               <span
                 style={{
                   fontSize: 10,
@@ -745,7 +954,8 @@ function StoppedMedicationsList({ t, userMedicines }) {
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
