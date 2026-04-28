@@ -955,6 +955,7 @@ export default function Sidebar({ patient, t = {} }) {
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showGad7Modal, setShowGad7Modal] = useState(false);
   const [showPhq9Modal, setShowPhq9Modal] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const copdDiagnosed = patient.copdDiagnosed ?? false;
   const copdDiagnosedDate = patient.copdDiagnosedDate ?? null;
@@ -1158,49 +1159,97 @@ export default function Sidebar({ patient, t = {} }) {
                   onReadMore={() => setShowSpirometryModal(true)}
                   readMoreLabel={readMoreLabel}
                 />
-                {latestSpiro.date && (
-                  <Row
-                    label={t.reportDate ?? "Date"}
-                    value={latestSpiro.date}
-                  />
-                )}
-                {latestSpiro.fev1 != null && (
-                  <Row
-                    label={t.sFev1 ?? "FEV1"}
-                    value={`${fmt1(latestSpiro.fev1)} L`}
-                    color={
-                      latestSpiro.fev1 < 1.5
-                        ? DANGER
-                        : latestSpiro.fev1 < 2.5
-                          ? WARN
-                          : OK
-                    }
-                  />
-                )}
-                {latestSpiro.fvc != null && (
-                  <Row
-                    label={t.sFvc ?? "FVC"}
-                    value={`${fmt1(latestSpiro.fvc)} L`}
-                  />
-                )}
-                {latestSpiro.fev1fvc != null && (
-                  <Row
-                    label={t.sFev1Fvc ?? "FEV1/FVC"}
-                    value={`${latestSpiro.fev1fvc}%`}
-                    color={latestSpiro.fev1fvc < 70 ? DANGER : OK}
-                  />
-                )}
-                {latestSpiro.goldGrade != null && (
-                  <Row
-                    label={t.sGoldGrade ?? "GOLD grade"}
-                    value={`${t.sGrade ?? "Grade"} ${latestSpiro.goldGrade}`}
-                    color={
-                      [OK, WARN, "#e07a30", DANGER, DANGER][
-                        latestSpiro.goldGrade
-                      ] ?? TX
-                    }
-                  />
-                )}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "6px 0",
+                    borderBottom: "1px solid rgba(38,142,134,0.07)",
+                    fontSize: 11,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {latestSpiro.date && (
+                    <span style={{ color: MU, fontWeight: 600 }}>
+                      {latestSpiro.date}
+                    </span>
+                  )}
+                  {latestSpiro.fev1 != null && (
+                    <>
+                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                      <span style={{ color: MU, fontWeight: 500 }}>
+                        {t.sFev1 ?? "FEV1"}
+                      </span>
+                      <strong
+                        style={{
+                          color:
+                            latestSpiro.fev1 < 1.5
+                              ? DANGER
+                              : latestSpiro.fev1 < 2.5
+                                ? WARN
+                                : OK,
+                        }}
+                      >
+                        {fmt1(latestSpiro.fev1)} L
+                      </strong>
+                    </>
+                  )}
+                  {latestSpiro.fvc != null && (
+                    <>
+                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                      <span style={{ color: MU, fontWeight: 500 }}>
+                        {t.sFvc ?? "FVC"}
+                      </span>
+                      <strong style={{ color: TX }}>
+                        {fmt1(latestSpiro.fvc)} L
+                      </strong>
+                    </>
+                  )}
+                  {(() => {
+                    // Prefer the stored ratio; otherwise compute from raw L values
+                    const ratio =
+                      latestSpiro.fev1fvc != null
+                        ? latestSpiro.fev1fvc
+                        : latestSpiro.fev1 != null &&
+                            latestSpiro.fvc != null &&
+                            latestSpiro.fvc > 0
+                          ? (latestSpiro.fev1 / latestSpiro.fvc) * 100
+                          : null;
+                    if (ratio == null) return null;
+                    return (
+                      <>
+                        <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                        <span style={{ color: MU, fontWeight: 500 }}>
+                          {t.sFev1Fvc ?? "FEV1/FVC"}
+                        </span>
+                        <strong
+                          style={{ color: ratio < 70 ? DANGER : OK }}
+                        >
+                          {ratio.toFixed(1)}%
+                        </strong>
+                      </>
+                    );
+                  })()}
+                  {latestSpiro.goldGrade != null && (
+                    <>
+                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                      <span style={{ color: MU, fontWeight: 500 }}>
+                        {t.sGoldGrade ?? "GOLD"}
+                      </span>
+                      <strong
+                        style={{
+                          color:
+                            [OK, WARN, "#e07a30", DANGER, DANGER][
+                              latestSpiro.goldGrade
+                            ] ?? TX,
+                        }}
+                      >
+                        {latestSpiro.goldGrade}
+                      </strong>
+                    </>
+                  )}
+                </div>
               </>
             )}
 
@@ -1327,15 +1376,55 @@ export default function Sidebar({ patient, t = {} }) {
               </>
             )}
 
-            {/* ── Vaccinations ───────────────────────────────────────────────── */}
-            {activeVax.length > 0 && (
+            {/* ── Show more toggle ──────────────────────────────────────────── */}
+            <button
+              onClick={() => setShowMore((v) => !v)}
+              style={{
+                width: "100%",
+                marginTop: 12,
+                padding: "8px 12px",
+                background: showMore ? "rgba(38,142,134,0.08)" : "transparent",
+                border: `1px solid ${BO}`,
+                borderRadius: 10,
+                cursor: "pointer",
+                fontSize: 11,
+                fontWeight: 700,
+                color: A,
+                letterSpacing: 0.4,
+                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                transition: "background 0.15s ease",
+              }}
+            >
+              {showMore
+                ? (t.sShowLess ?? "Show less")
+                : (t.sShowMore ?? "Show more")}
+              <span
+                style={{
+                  display: "inline-block",
+                  transform: showMore ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.2s ease",
+                  fontSize: 10,
+                }}
+              >
+                ▼
+              </span>
+            </button>
+
+            {showMore && (
               <>
-                <Divider label={t.sVaccinations ?? "Vaccinations"} />
-                {activeVax.map(({ key, label }) => (
-                  <Row key={key} label={label} value="✓" color={OK} />
-                ))}
-              </>
-            )}
+                {/* ── Vaccinations ───────────────────────────────────────────────── */}
+                {activeVax.length > 0 && (
+                  <>
+                    <Divider label={t.sVaccinations ?? "Vaccinations"} />
+                    {activeVax.map(({ key, label }) => (
+                      <Row key={key} label={label} value="✓" color={OK} />
+                    ))}
+                  </>
+                )}
 
             {/* ── GAD-7 ──────────────────────────────────────────────────────── */}
             {latestGad7 && (
@@ -1586,6 +1675,8 @@ export default function Sidebar({ patient, t = {} }) {
                     color={DANGER}
                   />
                 ))}
+              </>
+            )}
               </>
             )}
           </div>
