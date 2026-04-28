@@ -9,6 +9,7 @@ import { getT } from "@/translations";
 import CalendarPanel from "@/components/dashboard/CalendarPanel";
 import DayDetailDrawer from "@/components/dashboard/DayDetailDrawer";
 import Sidebar from "@/components/dashboard/Sidebar";
+import AdviceSection from "./AdviceSection";
 
 function parsePatientData() {
   if (typeof window === "undefined")
@@ -29,7 +30,16 @@ export default function Dashboard() {
   const router = useRouter();
   const { lang } = useLang();
   const t = getT(lang);
-
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("language") !== lang) {
+      // ← "language"
+      url.searchParams.set("language", lang); // ← "language"
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [lang]);
+  // ↑↑↑ slutt ny ↑↑↑
   const [patient, setPatient] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -336,6 +346,8 @@ export default function Dashboard() {
           className="lg:max-w-[280px] lg:flex-shrink-0"
         >
           <Sidebar patient={patient} t={t} />
+
+          <AdviceSection advice={patient.advice ?? []} t={t} />
         </div>
       </main>
 

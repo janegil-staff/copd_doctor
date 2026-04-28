@@ -973,6 +973,7 @@ export default function Sidebar({ patient, t = {} }) {
   const latestPhq9 = patient.latestPhq9 ?? null;
   const records = Array.isArray(patient.records) ? patient.records : [];
   const latestAlpha1 = patient.latestAlpha1 ?? null;
+  const latestNutrition = patient.latestNutrition ?? null;
   const cond = patient.latestRelevantConditions ?? null;
 
   const latestVax = vaccinations.length
@@ -1430,16 +1431,80 @@ export default function Sidebar({ patient, t = {} }) {
 
             {/* ── Nutrition ──────────────────────────────────────────────────── */}
             <Divider label={t.sNutrition ?? "Nutrition"} />
-            <p
-              style={{
-                fontSize: 11,
-                color: MU,
-                fontStyle: "italic",
-                padding: "4px 0",
-              }}
-            >
-              {t.noData ?? "No data recorded."}
-            </p>
+            {latestNutrition?.value != null ? (
+              (() => {
+                const v = latestNutrition.value;
+                // 1 (poor) → red, 5 (excellent) → green
+                const nColor =
+                  v <= 1
+                    ? DANGER
+                    : v === 2
+                      ? "#e07a30"
+                      : v === 3
+                        ? WARN
+                        : v === 4
+                          ? A
+                          : OK;
+                const label =
+                  t.nutritionLabels?.[v] ??
+                  [
+                    t.sNutritionPoor ?? "Poor",
+                    t.sNutritionFair ?? "Fair",
+                    t.sNutritionOk ?? "OK",
+                    t.sNutritionGood ?? "Good",
+                    t.sNutritionExcellent ?? "Excellent",
+                  ][v - 1] ??
+                  String(v);
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "4px 0",
+                      borderBottom: "1px solid rgba(38,142,134,0.07)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: MU,
+                        fontWeight: 500,
+                        flexShrink: 0,
+                        paddingRight: 10,
+                      }}
+                    >
+                      {t.sScore ?? "Score"}
+                    </span>
+                    <Bar value={v} max={5} color={nColor} />
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: nColor,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {v}{" "}
+                      <span style={{ fontSize: 10, fontWeight: 500 }}>
+                        ({label})
+                      </span>
+                    </span>
+                  </div>
+                );
+              })()
+            ) : (
+              <p
+                style={{
+                  fontSize: 11,
+                  color: MU,
+                  fontStyle: "italic",
+                  padding: "4px 0",
+                }}
+              >
+                {t.noData ?? "No data recorded."}
+              </p>
+            )}
 
             {/* ── Weight ─────────────────────────────────────────────────────── */}
             {records.some((r) => r.weight != null) && (

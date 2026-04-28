@@ -20,9 +20,8 @@ export default function LangRedirect({ params }) {
   const { lang } = params;
 
   if (SUPPORTED_LANGS.includes(lang)) {
-    redirect(`/?lang=${lang}`);
+    redirect(`/?language=${lang}`);              // ← endret fra ?lang=
   }
 
-  // If not a valid lang, redirect to home
   redirect("/");
 }

@@ -15,9 +15,9 @@ const LangContext = createContext({ lang: DEFAULT_LANG, setLang: () => {} });
 function resolveInitialLang() {
   if (typeof window === "undefined") return DEFAULT_LANG;
 
-  // 1. Check ?lang= query parameter first — overrides everything
+  // 1. Check ?language= query parameter first — overrides everything
   const params = new URLSearchParams(window.location.search);
-  const queryLang = params.get("lang");
+  const queryLang = params.get("language");        // ← endret fra "lang"
   if (queryLang && SUPPORTED_LANGS.includes(queryLang)) {
     localStorage.setItem("lang", queryLang);
     return queryLang;
@@ -54,3 +54,4 @@ export function LangProvider({ children }) {
 export function useLang() {
   return useContext(LangContext);
 }
+
