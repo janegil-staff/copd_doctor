@@ -27,7 +27,7 @@ function formatDate(dateStr, lang) {
 
 export default function AdviceCard({ advice }) {
   const { lang, t } = useLang();
-  const { category, title, text, date, severity, source } = advice;
+  const { title, text, date, severity, source } = advice;
 
   const severityColor = severity ? SEVERITY_COLORS[severity] : null;
 
@@ -37,9 +37,7 @@ export default function AdviceCard({ advice }) {
       style={severityColor ? { borderLeftColor: severityColor } : undefined}
     >
       <div className={styles.topRow}>
-        <span className={styles.category}>
-          {t(`advice.category.${category}`, category)}
-        </span>
+        {title && <h3 className={styles.title}>{title}</h3>}
         {date && (
           <time className={styles.date} dateTime={date}>
             {formatDate(date, lang)}
@@ -47,7 +45,6 @@ export default function AdviceCard({ advice }) {
         )}
       </div>
 
-      {title && <h3 className={styles.title}>{title}</h3>}
       {text && <p className={styles.text}>{text}</p>}
 
       {source && (

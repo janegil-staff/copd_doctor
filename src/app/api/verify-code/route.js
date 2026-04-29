@@ -1,6 +1,6 @@
 // app/api/verify-code/route.js
 import { NextResponse } from "next/server";
-import { mockPatient } from "@/lib/mockPatient";
+
 
 const SUPPORTED = ["no", "en", "nl", "fr", "de", "it", "sv", "da", "fi", "es", "pl", "pt"];
 
@@ -13,11 +13,6 @@ export async function POST(req) {
   if (!/^\d{6}$/.test(code?.trim())) {
     return NextResponse.json({ valid: false });
   }
-
-  if (code === "000000") {
-    return NextResponse.json({ valid: true, patient: mockPatient });
-  }
-
   try {
     const url =
       `https://server.copdcalendar.com/api/patients/details/json?accessCode=${encodeURIComponent(code.trim())}&language=${encodeURIComponent(language)}`;

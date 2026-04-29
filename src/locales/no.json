@@ -126,7 +126,12 @@
   "sPulseRate": "Puls",
   "sSmokedAges": "Røykte i alder",
   "sCigarettesDay": "Sigaretter / dag",
-  
+  "relevantAdviceTitle": "Relevante råd",
+  "relevantAdviceSubtitle": "Råd pasienten har markert som relevante.",
+  "adviceLanguage": "Språk",
+  "readMore": "Les mer",
+  "showLess": "Vis mindre",
+  "loadingAdvice": "Laster råd…",
   "sFev1": "FEV1",
   "sFvc": "FVC",
   "sFev1Fvc": "FEV1/FVC",

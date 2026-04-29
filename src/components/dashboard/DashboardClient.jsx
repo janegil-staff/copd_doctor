@@ -1,7 +1,5 @@
 "use client";
 
-// src/components/dashboard/DashboardClient.jsx
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
@@ -30,26 +28,30 @@ export default function Dashboard() {
   const router = useRouter();
   const { lang } = useLang();
   const t = getT(lang);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const url = new URL(window.location.href);
-    if (url.searchParams.get("language") !== lang) {
-      // ← "language"
-      url.searchParams.set("language", lang); // ← "language"
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, [lang]);
-  // ↑↑↑ slutt ny ↑↑↑
+
   const [patient, setPatient] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [patientCode, setPatientCode] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("language") !== lang) {
+      url.searchParams.set("language", lang);
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [lang]);
 
   useEffect(() => {
     const { patient: p, selectedRecord: r } = parsePatientData();
     setPatient(p);
     setSelectedRecord(r);
+    if (typeof window !== "undefined") {
+      setPatientCode(sessionStorage.getItem("coachlyCode"));
+    }
     setMounted(true);
   }, []);
 
@@ -60,6 +62,15 @@ export default function Dashboard() {
   const handleDayClick = (record) => {
     setSelectedRecord(record);
     setDrawerOpen(true);
+  };
+
+  const handleAdviceUpdated = (newAdvice) => {
+    setPatient((p) => {
+      if (!p) return p;
+      const updated = { ...p, advice: newAdvice };
+      sessionStorage.setItem("patientData", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   if (!mounted || !patient) return null;
@@ -76,7 +87,6 @@ export default function Dashboard() {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
       <header
         style={{
           display: "flex",
@@ -91,7 +101,6 @@ export default function Dashboard() {
           borderBottom: "1px solid rgba(38,142,134,0.15)",
         }}
       >
-        {/* Patient badge */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div
             style={{
@@ -133,7 +142,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Nav buttons — desktop */}
         <div
           style={{ display: "flex", alignItems: "center", gap: 8 }}
           className="hidden sm:flex"
@@ -180,7 +188,6 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Hamburger — mobile */}
         <div style={{ position: "relative" }} className="sm:hidden">
           <button
             onClick={() => setMenuOpen((o) => !o)}
@@ -284,7 +291,6 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* ── Main content ───────────────────────────────────────────────────── */}
       <main
         style={{
           flex: 1,
@@ -296,7 +302,6 @@ export default function Dashboard() {
           padding: "24px 16px 40px",
         }}
       >
-        {/* Calendar card */}
         <div
           style={{
             background: "rgba(255,255,255,0.88)",
@@ -335,7 +340,6 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Sidebar */}
         <div
           style={{
             width: "100%",
@@ -347,11 +351,16 @@ export default function Dashboard() {
         >
           <Sidebar patient={patient} t={t} />
 
-          <AdviceSection advice={patient.advice ?? []} t={t} />
+          <AdviceSection
+            advice={patient.advice ?? []}
+            t={t}
+            doctorLang={lang}
+            patientCode={patientCode}
+            onAdviceUpdated={handleAdviceUpdated}
+          />
         </div>
       </main>
 
-      {/* ── Day detail drawer ──────────────────────────────────────────────── */}
       <DayDetailDrawer
         t={t}
         open={drawerOpen}

@@ -69,6 +69,13 @@
   "sDeficient": "Puutos",
   "sResult": "Tulos",
   "sSaturation": "Saturaatio",
+  "relevantAdviceTitle": "Olennaiset neuvot",
+  "relevantAdviceSubtitle": "Potilaan olennaisiksi merkitsemät neuvot.",
+  "adviceLanguage": "Kieli",
+  "readMore": "Lue lisää",
+  "showLess": "Näytä vähemmän",
+  "loadingAdvice": "Ladataan neuvoja…",
+
   "sStatus": "Tila",
   "sPulseRate": "Syke",
   "sSmokedAges": "Tupakoi iässä",
@@ -203,15 +210,7 @@
     "Marraskuu",
     "Joulukuu"
   ],
-  "days": [
-    "Ma",
-    "Ti",
-    "Ke",
-    "To",
-    "Pe",
-    "La",
-    "Su"
-  ],
+  "days": ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
   "downloadSummaryPdf": "Lataa yhteenveto PDF",
   "summaryReport": "COPD yhteenveto",
   "generating": "Luodaan…",
