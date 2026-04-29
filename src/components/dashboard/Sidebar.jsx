@@ -53,7 +53,7 @@ function Row({ label, value, color }) {
   );
 }
 
-function Divider({ label, onReadMore, readMoreLabel }) {
+function Divider({ label, onReadMore, readMoreLabel, extra }) {
   return (
     <div
       style={{
@@ -78,6 +78,9 @@ function Divider({ label, onReadMore, readMoreLabel }) {
       <div
         style={{ flex: 1, height: 1, background: "rgba(38,142,134,0.15)" }}
       />
+      {extra && (
+        <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
+      )}
       {onReadMore && (
         <button
           onClick={onReadMore}
@@ -1093,7 +1096,6 @@ export default function Sidebar({ patient, t = {} }) {
           onClose={() => setShowPhq9Modal(false)}
         />
       )}
-
       <aside
         style={{
           width: "100%",
@@ -1102,7 +1104,7 @@ export default function Sidebar({ patient, t = {} }) {
           paddingBottom: 0,
           display: "flex",
           flexDirection: "column",
-          flex: 1,
+          // flex: 1,  ← remove
         }}
       >
         <div
@@ -1112,7 +1114,7 @@ export default function Sidebar({ patient, t = {} }) {
             border: `1px solid ${BO}`,
             borderRadius: 20,
             overflow: "hidden",
-            flex: 1,
+            // flex: 1,  ← remove
             display: "flex",
             flexDirection: "column",
           }}
@@ -1257,56 +1259,21 @@ export default function Sidebar({ patient, t = {} }) {
             )}
 
             {/* ── SPO2 ───────────────────────────────────────────────────────── */}
+            {/* ── SPO2 ───────────────────────────────────────────────────────── */}
             {latestSpo2v && (
-              <>
-                <Divider
-                  label={t.sSpo2 ?? "SPO₂"}
-                  onReadMore={() => setShowSpo2Modal(true)}
-                  readMoreLabel={readMoreLabel}
-                />
-                {latestSpo2v.date && (
-                  <Row
-                    label={t.reportDate ?? "Date"}
-                    value={latestSpo2v.date}
-                  />
-                )}
-                {latestSpo2v.value != null && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      padding: "4px 0",
-                      borderBottom: "1px solid rgba(38,142,134,0.07)",
-                    }}
-                  >
-                    <span
+              <Divider
+                label={
+                  latestSpo2v.date
+                    ? `${t.sSpo2 ?? "SPO₂"} · ${latestSpo2v.date}`
+                    : (t.sSpo2 ?? "SPO₂")
+                }
+                onReadMore={() => setShowSpo2Modal(true)}
+                readMoreLabel={readMoreLabel}
+                extra={
+                  latestSpo2v.value != null && (
+                    <strong
                       style={{
-                        fontSize: 11,
-                        color: MU,
-                        fontWeight: 500,
-                        flexShrink: 0,
-                        paddingRight: 10,
-                      }}
-                    >
-                      {t.sSaturation ?? "Saturation"}
-                    </span>
-                    <Bar
-                      value={latestSpo2v.value - 80}
-                      max={20}
-                      color={
-                        latestSpo2v.value < 90
-                          ? DANGER
-                          : latestSpo2v.value < 94
-                            ? WARN
-                            : OK
-                      }
-                    />
-                    <span
-                      style={{
-                        fontSize: 11,
                         fontWeight: 700,
-                        flexShrink: 0,
                         color:
                           latestSpo2v.value < 90
                             ? DANGER
@@ -1316,18 +1283,11 @@ export default function Sidebar({ patient, t = {} }) {
                       }}
                     >
                       {fmt1(latestSpo2v.value)}%
-                    </span>
-                  </div>
-                )}
-                {latestSpo2v.pulseRate != null && (
-                  <Row
-                    label={t.sPulseRate ?? "Pulse rate"}
-                    value={`${latestSpo2v.pulseRate} bpm`}
-                  />
-                )}
-              </>
+                    </strong>
+                  )
+                }
+              />
             )}
-
             {/* ── Smoking ────────────────────────────────────────────────────── */}
             {smoking && (
               <>

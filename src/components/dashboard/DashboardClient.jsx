@@ -296,7 +296,7 @@ export default function Dashboard() {
           flex: 1,
           display: "flex",
           flexWrap: "wrap",
-          alignItems: "stretch",
+          alignItems: "flex-start", // was "stretch"
           justifyContent: "center",
           gap: 20,
           padding: "24px 16px 40px",

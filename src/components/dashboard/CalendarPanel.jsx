@@ -618,6 +618,7 @@ function ActiveMedicationsList({
   };
 
   return (
+    
     <div
       className="mt-5 rounded-xl overflow-hidden"
       style={{
