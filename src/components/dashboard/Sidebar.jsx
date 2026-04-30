@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import MonthlySummary from "@/components/dashboard/MonthlySummary";
 // src/components/dashboard/Sidebar.jsx
 // Single card, fully translated via t prop, empty sections hidden.
 
@@ -1631,9 +1631,13 @@ export default function Sidebar({ patient, t = {} }) {
                       />
                     ))}
                   </>
+
+                  
                 )}
+              
               </>
             )}
+              <MonthlySummary t={t} records={records} />
           </div>
         </div>
       </aside>

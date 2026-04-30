@@ -216,7 +216,11 @@ export default function CalendarPanel({
       const d = parseLocal(r.date);
       const dow = (d.getDay() + 6) % 7;
       for (let i = 0; i < 7; i++) {
-        const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate() - dow + i);
+        const dd = new Date(
+          d.getFullYear(),
+          d.getMonth(),
+          d.getDate() - dow + i,
+        );
         const key = toKey(dd);
         if (!map[key]) map[key] = r;
       }
@@ -242,8 +246,18 @@ export default function CalendarPanel({
   const cells = buildCalendar(viewYear, viewMonth);
   const pad = (n) => String(n).padStart(2, "0");
   const months = t.monthNames ?? [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
   const days = t.days ?? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -275,13 +289,20 @@ export default function CalendarPanel({
     : null;
 
   const counts = {
-    low:                   monthRecords.filter((r) => r.cat8 != null && r.cat8 <= 10).length,
-    medium:                monthRecords.filter((r) => r.cat8 != null && r.cat8 > 10 && r.cat8 <= 20).length,
-    high:                  monthRecords.filter((r) => r.cat8 != null && r.cat8 > 20 && r.cat8 <= 30).length,
-    veryHigh:              monthRecords.filter((r) => r.cat8 != null && r.cat8 > 30).length,
-    moderateExacerbations: monthRecords.filter((r) => r.moderateExacerbations && !r.seriousExacerbations).length,
-    seriousExacerbations:  monthRecords.filter((r) => r.seriousExacerbations).length,
-    filled:                monthRecords.length,
+    low: monthRecords.filter((r) => r.cat8 != null && r.cat8 <= 10).length,
+    medium: monthRecords.filter(
+      (r) => r.cat8 != null && r.cat8 > 10 && r.cat8 <= 20,
+    ).length,
+    high: monthRecords.filter(
+      (r) => r.cat8 != null && r.cat8 > 20 && r.cat8 <= 30,
+    ).length,
+    veryHigh: monthRecords.filter((r) => r.cat8 != null && r.cat8 > 30).length,
+    moderateExacerbations: monthRecords.filter(
+      (r) => r.moderateExacerbations && !r.seriousExacerbations,
+    ).length,
+    seriousExacerbations: monthRecords.filter((r) => r.seriousExacerbations)
+      .length,
+    filled: monthRecords.length,
   };
 
   return (
@@ -314,7 +335,15 @@ export default function CalendarPanel({
       </div>
 
       {/* Week rows */}
-      <div style={{ paddingLeft: 26, paddingRight: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+      <div
+        style={{
+          paddingLeft: 26,
+          paddingRight: 10,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
         {(() => {
           const rows = [];
           const seen = new Set();
@@ -328,7 +357,11 @@ export default function CalendarPanel({
             if (seen.has(monKey)) continue;
             seen.add(monKey);
 
-            const thu = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 3);
+            const thu = new Date(
+              mon.getFullYear(),
+              mon.getMonth(),
+              mon.getDate() + 3,
+            );
             const jan4 = new Date(thu.getFullYear(), 0, 4);
             const wn = 1 + Math.round((thu - jan4) / 604800000);
 
@@ -369,10 +402,7 @@ export default function CalendarPanel({
                 : "rgba(38,142,134,0.08)";
 
             rows.push(
-              <div
-                key={monKey}
-                style={{ position: "relative" }}
-              >
+              <div key={monKey} style={{ position: "relative" }}>
                 {exLevel && <ExacerbationTriangle level={exLevel} />}
                 {record?.medicines?.length > 0 && <MedicineIcon />}
                 {record?.physicalActivity > 0 && <ExerciseIcon />}
@@ -465,105 +495,6 @@ export default function CalendarPanel({
         })()}
       </div>
 
-      {/* Monthly summary */}
-      <div
-        className="mt-5 rounded-xl overflow-hidden"
-        style={{
-          background: "#fff",
-          border: "1px solid rgba(38,142,134,0.14)",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
-        }}
-      >
-        <div
-          className="px-4 pt-3 pb-2"
-          style={{ borderBottom: "1px solid rgba(38,142,134,0.08)" }}
-        >
-          <p
-            className="text-xs font-semibold tracking-widest uppercase"
-            style={{ color: "#268E86" }}
-          >
-            {t.monthlySummary}
-          </p>
-        </div>
-
-        {[
-          {
-            icon: "⬤",
-            iconColor:
-              avgCatRaw == null
-                ? "#a0b8b6"
-                : avgCatRaw <= 10
-                  ? "#4CC189"
-                  : avgCatRaw <= 20
-                    ? "#FFC659"
-                    : avgCatRaw <= 30
-                      ? "#FF7473"
-                      : "#BE3830",
-            label: t.avgSymptoms,
-            value: avgCat ?? "–",
-          },
-          {
-            icon: "⚠",
-            iconColor: "#f97316",
-            label: t.moderateExacerbation,
-            value: counts.moderateExacerbations,
-          },
-          {
-            icon: "⚠",
-            iconColor: "#ef4444",
-            label: t.seriousExacerbation,
-            value: counts.seriousExacerbations,
-          },
-          {
-            icon: "🏃",
-            iconColor: "#268E86",
-            label: t.physicalActivity,
-            value: (() => {
-              const vals = monthRecords.filter((r) => r.physicalActivity > 0);
-              if (!vals.length) return "–";
-              const avg = Math.round(
-                vals.reduce((s, r) => s + r.physicalActivity, 0) / vals.length,
-              );
-              return t.activityLabels?.[avg] ?? avg;
-            })(),
-          },
-          {
-            iconSrc: "/icons/ico_medicine.png",
-            icon: "💊",
-            iconColor: "#0ea5e9",
-            label: t.weeksWithMedicine ?? t.medicines,
-            value: monthRecords.filter((r) => r.medicines?.length > 0).length,
-          },
-        ].map(({ icon, iconSrc, iconColor, label, value }) => (
-          <div
-            key={label}
-            className="flex items-center px-4 py-2.5"
-            style={{ borderBottom: "1px solid rgba(38,142,134,0.06)" }}
-          >
-            <span
-              className="w-6 text-base flex items-center"
-              style={{ color: iconColor }}
-            >
-              {iconSrc ? (
-                <img
-                  src={iconSrc}
-                  alt=""
-                  style={{ width: 18, height: 18, objectFit: "contain" }}
-                />
-              ) : (
-                icon
-              )}
-            </span>
-            <span className="flex-1 text-sm ml-2" style={{ color: "#4a7a78" }}>
-              {label}
-            </span>
-            <span className="text-sm font-bold" style={{ color: "#b91c1c" }}>
-              {value}
-            </span>
-          </div>
-        ))}
-      </div>
-
       {/* Active medications */}
       <ActiveMedicationsList
         t={t}
@@ -602,7 +533,10 @@ function ActiveMedicationsList({
     { key: "pharmacy", label: t.sPharmacy ?? "Pharmacy" },
     { key: "homeCareNurse", label: t.sHomeCareNurse ?? "Home nurse" },
     { key: "rehabilitationCenter", label: t.sRehab ?? "Rehab" },
-    { key: "hospitalLungSpecialist", label: t.sLungSpecialist ?? "Lung specialist" },
+    {
+      key: "hospitalLungSpecialist",
+      label: t.sLungSpecialist ?? "Lung specialist",
+    },
     { key: "trainingVideo", label: t.sVideo ?? "Video" },
   ];
 
@@ -618,7 +552,6 @@ function ActiveMedicationsList({
   };
 
   return (
-    
     <div
       className="mt-5 rounded-xl overflow-hidden"
       style={{
@@ -770,9 +703,18 @@ function ActiveMedicationsList({
 
 // ─── StoppedMedicationsList ───────────────────────────────────────────────────
 const REASON_CONFIG = {
-  0: { key: "sideEffects",     color: { bg: "#fde8e8", text: "#b42525", border: "#f5b5b5" } },
-  1: { key: "ineffective",     color: { bg: "#fff4e8", text: "#a35400", border: "#f5c9a0" } },
-  2: { key: "otherReason",     color: { bg: "#f0f0f0", text: "#555",    border: "#cecece" } },
+  0: {
+    key: "sideEffects",
+    color: { bg: "#fde8e8", text: "#b42525", border: "#f5b5b5" },
+  },
+  1: {
+    key: "ineffective",
+    color: { bg: "#fff4e8", text: "#a35400", border: "#f5c9a0" },
+  },
+  2: {
+    key: "otherReason",
+    color: { bg: "#f0f0f0", text: "#555", border: "#cecece" },
+  },
 };
 const DEFAULT_REASON_COLOR = { bg: "#f0f0f0", text: "#555", border: "#cecece" };
 
@@ -801,9 +743,9 @@ function StoppedMedicationsList({ t, userMedicines }) {
     const cfg = REASON_CONFIG[reason];
     if (!cfg) return t.otherReason ?? "Other";
     const fallbacks = {
-      sideEffects:     "Side effects",
-      ineffective:     "Not effective",
-      otherReason:     "Other",
+      sideEffects: "Side effects",
+      ineffective: "Not effective",
+      otherReason: "Other",
     };
     return t[cfg.key] ?? fallbacks[cfg.key];
   };
@@ -867,112 +809,119 @@ function StoppedMedicationsList({ t, userMedicines }) {
       </button>
 
       {expanded && (
-        <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
-        {stopped.map((um) => {
-          const med = um.medicine ?? {};
-          const color = reasonColor(um.reason);
-          const days = daysBetween(um.startedUsage, um.stoppedUsage);
+        <div
+          style={{
+            padding: "10px 12px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          {stopped.map((um) => {
+            const med = um.medicine ?? {};
+            const color = reasonColor(um.reason);
+            const days = daysBetween(um.startedUsage, um.stoppedUsage);
 
-          return (
-            <div
-              key={`${um.medicineId}-${um.stoppedUsage}`}
-              style={{
-                padding: "10px 12px",
-                background: "rgba(38,142,134,0.03)",
-                borderRadius: 10,
-                border: "1px solid rgba(38,142,134,0.08)",
-                borderLeft: `3px solid ${color.text}`,
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 10,
-              }}
-            >
-              {med.image ? (
-                <img
-                  src={med.image}
-                  alt=""
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
-                    objectFit: "cover",
-                    flexShrink: 0,
-                    background: "#e8f5f3",
-                    opacity: 0.8,
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
-                    background: "#e8f5f3",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 15,
-                    flexShrink: 0,
-                    opacity: 0.7,
-                  }}
-                >
-                  💊
-                </div>
-              )}
-
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "#1a6b65",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {med.name ?? `#${um.medicineId}`}
-                </div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: "#7a9a98",
-                    marginTop: 3,
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "2px 8px",
-                  }}
-                >
-                  <span>
-                    {um.startedUsage ? fmtDate(um.startedUsage) : "?"} →{" "}
-                    {fmtDate(um.stoppedUsage)}
-                  </span>
-                  {days != null && (
-                    <span>
-                      · {days} {t.daysLabel ?? "days"}
-                    </span>
-                  )}
-                  {med.atcCode && <span>· {med.atcCode}</span>}
-                </div>
-              </div>
-
-              <span
+            return (
+              <div
+                key={`${um.medicineId}-${um.stoppedUsage}`}
                 style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  background: color.bg,
-                  color: color.text,
-                  border: `1px solid ${color.border}`,
-                  borderRadius: 20,
-                  padding: "3px 10px",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                  alignSelf: "center",
+                  padding: "10px 12px",
+                  background: "rgba(38,142,134,0.03)",
+                  borderRadius: 10,
+                  border: "1px solid rgba(38,142,134,0.08)",
+                  borderLeft: `3px solid ${color.text}`,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
                 }}
               >
-                {reasonLabel(um.reason)}
-              </span>
-            </div>
-          );
-        })}
+                {med.image ? (
+                  <img
+                    src={med.image}
+                    alt=""
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      objectFit: "cover",
+                      flexShrink: 0,
+                      background: "#e8f5f3",
+                      opacity: 0.8,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: "#e8f5f3",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 15,
+                      flexShrink: 0,
+                      opacity: 0.7,
+                    }}
+                  >
+                    💊
+                  </div>
+                )}
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: "#1a6b65",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {med.name ?? `#${um.medicineId}`}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: "#7a9a98",
+                      marginTop: 3,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "2px 8px",
+                    }}
+                  >
+                    <span>
+                      {um.startedUsage ? fmtDate(um.startedUsage) : "?"} →{" "}
+                      {fmtDate(um.stoppedUsage)}
+                    </span>
+                    {days != null && (
+                      <span>
+                        · {days} {t.daysLabel ?? "days"}
+                      </span>
+                    )}
+                    {med.atcCode && <span>· {med.atcCode}</span>}
+                  </div>
+                </div>
+
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    background: color.bg,
+                    color: color.text,
+                    border: `1px solid ${color.border}`,
+                    borderRadius: 20,
+                    padding: "3px 10px",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                    alignSelf: "center",
+                  }}
+                >
+                  {reasonLabel(um.reason)}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
