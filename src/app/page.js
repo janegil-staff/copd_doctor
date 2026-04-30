@@ -8,6 +8,7 @@ import ImportCard from "@/components/home/ImportCard";
 import PhoneShowcase from "@/components/home/PhoneShowcase";
 import HomeFooter from "@/components/home/HomeFooter";
 import { getT } from "@/translations";
+import DiagnosisCard from "@/components/home/DiagnosisCard";
 
 const COUNTRIES = [
   { code: "no", label: "Norway", flag: "🇳🇴" },
@@ -49,7 +50,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
+    <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0">
       <main className="flex-1 flex flex-col min-[900px]:flex-row items-center min-[900px]:items-start justify-center gap-6 px-6 min-[900px]:px-12 pt-12 pb-6 relative z-10">
         {/* Left column */}
         <div className="flex flex-col gap-6 flex-1 min-[900px]:min-w-[300px] min-[900px]:max-w-[580px] w-full order-1 min-[900px]:order-1">
@@ -60,19 +61,19 @@ export default function Home() {
         </div>
 
         {/* Right column — dropdown + ImportCard share the same width */}
-        <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3">
+        <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3 min-[900px]:-mt-10">
           {/* Country dropdown */}
-          <div className="relative w-full max-w-[400px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0">
+          <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0">
             <select
               value={lang}
               onChange={(e) => {
                 const newLang = e.target.value;
                 setLang(newLang);
                 const url = new URL(window.location.href);
-                url.searchParams.set("language", newLang); // ← "language", ikke "lang"
+                url.searchParams.set("language", newLang);
                 window.history.replaceState({}, "", url.toString());
               }}
-              className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-700 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-1.5 pr-9 text-xs font-medium text-gray-700 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -82,7 +83,7 @@ export default function Home() {
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
               <svg
-                className="w-4 h-4"
+                className="w-3.5 h-3.5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -104,6 +105,7 @@ export default function Home() {
             handleChange={handleChange}
             handleClick={handleClick}
           />
+          <DiagnosisCard t={t} />
         </div>
 
         {/* Phone showcase mobile */}

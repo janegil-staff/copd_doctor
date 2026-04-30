@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 
 export default function ImportCard({
@@ -10,7 +11,7 @@ export default function ImportCard({
   handleClick,
 }) {
   return (
-    <div className="w-full max-w-[400px] mx-auto min-[900px]:w-[400px] min-[900px]:mx-0 flex-shrink-0">
+    <div className="w-full max-w-[480px] mx-auto min-[900px]:w-[480px] min-[900px]:mx-0 flex-shrink-0">
       <div
         className="rounded-2xl overflow-hidden shadow-lg"
         style={{
@@ -20,52 +21,17 @@ export default function ImportCard({
           padding: 40,
         }}
       >
-        {/* Screenshots — hidden on mobile */}
-        <div
-          className="relative overflow-hidden min-[600px]:block"
-          style={{ height: 180 }}
-        >
-          <div className="overflow-hidden">
-            <Image
-              height={300}
-              width={130}
-              src="/welcome.png"
-              alt="App home"
-              style={{
-                width: "200%",
-                height: "auto",
-                display: "block",
-                marginLeft: 0,
-              }}
-            />
-          </div>
-          <div className="absolute top-0 right-0">
-            <Image height={50} width={50} src="/logo.png" alt="App settings" />
-          </div>
-          <div
-            className="absolute inset-y-0"
-            style={{
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 2,
-              background: "rgba(255,255,255,0.6)",
-            }}
-          />
-          <div
-            className="absolute bottom-0 left-0 right-0"
-            style={{
-              height: 80,
-              background:
-                "linear-gradient(to bottom, transparent, rgba(255,255,255,0.95))",
-            }}
-          />
-        </div>
-
         {/* Form */}
         <div className="px-5 pb-5">
-          <p className="text-center font-bold tracking-widest text-sm mb-4 text-gray-800 uppercase">
-            {t.importTitle}
-          </p>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={60}
+              height={60}
+              style={{ height: "auto" }}
+            />
+          </div>
           <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase mb-2">
             {t.importLabel}
           </p>
