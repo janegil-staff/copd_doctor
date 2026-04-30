@@ -51,4 +51,7 @@ Thumbs.db
 
 .next
 .env
-.env.local
+.env.localvenv/
+node_modules/
+.next/
+.env*
