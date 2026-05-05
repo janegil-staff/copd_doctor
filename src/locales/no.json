@@ -2,7 +2,7 @@
   "title": "Kolskalendar",
   "subtitle": "Få full oversikt med enkel registrering og daglig påminnelse. Enkel import av data på denne siden. Utviklet i samarbeid med lungeleger og KOLS-spesialister.",
   "importTitle": "Importer data",
-  "importLabel": "Kode (fra mobil app):",
+  "importLabel": "Importer data fra mobilapp:",
   "placeholder": "Skriv inn kode",
   "importButton": "Start",
   "available": "Tilgjengelig på App Store og Google Play.",
