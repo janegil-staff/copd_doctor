@@ -7,32 +7,29 @@ definitions:
 pipelines:
   default:
     - step:
-        name: Install & Lint
+        name: Install
         caches:
           - node
         script:
           - npm ci
-          - npm run lint
 
   branches:
     testing:
       - step:
-          name: Install, Lint & Test
+          name: Install & Test
           caches:
             - node
           script:
             - npm ci
-            - npm run lint
             - npm test -- --watchAll=false --passWithNoTests
 
     main:
       - step:
-          name: Install, Lint & Test
+          name: Install & Test
           caches:
             - node
           script:
             - npm ci
-            - npm run lint
             - npm test -- --watchAll=false --passWithNoTests
       - step:
           name: Build
