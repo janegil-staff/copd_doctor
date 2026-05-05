@@ -221,7 +221,15 @@
     "Novembro",
     "Dezembro"
   ],
-  "days": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+  "days": [
+    "Seg",
+    "Ter",
+    "Qua",
+    "Qui",
+    "Sex",
+    "Sáb",
+    "Dom"
+  ],
   "downloadSummaryPdf": "Descarregar PDF resumo",
   "summaryReport": "Resumo DPOC",
   "generating": "A gerar…",
@@ -341,5 +349,25 @@
   "started": "Iniciado",
   "daysLabel": "dias",
   "dose": "Dose",
-  "timesLogged": "vezes registado"
+  "timesLogged": "vezes registado",
+  "treatmentToggle": "Tratamento DPOC",
+  "treatmentIntro": "As diretrizes dividem o tratamento da DPOC nos grupos: A, B e E.",
+  "treatmentEvalE": "Avaliar primeiro o Grupo E",
+  "treatmentEvalE1": "Avaliar o número de exacerbações",
+  "treatmentEvalE2": "O Grupo E é escolhido se o número de exacerbações moderadas/graves ≥ 1",
+  "treatmentEvalAB": "Se não for Grupo E, escolher A ou B",
+  "treatmentEvalAB1": "Avaliar os sintomas usando a pontuação MMRC",
+  "treatmentEvalAB2": "O Grupo A é escolhido se a pontuação MMRC < 2",
+  "treatmentEvalAB3": "O Grupo B é escolhido se a pontuação MMRC ≥ 2",
+  "medicationsToggle": "Medicamentos DPOC",
+  "medicationsIntro": "Os medicamentos são escolhidos com base no grupo de tratamento.",
+  "medicationsGroupA": "Grupo de tratamento A:",
+  "medicationsGroupA1": "Primeira escolha: LABA ou LAMA",
+  "medicationsGroupA2": "As diretrizes norueguesas sugerem que pacientes com sintomas ocasionais podem usar SABA ou SAMA",
+  "medicationsGroupB": "Grupo de tratamento B:",
+  "medicationsGroupB1": "Primeira escolha: LABA+LAMA em inalador combinado",
+  "medicationsGroupB2": "Na Noruega recomenda-se LABA ou LAMA. LABA+LAMA com efeito insuficiente.",
+  "medicationsGroupE": "Grupo de tratamento E:",
+  "medicationsGroupE1": "Primeira escolha: LABA+LAMA. Com eosinófilos ≥ 0,3, LABA+LAMA+ICS é recomendado.",
+  "medicationsGroupE2": "As diretrizes norueguesas recomendam começar com LAMA ou LABA. Com efeito insuficiente LABA+LAMA. LABA/LAMA/ICS pode ser considerado com FEV1 < 50 % e eosinofilia > 300 células/µL."
 }

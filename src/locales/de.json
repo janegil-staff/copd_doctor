@@ -215,7 +215,15 @@
     "November",
     "Dezember"
   ],
-  "days": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+  "days": [
+    "Mo",
+    "Di",
+    "Mi",
+    "Do",
+    "Fr",
+    "Sa",
+    "So"
+  ],
   "downloadSummaryPdf": "Zusammenfassung PDF herunterladen",
   "summaryReport": "COPD Zusammenfassung",
   "generating": "Wird erstellt…",
@@ -335,5 +343,25 @@
   "started": "Begonnen",
   "daysLabel": "Tage",
   "dose": "Dosis",
-  "timesLogged": "mal protokolliert"
+  "timesLogged": "mal protokolliert",
+  "treatmentToggle": "COPD-Behandlung",
+  "treatmentIntro": "Die Leitlinien teilen die COPD-Behandlung in die Gruppen A, B und E ein.",
+  "treatmentEvalE": "Gruppe E zuerst beurteilen",
+  "treatmentEvalE1": "Anzahl der Exazerbationen beurteilen",
+  "treatmentEvalE2": "Gruppe E wird gewählt, wenn Anzahl moderater/schwerer Exazerbationen ≥ 1",
+  "treatmentEvalAB": "Wenn nicht Gruppe E, A oder B wählen",
+  "treatmentEvalAB1": "Symptome mit dem MMRC-Score bewerten",
+  "treatmentEvalAB2": "Gruppe A bei MMRC-Score < 2",
+  "treatmentEvalAB3": "Gruppe B bei MMRC-Score ≥ 2",
+  "medicationsToggle": "COPD-Medikamente",
+  "medicationsIntro": "Die Medikamente werden nach der Behandlungsgruppe ausgewählt.",
+  "medicationsGroupA": "Behandlungsgruppe A:",
+  "medicationsGroupA1": "Erste Wahl ist LABA oder LAMA",
+  "medicationsGroupA2": "Norwegische Leitlinien empfehlen, dass Patienten mit gelegentlichen Symptomen SABA oder SAMA verwenden können",
+  "medicationsGroupB": "Behandlungsgruppe B:",
+  "medicationsGroupB1": "Erste Wahl ist LABA+LAMA im Kombinationsinhalator",
+  "medicationsGroupB2": "In Norwegen wird LABA oder LAMA empfohlen. LABA+LAMA bei unzureichender Wirkung.",
+  "medicationsGroupE": "Behandlungsgruppe E:",
+  "medicationsGroupE1": "Erste Wahl ist LABA+LAMA. Bei Eosinophilen ≥ 0,3 wird LABA+LAMA+ICS empfohlen.",
+  "medicationsGroupE2": "Norwegische Leitlinien empfehlen, mit LAMA oder LABA zu beginnen. Bei unzureichender Wirkung LABA+LAMA. LABA/LAMA/ICS kann bei FEV1 < 50 % und Eosinophilie > 300 Zellen/µL erwogen werden."
 }

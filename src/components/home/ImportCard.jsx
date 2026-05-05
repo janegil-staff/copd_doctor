@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 export default function ImportCard({
   t,
   code,
@@ -11,28 +9,19 @@ export default function ImportCard({
   handleClick,
 }) {
   return (
-    <div className="w-full max-w-[480px] mx-auto min-[900px]:w-[480px] min-[900px]:mx-0 flex-shrink-0">
+    <div className="w-full max-w-[480px] mx-auto min-[900px]:w-[480px] min-[900px]:mx-0 flex-shrink-0 min-[900px]:mt-20">
       <div
         className="rounded-2xl overflow-hidden shadow-lg"
         style={{
           background: "rgba(255,255,255,0.82)",
           border: "1px solid rgba(38,142,134,0.15)",
           backdropFilter: "blur(10px)",
-          padding: 40,
+          padding: 10,
         }}
       >
         {/* Form */}
-        <div className="px-5 pb-5">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={60}
-              height={60}
-              style={{ height: "auto" }}
-            />
-          </div>
-          <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase mb-2">
+        <div className="px-2 pb-5">
+          <p className="font-bold tracking-widest text-sm uppercase text-gray-800 mb-2">
             {t.importLabel}
           </p>
           <form onSubmit={handleClick}>

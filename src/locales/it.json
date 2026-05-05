@@ -221,7 +221,15 @@
     "Novembre",
     "Dicembre"
   ],
-  "days": ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"],
+  "days": [
+    "Lun",
+    "Mar",
+    "Mer",
+    "Gio",
+    "Ven",
+    "Sab",
+    "Dom"
+  ],
   "downloadSummaryPdf": "Scarica PDF riepilogo",
   "summaryReport": "Riepilogo BPCO",
   "generating": "Generazione…",
@@ -341,5 +349,25 @@
   "started": "Iniziato",
   "daysLabel": "giorni",
   "dose": "Dose",
-  "timesLogged": "volte registrato"
+  "timesLogged": "volte registrato",
+  "treatmentToggle": "Trattamento BPCO",
+  "treatmentIntro": "Le linee guida dividono il trattamento della BPCO nei gruppi: A, B ed E.",
+  "treatmentEvalE": "Valutare prima il Gruppo E",
+  "treatmentEvalE1": "Valutare il numero di riacutizzazioni",
+  "treatmentEvalE2": "Il Gruppo E è scelto se il numero di riacutizzazioni moderate/severe ≥ 1",
+  "treatmentEvalAB": "Se non Gruppo E, scegliere A o B",
+  "treatmentEvalAB1": "Valutare i sintomi con il punteggio MMRC",
+  "treatmentEvalAB2": "Il Gruppo A è scelto con punteggio MMRC < 2",
+  "treatmentEvalAB3": "Il Gruppo B è scelto con punteggio MMRC ≥ 2",
+  "medicationsToggle": "Farmaci BPCO",
+  "medicationsIntro": "I farmaci sono scelti in base al gruppo di trattamento.",
+  "medicationsGroupA": "Gruppo di trattamento A:",
+  "medicationsGroupA1": "Prima scelta: LABA o LAMA",
+  "medicationsGroupA2": "Le linee guida norvegesi suggeriscono che pazienti con sintomi occasionali possano usare SABA o SAMA",
+  "medicationsGroupB": "Gruppo di trattamento B:",
+  "medicationsGroupB1": "Prima scelta: LABA+LAMA in inalatore combinato",
+  "medicationsGroupB2": "In Norvegia si raccomanda LABA o LAMA. LABA+LAMA in caso di effetto insufficiente.",
+  "medicationsGroupE": "Gruppo di trattamento E:",
+  "medicationsGroupE1": "Prima scelta: LABA+LAMA. Con eosinofili ≥ 0,3 è raccomandato LABA+LAMA+ICS.",
+  "medicationsGroupE2": "Le linee guida norvegesi raccomandano di iniziare con LAMA o LABA. In caso di effetto insufficiente LABA+LAMA. LABA/LAMA/ICS può essere considerato con FEV1 < 50 % ed eosinofilia > 300 cellule/µL."
 }

@@ -221,7 +221,15 @@
     "November",
     "December"
   ],
-  "days": ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"],
+  "days": [
+    "Mån",
+    "Tis",
+    "Ons",
+    "Tor",
+    "Fre",
+    "Lör",
+    "Sön"
+  ],
   "downloadSummaryPdf": "Ladda ner sammanfattning PDF",
   "summaryReport": "KOL sammanfattning",
   "generating": "Genererar…",
@@ -341,5 +349,25 @@
   "started": "Påbörjad",
   "daysLabel": "dagar",
   "dose": "Dos",
-  "timesLogged": "gånger loggad"
+  "timesLogged": "gånger loggad",
+  "treatmentToggle": "KOL-behandling",
+  "treatmentIntro": "Riktlinjerna delar in KOL-behandlingen i grupperna: A, B och E.",
+  "treatmentEvalE": "Bedöm grupp E först",
+  "treatmentEvalE1": "Bedöm antalet exacerbationer",
+  "treatmentEvalE2": "Grupp E väljs om antalet måttliga/svåra exacerbationer ≥ 1",
+  "treatmentEvalAB": "Om inte grupp E, välj A eller B",
+  "treatmentEvalAB1": "Bedöm symtom med hjälp av MMRC-poäng",
+  "treatmentEvalAB2": "Grupp A väljs vid MMRC-poäng < 2",
+  "treatmentEvalAB3": "Grupp B väljs vid MMRC-poäng ≥ 2",
+  "medicationsToggle": "KOL-läkemedel",
+  "medicationsIntro": "Läkemedel väljs utifrån behandlingsgrupp.",
+  "medicationsGroupA": "Behandlingsgrupp A:",
+  "medicationsGroupA1": "Förstahandsval är LABA eller LAMA",
+  "medicationsGroupA2": "Norska riktlinjer föreslår att patienter med tillfälliga symtom kan använda SABA eller SAMA",
+  "medicationsGroupB": "Behandlingsgrupp B:",
+  "medicationsGroupB1": "Förstahandsval är LABA+LAMA i kombinationsinhalator",
+  "medicationsGroupB2": "I Norge rekommenderas LABA eller LAMA. LABA+LAMA vid otillräcklig effekt.",
+  "medicationsGroupE": "Behandlingsgrupp E:",
+  "medicationsGroupE1": "Förstahandsval är LABA+LAMA. Vid eosinofiler ≥ 0,3 rekommenderas LABA+LAMA+ICS.",
+  "medicationsGroupE2": "Norska riktlinjer rekommenderar att börja med LAMA eller LABA. Vid otillräcklig effekt LABA+LAMA. LABA/LAMA/ICS kan övervägas vid FEV1 < 50 % och eosinofili > 300 celler/µL."
 }

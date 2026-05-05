@@ -203,7 +203,15 @@
     "November",
     "December"
   ],
-  "days": ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"],
+  "days": [
+    "Ma",
+    "Di",
+    "Wo",
+    "Do",
+    "Vr",
+    "Za",
+    "Zo"
+  ],
   "downloadSummaryPdf": "Download samenvatting PDF",
   "summaryReport": "COPD samenvatting",
   "generating": "Genereren…",
@@ -341,5 +349,25 @@
   "started": "Gestart",
   "daysLabel": "dagen",
   "dose": "Dosis",
-  "timesLogged": "keer geregistreerd"
+  "timesLogged": "keer geregistreerd",
+  "treatmentToggle": "COPD-behandeling",
+  "treatmentIntro": "De richtlijnen verdelen de COPD-behandeling in de groepen: A, B en E.",
+  "treatmentEvalE": "Beoordeel eerst groep E",
+  "treatmentEvalE1": "Beoordeel het aantal exacerbaties",
+  "treatmentEvalE2": "Groep E wordt gekozen bij ≥ 1 matige/ernstige exacerbatie",
+  "treatmentEvalAB": "Als niet groep E, kies A of B",
+  "treatmentEvalAB1": "Beoordeel symptomen met de MMRC-score",
+  "treatmentEvalAB2": "Groep A bij MMRC-score < 2",
+  "treatmentEvalAB3": "Groep B bij MMRC-score ≥ 2",
+  "medicationsToggle": "COPD-medicatie",
+  "medicationsIntro": "De medicatie wordt gekozen op basis van de behandelgroep.",
+  "medicationsGroupA": "Behandelgroep A:",
+  "medicationsGroupA1": "Eerste keuze is LABA of LAMA",
+  "medicationsGroupA2": "Noorse richtlijnen stellen dat patiënten met incidentele symptomen SABA of SAMA kunnen gebruiken",
+  "medicationsGroupB": "Behandelgroep B:",
+  "medicationsGroupB1": "Eerste keuze is LABA+LAMA in een combinatie-inhalator",
+  "medicationsGroupB2": "In Noorwegen wordt LABA of LAMA aanbevolen. LABA+LAMA bij onvoldoende effect.",
+  "medicationsGroupE": "Behandelgroep E:",
+  "medicationsGroupE1": "Eerste keuze is LABA+LAMA. Bij eosinofielen ≥ 0,3 wordt LABA+LAMA+ICS aanbevolen.",
+  "medicationsGroupE2": "Noorse richtlijnen adviseren te starten met LAMA of LABA. Bij onvoldoende effect LABA+LAMA. LABA/LAMA/ICS kan worden overwogen bij FEV1 < 50 % en eosinofilie > 300 cellen/µL."
 }

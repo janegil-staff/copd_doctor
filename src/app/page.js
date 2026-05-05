@@ -9,6 +9,8 @@ import PhoneShowcase from "@/components/home/PhoneShowcase";
 import HomeFooter from "@/components/home/HomeFooter";
 import { getT } from "@/translations";
 import DiagnosisCard from "@/components/home/DiagnosisCard";
+import TreatmentCard from "@/components/home/TreatmentCard";
+import MedicationsCard from "@/components/home/MedicationsCard";
 
 const COUNTRIES = [
   { code: "no", label: "Norway", flag: "🇳🇴" },
@@ -63,7 +65,7 @@ export default function Home() {
         {/* Right column — dropdown + ImportCard share the same width */}
         <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3 min-[900px]:-mt-10">
           {/* Country dropdown */}
-          <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0">
+          <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0 min-[900px]:w-fit min-[900px]:self-start min-[900px]:mt-2">
             <select
               value={lang}
               onChange={(e) => {
@@ -73,7 +75,7 @@ export default function Home() {
                 url.searchParams.set("language", newLang);
                 window.history.replaceState({}, "", url.toString());
               }}
-              className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-1.5 pr-9 text-xs font-medium text-gray-700 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="appearance-none bg-white border border-gray-200 rounded-lg px-3 py-1.5 pr-9 text-xs font-medium text-gray-700 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 min-[900px]:w-auto w-full"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -106,6 +108,8 @@ export default function Home() {
             handleClick={handleClick}
           />
           <DiagnosisCard t={t} />
+          <TreatmentCard t={t} />
+          <MedicationsCard t={t} />
         </div>
 
         {/* Phone showcase mobile */}

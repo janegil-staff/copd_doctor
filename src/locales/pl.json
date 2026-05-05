@@ -215,7 +215,15 @@
     "Listopad",
     "Grudzień"
   ],
-  "days": ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"],
+  "days": [
+    "Pon",
+    "Wt",
+    "Śr",
+    "Czw",
+    "Pt",
+    "Sob",
+    "Nd"
+  ],
   "downloadSummaryPdf": "Pobierz PDF podsumowania",
   "summaryReport": "Podsumowanie POChP",
   "generating": "Generowanie…",
@@ -335,5 +343,25 @@
   "started": "Rozpoczęto",
   "daysLabel": "dni",
   "dose": "Dawka",
-  "timesLogged": "razy zarejestrowano"
+  "timesLogged": "razy zarejestrowano",
+  "treatmentToggle": "Leczenie POChP",
+  "treatmentIntro": "Wytyczne dzielą leczenie POChP na grupy: A, B i E.",
+  "treatmentEvalE": "Najpierw oceń grupę E",
+  "treatmentEvalE1": "Oceń liczbę zaostrzeń",
+  "treatmentEvalE2": "Grupę E wybiera się, gdy liczba umiarkowanych/ciężkich zaostrzeń ≥ 1",
+  "treatmentEvalAB": "Jeśli nie grupa E, wybierz A lub B",
+  "treatmentEvalAB1": "Oceń objawy za pomocą skali MMRC",
+  "treatmentEvalAB2": "Grupę A wybiera się przy wyniku MMRC < 2",
+  "treatmentEvalAB3": "Grupę B wybiera się przy wyniku MMRC ≥ 2",
+  "medicationsToggle": "Leki POChP",
+  "medicationsIntro": "Leki dobiera się na podstawie grupy leczenia.",
+  "medicationsGroupA": "Grupa leczenia A:",
+  "medicationsGroupA1": "Pierwszy wybór: LABA lub LAMA",
+  "medicationsGroupA2": "Wytyczne norweskie sugerują, że pacjenci z okazjonalnymi objawami mogą stosować SABA lub SAMA",
+  "medicationsGroupB": "Grupa leczenia B:",
+  "medicationsGroupB1": "Pierwszy wybór: LABA+LAMA w inhalatorze kombinowanym",
+  "medicationsGroupB2": "W Norwegii zaleca się LABA lub LAMA. LABA+LAMA przy niewystarczającym efekcie.",
+  "medicationsGroupE": "Grupa leczenia E:",
+  "medicationsGroupE1": "Pierwszy wybór: LABA+LAMA. Przy eozynofilach ≥ 0,3 zalecane LABA+LAMA+ICS.",
+  "medicationsGroupE2": "Wytyczne norweskie zalecają rozpoczęcie od LAMA lub LABA. Przy niewystarczającym efekcie LABA+LAMA. LABA/LAMA/ICS można rozważyć przy FEV1 < 50 % i eozynofilii > 300 komórek/µL."
 }

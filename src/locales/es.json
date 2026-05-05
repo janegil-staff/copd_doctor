@@ -221,7 +221,15 @@
     "Noviembre",
     "Diciembre"
   ],
-  "days": ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+  "days": [
+    "Lun",
+    "Mar",
+    "Mié",
+    "Jue",
+    "Vie",
+    "Sáb",
+    "Dom"
+  ],
   "downloadSummaryPdf": "Descargar PDF resumen",
   "summaryReport": "Resumen EPOC",
   "generating": "Generando…",
@@ -341,5 +349,25 @@
   "started": "Iniciado",
   "daysLabel": "días",
   "dose": "Dosis",
-  "timesLogged": "veces registrado"
+  "timesLogged": "veces registrado",
+  "treatmentToggle": "Tratamiento EPOC",
+  "treatmentIntro": "Las directrices dividen el tratamiento de la EPOC en los grupos: A, B y E.",
+  "treatmentEvalE": "Evaluar primero el Grupo E",
+  "treatmentEvalE1": "Evaluar el número de exacerbaciones",
+  "treatmentEvalE2": "Se elige el Grupo E si el número de exacerbaciones moderadas/graves ≥ 1",
+  "treatmentEvalAB": "Si no es Grupo E, elegir A o B",
+  "treatmentEvalAB1": "Evaluar los síntomas con la escala MMRC",
+  "treatmentEvalAB2": "Se elige el Grupo A si la puntuación MMRC < 2",
+  "treatmentEvalAB3": "Se elige el Grupo B si la puntuación MMRC ≥ 2",
+  "medicationsToggle": "Medicamentos EPOC",
+  "medicationsIntro": "Los medicamentos se eligen según el grupo de tratamiento.",
+  "medicationsGroupA": "Grupo de tratamiento A:",
+  "medicationsGroupA1": "Primera elección: LABA o LAMA",
+  "medicationsGroupA2": "Las directrices noruegas sugieren que pacientes con síntomas ocasionales pueden usar SABA o SAMA",
+  "medicationsGroupB": "Grupo de tratamiento B:",
+  "medicationsGroupB1": "Primera elección: LABA+LAMA en inhalador combinado",
+  "medicationsGroupB2": "En Noruega se recomienda LABA o LAMA. LABA+LAMA si el efecto es insuficiente.",
+  "medicationsGroupE": "Grupo de tratamiento E:",
+  "medicationsGroupE1": "Primera elección: LABA+LAMA. Con eosinófilos ≥ 0,3 se recomienda LABA+LAMA+ICS.",
+  "medicationsGroupE2": "Las directrices noruegas recomiendan empezar con LAMA o LABA. Con efecto insuficiente LABA+LAMA. LABA/LAMA/ICS puede considerarse con FEV1 < 50 % y eosinofilia > 300 células/µL."
 }

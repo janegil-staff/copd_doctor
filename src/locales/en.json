@@ -220,7 +220,15 @@
     "November",
     "December"
   ],
-  "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+  "days": [
+    "Mo",
+    "Tu",
+    "We",
+    "Th",
+    "Fr",
+    "Sa",
+    "Su"
+  ],
   "downloadSummaryPdf": "Download Summary PDF",
   "patientInformation": "Patient Information",
   "summaryReport": "COPD Summary",
@@ -341,5 +349,25 @@
   "started": "Started",
   "daysLabel": "days",
   "dose": "Dose",
-  "timesLogged": "times logged"
+  "timesLogged": "times logged",
+  "treatmentToggle": "COPD Treatment",
+  "treatmentIntro": "The guidelines divide COPD treatment into groups: A, B and E.",
+  "treatmentEvalE": "Evaluate Group E first",
+  "treatmentEvalE1": "Evaluate the number of exacerbations",
+  "treatmentEvalE2": "Group E is chosen if number of moderate/severe exacerbations ≥ 1",
+  "treatmentEvalAB": "If not Group E, choose A or B",
+  "treatmentEvalAB1": "Evaluate symptoms using the MMRC Score",
+  "treatmentEvalAB2": "Group A is chosen if MMRC Score < 2",
+  "treatmentEvalAB3": "Group B is chosen if MMRC Score ≥ 2",
+  "medicationsToggle": "COPD Medications",
+  "medicationsIntro": "Medications are selected based on the treatment group.",
+  "medicationsGroupA": "Treatment Group A:",
+  "medicationsGroupA1": "First choice is LABA or LAMA",
+  "medicationsGroupA2": "Norwegian guidelines suggest patients with occasional symptoms may use SABA or SAMA",
+  "medicationsGroupB": "Treatment Group B:",
+  "medicationsGroupB1": "First choice is LABA+LAMA in a combination inhaler",
+  "medicationsGroupB2": "In Norway, LABA or LAMA is recommended. LABA+LAMA is recommended if effect is insufficient.",
+  "medicationsGroupE": "Treatment Group E:",
+  "medicationsGroupE1": "First choice is LABA+LAMA. With eosinophils ≥ 0.3, LABA+LAMA+ICS is recommended.",
+  "medicationsGroupE2": "Norwegian guidelines recommend starting with LAMA or LABA. With insufficient effect, LABA+LAMA. LABA/LAMA/ICS may be considered with FEV1 < 50 % and eosinophilia > 300 cells/µL."
 }

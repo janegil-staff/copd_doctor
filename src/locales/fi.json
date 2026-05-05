@@ -87,7 +87,6 @@
   "readMore": "Lue lisää",
   "showLess": "Näytä vähemmän",
   "loadingAdvice": "Ladataan neuvoja…",
-
   "sStatus": "Tila",
   "sPulseRate": "Syke",
   "sSmokedAges": "Tupakoi iässä",
@@ -222,7 +221,15 @@
     "Marraskuu",
     "Joulukuu"
   ],
-  "days": ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
+  "days": [
+    "Ma",
+    "Ti",
+    "Ke",
+    "To",
+    "Pe",
+    "La",
+    "Su"
+  ],
   "downloadSummaryPdf": "Lataa yhteenveto PDF",
   "summaryReport": "COPD yhteenveto",
   "generating": "Luodaan…",
@@ -342,5 +349,25 @@
   "started": "Aloitettu",
   "daysLabel": "päivää",
   "dose": "Annos",
-  "timesLogged": "kertaa kirjattu"
+  "timesLogged": "kertaa kirjattu",
+  "treatmentToggle": "Keuhkoahtaumataudin hoito",
+  "treatmentIntro": "Ohjeet jakavat keuhkoahtaumataudin hoidon ryhmiin: A, B ja E.",
+  "treatmentEvalE": "Arvioi ryhmä E ensin",
+  "treatmentEvalE1": "Arvioi pahenemisvaiheiden määrä",
+  "treatmentEvalE2": "Ryhmä E valitaan, jos kohtalaisten/vakavien pahenemisvaiheiden määrä ≥ 1",
+  "treatmentEvalAB": "Jos ei ryhmä E, valitse A tai B",
+  "treatmentEvalAB1": "Arvioi oireita MMRC-pisteillä",
+  "treatmentEvalAB2": "Ryhmä A valitaan, jos MMRC-pisteet < 2",
+  "treatmentEvalAB3": "Ryhmä B valitaan, jos MMRC-pisteet ≥ 2",
+  "medicationsToggle": "Keuhkoahtaumataudin lääkkeet",
+  "medicationsIntro": "Lääkkeet valitaan hoitoryhmän perusteella.",
+  "medicationsGroupA": "Hoitoryhmä A:",
+  "medicationsGroupA1": "Ensisijainen valinta on LABA tai LAMA",
+  "medicationsGroupA2": "Norjalaiset ohjeet ehdottavat, että satunnaisia oireita kokevat potilaat voivat käyttää SABA:a tai SAMA:a",
+  "medicationsGroupB": "Hoitoryhmä B:",
+  "medicationsGroupB1": "Ensisijainen valinta on LABA+LAMA yhdistelmäinhalaattorissa",
+  "medicationsGroupB2": "Norjassa suositellaan LABA:a tai LAMA:a. LABA+LAMA, jos vaikutus on riittämätön.",
+  "medicationsGroupE": "Hoitoryhmä E:",
+  "medicationsGroupE1": "Ensisijainen valinta on LABA+LAMA. Eosinofiilien ≥ 0,3 yhteydessä suositellaan LABA+LAMA+ICS:ää.",
+  "medicationsGroupE2": "Norjalaiset ohjeet suosittelevat aloittamaan LAMA:lla tai LABA:lla. Riittämättömän vaikutuksen yhteydessä LABA+LAMA. LABA/LAMA/ICS:ää voidaan harkita, kun FEV1 < 50 % ja eosinofilia > 300 solua/µL."
 }
