@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
+import MonthlySummary from "./MonthlySummary";
 
 const A = "#268E86";
 const BO = "rgba(38,142,134,0.14)";
@@ -344,6 +345,7 @@ export default function CalendarPanel({
           gap: 8,
         }}
       >
+
         {(() => {
           const rows = [];
           const seen = new Set();
@@ -495,6 +497,16 @@ export default function CalendarPanel({
         })()}
       </div>
 
+      {/* Monthly summary — displays for the currently viewed month */}
+      <div style={{ marginTop: 20 }}>
+        <MonthlySummary
+          t={t}
+          records={records}
+          viewYear={viewYear}
+          viewMonth={viewMonth}
+        />
+      </div>
+
       {/* Active medications */}
       <ActiveMedicationsList
         t={t}
@@ -518,15 +530,14 @@ function ActiveMedicationsList({
   latestMedicineTraining,
   latestMedicineSatisfaction,
 }) {
+  const [expanded, setExpanded] = useState(false);
+
   const today = new Date().toISOString().slice(0, 10);
   const activeMeds = (userMedicines || []).filter(
     (m) => !m.stoppedUsage || m.stoppedUsage >= today,
   );
 
   if (activeMeds.length === 0) return null;
-
-  const MED_TYPE = { 1: "Inhaler", 2: "Tablet", 3: "Injection" };
-  const MED_REASON = { 0: "Rescue", 1: "Maintenance", 2: "Add-on" };
 
   const TRAINING_KEYS = [
     { key: "generalPractitioner", label: t.sGp ?? "GP" },
@@ -560,9 +571,17 @@ function ActiveMedicationsList({
         boxShadow: "0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
       }}
     >
-      <div
-        className="px-4 pt-3 pb-2 flex items-center justify-between"
-        style={{ borderBottom: "1px solid rgba(38,142,134,0.08)" }}
+      <button
+        onClick={() => setExpanded((e) => !e)}
+        aria-expanded={expanded}
+        className="w-full px-4 pt-3 pb-2 flex items-center justify-between"
+        style={{
+          borderBottom: expanded ? "1px solid rgba(38,142,134,0.08)" : "none",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
       >
         <p
           className="text-xs font-semibold tracking-widest uppercase"
@@ -570,133 +589,172 @@ function ActiveMedicationsList({
         >
           {t.sMedication ?? "Medication"}
         </p>
-        <p
-          className="text-xs font-semibold tracking-widest uppercase"
-          style={{ color: A, margin: 0 }}
-        >
-          {t.sSatisfaction ?? "Satisfaction"}
-        </p>
-      </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#fff",
+              background: A,
+              borderRadius: 20,
+              padding: "2px 8px",
+              minWidth: 18,
+              textAlign: "center",
+            }}
+          >
+            {activeMeds.length}
+          </span>
+          <span
+            style={{
+              fontSize: 14,
+              color: A,
+              transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s",
+              display: "inline-block",
+            }}
+          >
+            ▾
+          </span>
+        </div>
+      </button>
 
-      <div style={{ padding: "4px 14px 8px" }}>
-        {activeMeds.map((um) => {
-          const trainEntry = (latestMedicineTraining?.medicines ?? []).find(
-            (m) => m.medicineId === um.medicineId,
-          );
-          const trainSources = trainEntry
-            ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
-            : [];
-          const hasTrain = trainSources.length > 0;
-
-          return (
-            <div
-              key={um.medicineId}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 8,
-                padding: "8px 0",
-                borderBottom: "1px solid rgba(38,142,134,0.07)",
-              }}
+      {expanded && (
+        <div style={{ padding: "4px 14px 8px" }}>
+          {/* Sub-header for satisfaction column */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              padding: "4px 0 2px",
+            }}
+          >
+            <p
+              className="text-xs font-semibold tracking-widest uppercase"
+              style={{ color: A, margin: 0 }}
             >
-              {um.medicine?.image ? (
-                <img
-                  src={um.medicine.image}
-                  alt={um.medicine.name ?? ""}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    objectFit: "contain",
-                    borderRadius: 6,
-                    border: `1px solid ${BO}`,
-                    background: "#fff",
-                    flexShrink: 0,
-                    marginTop: 2,
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 6,
-                    flexShrink: 0,
-                    marginTop: 2,
-                    background: "rgba(38,142,134,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 15,
-                  }}
-                >
-                  💊
-                </div>
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: TX,
-                    margin: 0,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {medName(um.medicineId)}
-                </p>
-                {um.startedUsage && (
-                  <p style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}>
-                    {um.startedUsage}
-                  </p>
-                )}
-                {/* Training: only shown for inhalers (type 1) */}
-                {um.medicine?.type === 1 && (
+              {t.sSatisfaction ?? "Satisfaction"}
+            </p>
+          </div>
+
+          {activeMeds.map((um) => {
+            const trainEntry = (latestMedicineTraining?.medicines ?? []).find(
+              (m) => m.medicineId === um.medicineId,
+            );
+            const trainSources = trainEntry
+              ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
+              : [];
+            const hasTrain = trainSources.length > 0;
+
+            return (
+              <div
+                key={um.medicineId}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 8,
+                  padding: "8px 0",
+                  borderBottom: "1px solid rgba(38,142,134,0.07)",
+                }}
+              >
+                {um.medicine?.image ? (
+                  <img
+                    src={um.medicine.image}
+                    alt={um.medicine.name ?? ""}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      objectFit: "contain",
+                      borderRadius: 6,
+                      border: `1px solid ${BO}`,
+                      background: "#fff",
+                      flexShrink: 0,
+                      marginTop: 2,
+                    }}
+                  />
+                ) : (
                   <div
                     style={{
-                      marginTop: 4,
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      flexShrink: 0,
+                      marginTop: 2,
+                      background: "rgba(38,142,134,0.1)",
                       display: "flex",
-                      flexWrap: "wrap",
                       alignItems: "center",
-                      gap: 4,
+                      justifyContent: "center",
+                      fontSize: 15,
                     }}
                   >
-                    <span
+                    💊
+                  </div>
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: TX,
+                      margin: 0,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {medName(um.medicineId)}
+                  </p>
+                  {um.startedUsage && (
+                    <p style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}>
+                      {um.startedUsage}
+                    </p>
+                  )}
+                  {/* Training: only shown for inhalers (type 1) */}
+                  {um.medicine?.type === 1 && (
+                    <div
                       style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        color: MU,
+                        marginTop: 4,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: 4,
                       }}
                     >
-                      {t.sTrainingLabel ?? "Training:"}
-                    </span>
-                    {hasTrain ? (
-                      trainSources.map((s) => (
-                        <Chip key={s.key} label={s.label} />
-                      ))
-                    ) : (
                       <span
                         style={{
                           fontSize: 10,
                           fontWeight: 600,
-                          color: DANGER,
+                          color: MU,
                         }}
                       >
-                        {t.sNoTraining ?? "✗ No training"}
+                        {t.sTrainingLabel ?? "Training:"}
                       </span>
-                    )}
-                  </div>
+                      {hasTrain ? (
+                        trainSources.map((s) => (
+                          <Chip key={s.key} label={s.label} />
+                        ))
+                      ) : (
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            color: DANGER,
+                          }}
+                        >
+                          {t.sNoTraining ?? "✗ No training"}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {satMap[um.medicineId] != null && (
+                  <SatDice value={satMap[um.medicineId]} />
                 )}
               </div>
-              {satMap[um.medicineId] != null && (
-                <SatDice value={satMap[um.medicineId]} />
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
