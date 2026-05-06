@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import { useSecretCode } from "@/hooks/useSecretCode";
 import Headline from "@/components/home/Headline";
+import HeadlineSubtitle from "@/components/home/HeadlineSubtitle";
 import ImportCard from "@/components/home/ImportCard";
 import PhoneShowcase from "@/components/home/PhoneShowcase";
 import HomeFooter from "@/components/home/HomeFooter";
@@ -11,6 +12,8 @@ import { getT } from "@/translations";
 import DiagnosisCard from "@/components/home/DiagnosisCard";
 import TreatmentCard from "@/components/home/TreatmentCard";
 import MedicationsCard from "@/components/home/MedicationsCard";
+import TreatmentMedicationsCard from "@/components/home/TreatmentMedicationsCard";
+import RecommendationsCard from "@/components/home/RecommendationsCard";
 
 const COUNTRIES = [
   { code: "no", label: "Norway", flag: "🇳🇴" },
@@ -56,7 +59,10 @@ export default function Home() {
       <main className="flex-1 flex flex-col min-[900px]:flex-row items-center min-[900px]:items-start justify-center gap-6 px-6 min-[900px]:px-12 pt-12 pb-6 relative z-10">
         {/* Left column */}
         <div className="flex flex-col gap-6 flex-1 min-[900px]:min-w-[300px] min-[900px]:max-w-[580px] w-full order-1 min-[900px]:order-1">
-          <Headline t={t} />
+          <div className="flex flex-col gap-3">
+            <Headline t={t} />
+            <HeadlineSubtitle t={t} />
+          </div>
           <div className="hidden min-[900px]:block">
             <PhoneShowcase t={t} />
           </div>
@@ -65,7 +71,7 @@ export default function Home() {
         {/* Right column — dropdown + ImportCard share the same width */}
         <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3 min-[900px]:-mt-10">
           {/* Country dropdown */}
-          <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0 min-[900px]:w-fit min-[900px]:self-start min-[900px]:mt-2">
+          <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0 min-[900px]:w-fit min-[900px]:self-end min-[900px]:mt-2 flex justify-end">
             <select
               value={lang}
               onChange={(e) => {
@@ -108,8 +114,8 @@ export default function Home() {
             handleClick={handleClick}
           />
           <DiagnosisCard t={t} />
-          <TreatmentCard t={t} />
-          <MedicationsCard t={t} />
+          <TreatmentMedicationsCard t={t} />
+          <RecommendationsCard t={t} />
         </div>
 
         {/* Phone showcase mobile */}
