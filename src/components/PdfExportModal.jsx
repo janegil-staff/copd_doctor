@@ -304,7 +304,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
           label: t.physicalActivity,
           value:
             avgAct != null
-              ? (t.activityLabels?.[Math.round(avgAct)] ?? Math.round(avgAct))
+              ? (t.activityLabels?.[Math.round(avgAct) - 1] ?? Math.round(avgAct))
               : "–",
         },
       ];
@@ -594,7 +594,7 @@ export default function PdfExportModal({ open, onClose, patient, t }) {
             }
             if (fields.activity && r.physicalActivity > 0) {
               doc.text(
-                (t.activityLabels?.[r.physicalActivity] ?? r.physicalActivity) + "",
+                (t.activityLabels?.[r.physicalActivity - 1] ?? r.physicalActivity) + "",
                 COL.stats.x + PAD_SIDE,
                 sy,
               );

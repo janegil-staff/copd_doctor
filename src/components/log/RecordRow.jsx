@@ -162,7 +162,7 @@ export function RecordRow({
               style={{ color: "#a0b8b6" }}
             >
               🚶{" "}
-              {t.activityLabels?.[record.physicalActivity] ??
+              {t.activityLabels?.[record.physicalActivity - 1] ??
                 record.physicalActivity}
             </span>
           )}
@@ -266,7 +266,7 @@ export function RecordRow({
                     {t.physicalActivity}
                   </p>
                   <p className="text-sm font-bold" style={{ color: "#268E86" }}>
-                    {t.activityLabels?.[record.physicalActivity] ??
+                    {t.activityLabels?.[record.physicalActivity - 1] ??
                       record.physicalActivity}
                   </p>
                 </div>

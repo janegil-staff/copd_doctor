@@ -11,7 +11,7 @@ export function ActivityCard({ t, activityData, avgActivity }) {
         avgActivity != null
           ? {
               value:
-                t.activityLabels?.[Math.round(avgActivity)] ??
+                t.activityLabels?.[Math.round(avgActivity) - 1] ??
                 Math.round(avgActivity),
               color: "#0f8a6a",
             }
