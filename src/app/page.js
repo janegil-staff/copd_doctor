@@ -69,7 +69,7 @@ export default function Home() {
         </div>
 
         {/* Right column — dropdown + ImportCard share the same width */}
-        <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3 min-[900px]:-mt-10">
+        <div className="w-full min-[900px]:w-auto order-2 min-[900px]:order-2 flex flex-col gap-3 min-[900px]:-mt-0">
           {/* Country dropdown */}
           <div className="relative w-full max-w-[480px] mx-auto min-[900px]:max-w-none min-[900px]:mx-0 min-[900px]:w-fit min-[900px]:self-end min-[900px]:mt-2 flex justify-end">
             <select
