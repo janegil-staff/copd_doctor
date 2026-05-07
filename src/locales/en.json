@@ -23,7 +23,7 @@
   "medication": "Medication",
   "activity": "Activity",
   "exacerbation": "Exacerbation",
-  "noData": "No data recorded for this day.",
+  "noData": "No data registered.",
   "loading": "Loading...",
   "noEntries": "No entries this month.",
   "entries": "entries",
@@ -391,5 +391,11 @@
   "recommendations15": "If SpO₂ is low, arterial blood gas should be taken to assess the need for long-term oxygen therapy.",
   "recommendations16": "Consider whether chest X-ray should be taken at diagnosis to rule out other disease.",
   "medicationsHeadline": "COPD medications",
-  "treatmentHeadline": "COPD treatment"
+  "treatmentHeadline": "COPD treatment",
+  "copdStatus": "COPD",
+  "asthmaStatus": "Asthma",
+  "confirmed": "Confirmed",
+  "notConfirmed": "Not confirmed",
+  "moderateExacerbationSub": "(prednisolone / antibiotics)",
+  "seriousExacerbationSub": "(hospitalization)"
 }

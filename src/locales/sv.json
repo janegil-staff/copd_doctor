@@ -24,7 +24,7 @@
   "activity": "Aktivitet",
   "weeksRecorded": "Veckor registrerade",
   "exacerbation": "Exacerbation",
-  "noData": "Ingen data registrerad för denna dag.",
+  "noData": "Inga uppgifter registrerade.",
   "loading": "Laddar...",
   "noEntries": "Inga poster denna månad.",
   "entries": "poster",
@@ -391,5 +391,11 @@
   "recommendations15": "Vid låg SpO₂ bör blodgas tas för bedömning av behov av långtidsoxygenbehandling.",
   "recommendations16": "Överväg lungröntgen vid diagnostidpunkt för att utesluta annan sjukdom.",
   "medicationsHeadline": "KOL-läkemedel",
-  "treatmentHeadline": "KOL-behandling"
+  "treatmentHeadline": "KOL-behandling",
+  "copdStatus": "KOL",
+  "asthmaStatus": "Astma",
+  "confirmed": "Bekräftad",
+  "notConfirmed": "Inte bekräftad",
+  "moderateExacerbationSub": "(prednisolon / antibiotika)",
+  "seriousExacerbationSub": "(sjukhusinläggning)"
 }

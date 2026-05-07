@@ -24,7 +24,7 @@
   "medication": "Medicamento",
   "activity": "Actividad",
   "exacerbation": "Exacerbación",
-  "noData": "No hay datos registrados para este día.",
+  "noData": "No hay datos registrados.",
   "loading": "Cargando...",
   "noEntries": "No hay entradas este mes.",
   "entries": "entradas",
@@ -391,5 +391,11 @@
   "recommendations15": "Si la SpO₂ es baja, debe realizarse una gasometría arterial para valorar la necesidad de oxigenoterapia de larga duración.",
   "recommendations16": "Valorar la realización de una radiografía de tórax en el momento del diagnóstico para descartar otras enfermedades.",
   "medicationsHeadline": "Medicamentos para la EPOC",
-  "treatmentHeadline": "Tratamiento de la EPOC"
+  "treatmentHeadline": "Tratamiento de la EPOC",
+  "copdStatus": "EPOC",
+  "asthmaStatus": "Asma",
+  "confirmed": "Confirmado",
+  "notConfirmed": "No confirmado",
+  "moderateExacerbationSub": "(prednisolona / antibióticos)",
+  "seriousExacerbationSub": "(hospitalización)"
 }

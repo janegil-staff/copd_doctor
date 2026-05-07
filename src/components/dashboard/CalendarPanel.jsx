@@ -345,7 +345,6 @@ export default function CalendarPanel({
           gap: 8,
         }}
       >
-
         {(() => {
           const rows = [];
           const seen = new Set();
@@ -537,8 +536,6 @@ function ActiveMedicationsList({
     (m) => !m.stoppedUsage || m.stoppedUsage >= today,
   );
 
-  if (activeMeds.length === 0) return null;
-
   const TRAINING_KEYS = [
     { key: "generalPractitioner", label: t.sGp ?? "GP" },
     { key: "pharmacy", label: t.sPharmacy ?? "Pharmacy" },
@@ -617,142 +614,160 @@ function ActiveMedicationsList({
           </span>
         </div>
       </button>
-
       {expanded && (
         <div style={{ padding: "4px 14px 8px" }}>
-          {/* Sub-header for satisfaction column */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              padding: "4px 0 2px",
-            }}
-          >
+          {activeMeds.length === 0 ? (
             <p
-              className="text-xs font-semibold tracking-widest uppercase"
-              style={{ color: A, margin: 0 }}
+              style={{
+                fontSize: 12,
+                color: MU,
+                fontStyle: "italic",
+                padding: "10px 0",
+                margin: 0,
+                opacity: 0.75,
+              }}
             >
-              {t.sSatisfaction ?? "Satisfaction"}
+              {t.noData ?? "No data registered."}
             </p>
-          </div>
-
-          {activeMeds.map((um) => {
-            const trainEntry = (latestMedicineTraining?.medicines ?? []).find(
-              (m) => m.medicineId === um.medicineId,
-            );
-            const trainSources = trainEntry
-              ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
-              : [];
-            const hasTrain = trainSources.length > 0;
-
-            return (
+          ) : (
+            <>
+              {/* Sub-header for satisfaction column */}
               <div
-                key={um.medicineId}
                 style={{
                   display: "flex",
-                  alignItems: "flex-start",
-                  gap: 8,
-                  padding: "8px 0",
-                  borderBottom: "1px solid rgba(38,142,134,0.07)",
+                  justifyContent: "flex-end",
+                  padding: "4px 0 2px",
                 }}
               >
-                {um.medicine?.image ? (
-                  <img
-                    src={um.medicine.image}
-                    alt={um.medicine.name ?? ""}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      objectFit: "contain",
-                      borderRadius: 6,
-                      border: `1px solid ${BO}`,
-                      background: "#fff",
-                      flexShrink: 0,
-                      marginTop: 2,
-                    }}
-                  />
-                ) : (
+                <p
+                  className="text-xs font-semibold tracking-widest uppercase"
+                  style={{ color: A, margin: 0 }}
+                >
+                  {t.sSatisfaction ?? "Satisfaction"}
+                </p>
+              </div>
+
+              {activeMeds.map((um) => {
+                const trainEntry = (
+                  latestMedicineTraining?.medicines ?? []
+                ).find((m) => m.medicineId === um.medicineId);
+                const trainSources = trainEntry
+                  ? TRAINING_KEYS.filter((k) => trainEntry[k.key] === true)
+                  : [];
+                const hasTrain = trainSources.length > 0;
+
+                return (
                   <div
+                    key={um.medicineId}
                     style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 6,
-                      flexShrink: 0,
-                      marginTop: 2,
-                      background: "rgba(38,142,134,0.1)",
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 15,
+                      alignItems: "flex-start",
+                      gap: 8,
+                      padding: "8px 0",
+                      borderBottom: "1px solid rgba(38,142,134,0.07)",
                     }}
                   >
-                    💊
-                  </div>
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: TX,
-                      margin: 0,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {medName(um.medicineId)}
-                  </p>
-                  {um.startedUsage && (
-                    <p style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}>
-                      {um.startedUsage}
-                    </p>
-                  )}
-                  {/* Training: only shown for inhalers (type 1) */}
-                  {um.medicine?.type === 1 && (
-                    <div
-                      style={{
-                        marginTop: 4,
-                        display: "flex",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                        gap: 4,
-                      }}
-                    >
-                      <span
+                    {um.medicine?.image ? (
+                      <img
+                        src={um.medicine.image}
+                        alt={um.medicine.name ?? ""}
                         style={{
-                          fontSize: 10,
-                          fontWeight: 600,
-                          color: MU,
+                          width: 32,
+                          height: 32,
+                          objectFit: "contain",
+                          borderRadius: 6,
+                          border: `1px solid ${BO}`,
+                          background: "#fff",
+                          flexShrink: 0,
+                          marginTop: 2,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 6,
+                          flexShrink: 0,
+                          marginTop: 2,
+                          background: "rgba(38,142,134,0.1)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 15,
                         }}
                       >
-                        {t.sTrainingLabel ?? "Training:"}
-                      </span>
-                      {hasTrain ? (
-                        trainSources.map((s) => (
-                          <Chip key={s.key} label={s.label} />
-                        ))
-                      ) : (
-                        <span
+                        💊
+                      </div>
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: TX,
+                          margin: 0,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {medName(um.medicineId)}
+                      </p>
+                      {um.startedUsage && (
+                        <p
+                          style={{ fontSize: 10, color: MU, margin: "2px 0 0" }}
+                        >
+                          {um.startedUsage}
+                        </p>
+                      )}
+                      {/* Training: only shown for inhalers (type 1) */}
+                      {um.medicine?.type === 1 && (
+                        <div
                           style={{
-                            fontSize: 10,
-                            fontWeight: 600,
-                            color: DANGER,
+                            marginTop: 4,
+                            display: "flex",
+                            flexWrap: "wrap",
+                            alignItems: "center",
+                            gap: 4,
                           }}
                         >
-                          {t.sNoTraining ?? "✗ No training"}
-                        </span>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 600,
+                              color: MU,
+                            }}
+                          >
+                            {t.sTrainingLabel ?? "Training:"}
+                          </span>
+                          {hasTrain ? (
+                            trainSources.map((s) => (
+                              <Chip key={s.key} label={s.label} />
+                            ))
+                          ) : (
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 600,
+                                color: DANGER,
+                              }}
+                            >
+                              {t.sNoTraining ?? "✗ No training"}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-                {satMap[um.medicineId] != null && (
-                  <SatDice value={satMap[um.medicineId]} />
-                )}
-              </div>
-            );
-          })}
+                    {satMap[um.medicineId] != null && (
+                      <SatDice value={satMap[um.medicineId]} />
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -782,8 +797,6 @@ function StoppedMedicationsList({ t, userMedicines }) {
   const stopped = (userMedicines || [])
     .filter((m) => m.stoppedUsage)
     .sort((a, b) => new Date(b.stoppedUsage) - new Date(a.stoppedUsage));
-
-  if (stopped.length === 0) return null;
 
   const fmtDate = (d) => {
     if (!d) return "";

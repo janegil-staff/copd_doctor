@@ -23,7 +23,7 @@
   "medication": "Lek",
   "activity": "Aktywność",
   "exacerbation": "Zaostrzenie",
-  "noData": "Brak danych dla tego dnia.",
+  "noData": "Brak zarejestrowanych danych.",
   "loading": "Ładowanie...",
   "weeksRecorded": "Zarejestrowane tygodnie",
   "noEntries": "Brak wpisów w tym miesiącu.",
@@ -385,5 +385,11 @@
   "recommendations15": "Przy niskim SpO₂ należy wykonać gazometrię w celu oceny potrzeby długotrwałej tlenoterapii.",
   "recommendations16": "Rozważyć wykonanie zdjęcia RTG klatki piersiowej w momencie rozpoznania w celu wykluczenia innych chorób.",
   "medicationsHeadline": "Leki na POChP",
-  "treatmentHeadline": "Leczenie POChP"
+  "treatmentHeadline": "Leczenie POChP",
+  "copdStatus": "POChP",
+  "asthmaStatus": "Astma",
+  "confirmed": "Potwierdzone",
+  "notConfirmed": "Niepotwierdzone",
+  "moderateExacerbationSub": "(prednizolon / antybiotyki)",
+  "seriousExacerbationSub": "(hospitalizacja)"
 }

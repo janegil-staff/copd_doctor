@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 // src/components/dashboard/Sidebar.jsx
-// Single card, fully translated via t prop, empty sections hidden.
+// All sections always visible. Empty data shows placeholder rows.
 
 const A = "#268E86";
 const BG = "rgba(255,255,255,0.92)";
@@ -16,8 +16,10 @@ const OK = "#4aba7a";
 
 // ── primitives ───────────────────────────────────────────────────────────────
 
-function Row({ label, value, color }) {
-  if (value == null || value === "" || value === "–") return null;
+function Row({ label, value, color, alwaysShow = false }) {
+  const isEmpty = value == null || value === "" || value === "–";
+  if (isEmpty && !alwaysShow) return null;
+
   return (
     <div
       style={{
@@ -42,18 +44,38 @@ function Row({ label, value, color }) {
       <span
         style={{
           fontSize: 11,
-          fontWeight: 700,
-          color: color ?? TX,
+          fontWeight: isEmpty ? 500 : 700,
+          color: isEmpty ? MU : (color ?? TX),
           textAlign: "right",
+          fontStyle: isEmpty ? "italic" : "normal",
+          opacity: isEmpty ? 0.7 : 1,
         }}
       >
-        {value}
+        {isEmpty ? "–" : value}
       </span>
     </div>
   );
 }
 
-function Divider({ label, onReadMore, readMoreLabel, extra }) {
+function EmptyNote({ text }) {
+  return (
+    <p
+      style={{
+        fontSize: 11,
+        color: MU,
+        fontStyle: "italic",
+        padding: "6px 0",
+        margin: 0,
+        opacity: 0.75,
+        borderBottom: "1px solid rgba(38,142,134,0.07)",
+      }}
+    >
+      {text}
+    </p>
+  );
+}
+
+function Divider({ label, onReadMore, readMoreLabel, extra, disabled }) {
   return (
     <div
       style={{
@@ -81,7 +103,7 @@ function Divider({ label, onReadMore, readMoreLabel, extra }) {
       {extra && (
         <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
       )}
-      {onReadMore && (
+      {onReadMore && !disabled && (
         <button
           onClick={onReadMore}
           style={{
@@ -509,24 +531,21 @@ function WeightModal({ records, t, onClose }) {
 // ── Weight chart (inline SVG line chart) ─────────────────────────────────────
 
 function WeightChart({ entries, t }) {
-  // `entries` arrives latest-first; chart needs chronological
   const points = [...entries].reverse();
   if (points.length === 0) return null;
 
   const weights = points.map((p) => p.weight);
   const minW = Math.min(...weights);
   const maxW = Math.max(...weights);
-  const rangeW = maxW - minW || 1; // avoid divide-by-zero for single/flat data
-  const padW = rangeW * 0.15 || 1; // breathing room on y-axis
+  const rangeW = maxW - minW || 1;
+  const padW = rangeW * 0.15 || 1;
   const yMin = minW - padW;
   const yMax = maxW + padW;
 
-  // Overall trend: compare first vs last
   const first = points[0].weight;
   const last = points[points.length - 1].weight;
   const trendColor = last < first ? OK : last > first ? DANGER : MU;
 
-  // SVG dimensions
   const W = 420;
   const H = 160;
   const padL = 36;
@@ -542,18 +561,14 @@ function WeightChart({ entries, t }) {
       : padL + (i / (points.length - 1)) * chartW;
   const yFor = (w) => padT + chartH - ((w - yMin) / (yMax - yMin)) * chartH;
 
-  // Polyline path
   const pathD = points
     .map((p, i) => `${i === 0 ? "M" : "L"} ${xFor(i)} ${yFor(p.weight)}`)
     .join(" ");
 
-  // Area fill under the line
   const areaD = `${pathD} L ${xFor(points.length - 1)} ${padT + chartH} L ${xFor(0)} ${padT + chartH} Z`;
 
-  // Y-axis labels: show min/max
   const yTicks = [yMax, (yMin + yMax) / 2, yMin];
 
-  // X-axis labels: first, middle, last (to avoid crowding)
   const fmt = (d) => {
     try {
       return new Date(d).toLocaleDateString(undefined, {
@@ -577,7 +592,6 @@ function WeightChart({ entries, t }) {
         height="auto"
         style={{ display: "block" }}
       >
-        {/* Grid lines */}
         {yTicks.map((v, i) => (
           <line
             key={i}
@@ -591,7 +605,6 @@ function WeightChart({ entries, t }) {
           />
         ))}
 
-        {/* Y-axis labels */}
         {yTicks.map((v, i) => (
           <text
             key={i}
@@ -606,10 +619,8 @@ function WeightChart({ entries, t }) {
           </text>
         ))}
 
-        {/* Area fill */}
         <path d={areaD} fill={trendColor} fillOpacity="0.10" />
 
-        {/* Line */}
         <path
           d={pathD}
           fill="none"
@@ -619,7 +630,6 @@ function WeightChart({ entries, t }) {
           strokeLinecap="round"
         />
 
-        {/* Data points */}
         {points.map((p, i) => (
           <g key={i}>
             <circle
@@ -630,7 +640,6 @@ function WeightChart({ entries, t }) {
               stroke={trendColor}
               strokeWidth="2"
             />
-            {/* Tooltip on hover via <title> — simple native browser tooltip */}
             <circle
               cx={xFor(i)}
               cy={yFor(p.weight)}
@@ -645,7 +654,6 @@ function WeightChart({ entries, t }) {
           </g>
         ))}
 
-        {/* X-axis labels */}
         {xLabelIdx.map((i) => (
           <text
             key={i}
@@ -663,7 +671,6 @@ function WeightChart({ entries, t }) {
         ))}
       </svg>
 
-      {/* Legend */}
       <div
         style={{
           display: "flex",
@@ -1045,9 +1052,36 @@ export default function Sidebar({ patient, t = {} }) {
     { key: "sleepApnea", label: t.sSleepApnea ?? "Sleep apnea" },
   ];
 
-  const activeConditions = cond ? COND_FIELDS.filter((c) => cond[c.key]) : [];
-  const activeVax = latestVax ? VAX_FIELDS.filter((f) => latestVax[f.key]) : [];
   const readMoreLabel = t.sReadMore ?? "Read more";
+  const noDataText = t.noData ?? "No data registered.";
+
+  // Weight derivation (works even when empty)
+  const weightRecords = records.filter((r) => r.weight != null);
+  const latestWeight = weightRecords.length
+    ? weightRecords[weightRecords.length - 1]
+    : null;
+  const prevWeight =
+    weightRecords.length > 1
+      ? weightRecords[weightRecords.length - 2]
+      : null;
+  const weightDiff =
+    latestWeight && prevWeight ? latestWeight.weight - prevWeight.weight : null;
+  const weightDiffStr =
+    weightDiff == null
+      ? ""
+      : weightDiff < 0
+        ? ` (${weightDiff.toFixed(1)} kg)`
+        : weightDiff > 0
+          ? ` (+${weightDiff.toFixed(1)} kg)`
+          : "";
+  const weightColor =
+    weightDiff == null
+      ? undefined
+      : weightDiff < 0
+        ? OK
+        : weightDiff > 0
+          ? DANGER
+          : undefined;
 
   return (
     <>
@@ -1104,7 +1138,6 @@ export default function Sidebar({ patient, t = {} }) {
           paddingBottom: 0,
           display: "flex",
           flexDirection: "column",
-          // flex: 1,  ← remove
         }}
       >
         <div
@@ -1114,7 +1147,6 @@ export default function Sidebar({ patient, t = {} }) {
             border: `1px solid ${BO}`,
             borderRadius: 20,
             overflow: "hidden",
-            // flex: 1,  ← remove
             display: "flex",
             flexDirection: "column",
           }}
@@ -1137,165 +1169,166 @@ export default function Sidebar({ patient, t = {} }) {
 
           {/* ── Scrollable body ── */}
           <div style={{ padding: "0 14px 12px", overflowY: "auto", flex: 1 }}>
-            {/* ── Diagnosis ──────────────────────────────────────────────────── */}
+            {/* ── Diagnosis (always visible) ─────────────────────────────── */}
             <Divider label={t.sDiagnosis ?? "Diagnosis"} />
             <Row
               label={t.sCopd ?? "COPD"}
               value={
                 copdDiagnosed
-                  ? `${t.sConfirmed ?? "Confirmed"} · ${copdDiagnosedDate ?? ""}`
+                  ? `${t.sConfirmed ?? "Confirmed"}${copdDiagnosedDate ? ` · ${copdDiagnosedDate}` : ""}`
                   : (t.sNotConfirmed ?? "Not confirmed")
               }
-              color={copdDiagnosed ? OK : MU}
+              color={copdDiagnosed ? OK : DANGER}
+              alwaysShow
             />
             <Row
               label={t.sAsthma ?? "Asthma"}
               value={
                 asthma
-                  ? `${t.sConfirmed ?? "Confirmed"} · ${asthmaDate ?? ""}`
+                  ? `${t.sConfirmed ?? "Confirmed"}${asthmaDate ? ` · ${asthmaDate}` : ""}`
                   : (t.sNotConfirmed ?? "Not confirmed")
               }
-              color={asthma ? DANGER : MU}
+              color={asthma ? DANGER : DANGER}
+              alwaysShow
             />
 
-            {/* ── Spirometry ─────────────────────────────────────────────────── */}
-            {latestSpiro && (
-              <>
-                <Divider
-                  label={t.sSpirometry ?? "Spirometry"}
-                  onReadMore={() => setShowSpirometryModal(true)}
-                  readMoreLabel={readMoreLabel}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "6px 0",
-                    borderBottom: "1px solid rgba(38,142,134,0.07)",
-                    fontSize: 11,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {latestSpiro.date && (
-                    <span style={{ color: MU, fontWeight: 600 }}>
-                      {latestSpiro.date}
+            {/* ── Spirometry (always visible) ─────────────────────────────── */}
+            <Divider
+              label={t.sSpirometry ?? "Spirometry"}
+              onReadMore={latestSpiro ? () => setShowSpirometryModal(true) : undefined}
+              readMoreLabel={readMoreLabel}
+            />
+            {latestSpiro ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 0",
+                  borderBottom: "1px solid rgba(38,142,134,0.07)",
+                  fontSize: 11,
+                  flexWrap: "wrap",
+                }}
+              >
+                {latestSpiro.date && (
+                  <span style={{ color: MU, fontWeight: 600 }}>
+                    {latestSpiro.date}
+                  </span>
+                )}
+                {latestSpiro.fev1 != null && (
+                  <>
+                    <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                    <span style={{ color: MU, fontWeight: 500 }}>
+                      {t.sFev1 ?? "FEV1"}
                     </span>
-                  )}
-                  {latestSpiro.fev1 != null && (
-                    <>
-                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
-                      <span style={{ color: MU, fontWeight: 500 }}>
-                        {t.sFev1 ?? "FEV1"}
-                      </span>
-                      <strong
-                        style={{
-                          color:
-                            latestSpiro.fev1 < 1.5
-                              ? DANGER
-                              : latestSpiro.fev1 < 2.5
-                                ? WARN
-                                : OK,
-                        }}
-                      >
-                        {fmt1(latestSpiro.fev1)} L
-                      </strong>
-                    </>
-                  )}
-                  {latestSpiro.fvc != null && (
-                    <>
-                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
-                      <span style={{ color: MU, fontWeight: 500 }}>
-                        {t.sFvc ?? "FVC"}
-                      </span>
-                      <strong style={{ color: TX }}>
-                        {fmt1(latestSpiro.fvc)} L
-                      </strong>
-                    </>
-                  )}
-                  {(() => {
-                    // Prefer the stored ratio; otherwise compute from raw L values
-                    const ratio =
-                      latestSpiro.fev1fvc != null
-                        ? latestSpiro.fev1fvc
-                        : latestSpiro.fev1 != null &&
-                            latestSpiro.fvc != null &&
-                            latestSpiro.fvc > 0
-                          ? (latestSpiro.fev1 / latestSpiro.fvc) * 100
-                          : null;
-                    if (ratio == null) return null;
-                    return (
-                      <>
-                        <span style={{ color: MU, opacity: 0.5 }}>·</span>
-                        <span style={{ color: MU, fontWeight: 500 }}>
-                          {t.sFev1Fvc ?? "FEV1/FVC"}
-                        </span>
-                        <strong style={{ color: ratio < 70 ? DANGER : OK }}>
-                          {ratio.toFixed(1)}%
-                        </strong>
-                      </>
-                    );
-                  })()}
-                  {latestSpiro.goldGrade != null && (
-                    <>
-                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
-                      <span style={{ color: MU, fontWeight: 500 }}>
-                        {t.sGoldGrade ?? "GOLD"}
-                      </span>
-                      <strong
-                        style={{
-                          color:
-                            [OK, WARN, "#e07a30", DANGER, DANGER][
-                              latestSpiro.goldGrade
-                            ] ?? TX,
-                        }}
-                      >
-                        {latestSpiro.goldGrade}
-                      </strong>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* ── SPO2 ───────────────────────────────────────────────────────── */}
-            {/* ── SPO2 ───────────────────────────────────────────────────────── */}
-            {latestSpo2v && (
-              <Divider
-                label={
-                  latestSpo2v.date
-                    ? `${t.sSpo2 ?? "SPO₂"} · ${latestSpo2v.date}`
-                    : (t.sSpo2 ?? "SPO₂")
-                }
-                onReadMore={() => setShowSpo2Modal(true)}
-                readMoreLabel={readMoreLabel}
-                extra={
-                  latestSpo2v.value != null && (
                     <strong
                       style={{
-                        fontWeight: 700,
                         color:
-                          latestSpo2v.value < 90
+                          latestSpiro.fev1 < 1.5
                             ? DANGER
-                            : latestSpo2v.value < 94
+                            : latestSpiro.fev1 < 2.5
                               ? WARN
                               : OK,
                       }}
                     >
-                      {fmt1(latestSpo2v.value)}%
+                      {fmt1(latestSpiro.fev1)} L
                     </strong>
-                  )
-                }
-              />
+                  </>
+                )}
+                {latestSpiro.fvc != null && (
+                  <>
+                    <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                    <span style={{ color: MU, fontWeight: 500 }}>
+                      {t.sFvc ?? "FVC"}
+                    </span>
+                    <strong style={{ color: TX }}>
+                      {fmt1(latestSpiro.fvc)} L
+                    </strong>
+                  </>
+                )}
+                {(() => {
+                  const ratio =
+                    latestSpiro.fev1fvc != null
+                      ? latestSpiro.fev1fvc
+                      : latestSpiro.fev1 != null &&
+                          latestSpiro.fvc != null &&
+                          latestSpiro.fvc > 0
+                        ? (latestSpiro.fev1 / latestSpiro.fvc) * 100
+                        : null;
+                  if (ratio == null) return null;
+                  return (
+                    <>
+                      <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                      <span style={{ color: MU, fontWeight: 500 }}>
+                        {t.sFev1Fvc ?? "FEV1/FVC"}
+                      </span>
+                      <strong style={{ color: ratio < 70 ? DANGER : OK }}>
+                        {ratio.toFixed(1)}%
+                      </strong>
+                    </>
+                  );
+                })()}
+                {latestSpiro.goldGrade != null && (
+                  <>
+                    <span style={{ color: MU, opacity: 0.5 }}>·</span>
+                    <span style={{ color: MU, fontWeight: 500 }}>
+                      {t.sGoldGrade ?? "GOLD"}
+                    </span>
+                    <strong
+                      style={{
+                        color:
+                          [OK, WARN, "#e07a30", DANGER, DANGER][
+                            latestSpiro.goldGrade
+                          ] ?? TX,
+                      }}
+                    >
+                      {latestSpiro.goldGrade}
+                    </strong>
+                  </>
+                )}
+              </div>
+            ) : (
+              <EmptyNote text={noDataText} />
             )}
-            {/* ── Smoking ────────────────────────────────────────────────────── */}
-            {smoking && (
+
+            {/* ── SPO2 (always visible) ─────────────────────────────────── */}
+            <Divider
+              label={
+                latestSpo2v?.date
+                  ? `${t.sSpo2 ?? "SPO₂"} · ${latestSpo2v.date}`
+                  : (t.sSpo2 ?? "SPO₂")
+              }
+              onReadMore={latestSpo2v ? () => setShowSpo2Modal(true) : undefined}
+              readMoreLabel={readMoreLabel}
+              extra={
+                latestSpo2v?.value != null ? (
+                  <strong
+                    style={{
+                      fontWeight: 700,
+                      color:
+                        latestSpo2v.value < 90
+                          ? DANGER
+                          : latestSpo2v.value < 94
+                            ? WARN
+                            : OK,
+                    }}
+                  >
+                    {fmt1(latestSpo2v.value)}%
+                  </strong>
+                ) : null
+              }
+            />
+            {!latestSpo2v && <EmptyNote text={noDataText} />}
+
+            {/* ── Smoking (always visible) ───────────────────────────────── */}
+            <Divider label={t.sSmoking ?? "Smoking"} />
+            {smoking ? (
               <>
-                <Divider label={t.sSmoking ?? "Smoking"} />
                 <Row
                   label={t.sStatus ?? "Status"}
                   value={SMOKE_LABEL[smoking.smoking] ?? "–"}
                   color={SMOKE_COLOR[smoking.smoking] ?? MU}
+                  alwaysShow
                 />
                 {smoking.smoking > 0 && smoking.startAge > 0 && (
                   <Row
@@ -1318,9 +1351,11 @@ export default function Sidebar({ patient, t = {} }) {
                   />
                 )}
               </>
+            ) : (
+              <EmptyNote text={noDataText} />
             )}
 
-            {/* ── Show more toggle ──────────────────────────────────────────── */}
+            {/* ── Show more toggle ───────────────────────────────────────── */}
             <button
               onClick={() => setShowMore((v) => !v)}
               style={{
@@ -1360,123 +1395,139 @@ export default function Sidebar({ patient, t = {} }) {
 
             {showMore && (
               <>
-                <>
-                  <Divider label={t.sVaping ?? "Vaping"} />
+                {/* ── Vaping (always visible) ───────────────────────────── */}
+                <Divider label={t.sVaping ?? "Vaping"} />
+                {vaping ? (
                   <Row
                     label={t.sStatus ?? "Status"}
                     value={VAPE_LABEL[vaping.vaping] ?? "–"}
                     color={VAPE_COLOR[vaping.vaping] ?? MU}
+                    alwaysShow
                   />
-                </>
-
-                {/* ── Vaccinations ───────────────────────────────────────────────── */}
-                {activeVax.length > 0 && (
-                  <>
-                    <Divider label={t.sVaccinations ?? "Vaccinations"} />
-                    {activeVax.map(({ key, label }) => (
-                      <Row key={key} label={label} value="✓" color={OK} />
-                    ))}
-                  </>
+                ) : (
+                  <EmptyNote text={noDataText} />
                 )}
 
-                {/* ── GAD-7 ──────────────────────────────────────────────────────── */}
-                {latestGad7 && (
-                  <>
-                    <Divider
-                      label={t.sGad7 ?? "GAD-7 · Anxiety"}
-                      onReadMore={() => setShowGad7Modal(true)}
-                      readMoreLabel={readMoreLabel}
+                {/* ── Vaccinations (always visible) ─────────────────────── */}
+                <Divider label={t.sVaccinations ?? "Vaccinations"} />
+                {latestVax ? (
+                  VAX_FIELDS.map(({ key, label }) => (
+                    <Row
+                      key={key}
+                      label={label}
+                      value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
+                      color={latestVax[key] ? OK : MU}
+                      alwaysShow
                     />
-                    <div
+                  ))
+                ) : (
+                  VAX_FIELDS.map(({ key, label }) => (
+                    <Row
+                      key={key}
+                      label={label}
+                      value={null}
+                      alwaysShow
+                    />
+                  ))
+                )}
+
+                {/* ── GAD-7 (always visible) ───────────────────────────── */}
+                <Divider
+                  label={t.sGad7 ?? "GAD-7 · Anxiety"}
+                  onReadMore={latestGad7 ? () => setShowGad7Modal(true) : undefined}
+                  readMoreLabel={readMoreLabel}
+                />
+                {latestGad7 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "4px 0",
+                      borderBottom: "1px solid rgba(38,142,134,0.07)",
+                    }}
+                  >
+                    <span
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "4px 0",
-                        borderBottom: "1px solid rgba(38,142,134,0.07)",
+                        fontSize: 11,
+                        color: MU,
+                        fontWeight: 500,
+                        flexShrink: 0,
+                        paddingRight: 10,
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: 11,
-                          color: MU,
-                          fontWeight: 500,
-                          flexShrink: 0,
-                          paddingRight: 10,
-                        }}
-                      >
-                        {t.sScore ?? "Score"}
-                      </span>
-                      <Bar value={gad7Score} max={21} color={gSev.color} />
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: gSev.color,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {gad7Score}{" "}
-                        <span style={{ fontSize: 10, fontWeight: 500 }}>
-                          ({gSev.label})
-                        </span>
-                      </span>
-                    </div>
-                  </>
-                )}
-
-                {/* ── PHQ-9 ──────────────────────────────────────────────────────── */}
-                {latestPhq9 && (
-                  <>
-                    <Divider
-                      label={t.sPhq9 ?? "PHQ-9 · Depression"}
-                      onReadMore={() => setShowPhq9Modal(true)}
-                      readMoreLabel={readMoreLabel}
-                    />
-                    <div
+                      {t.sScore ?? "Score"}
+                    </span>
+                    <Bar value={gad7Score} max={21} color={gSev.color} />
+                    <span
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "4px 0",
-                        borderBottom: "1px solid rgba(38,142,134,0.07)",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: gSev.color,
+                        flexShrink: 0,
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: 11,
-                          color: MU,
-                          fontWeight: 500,
-                          flexShrink: 0,
-                          paddingRight: 10,
-                        }}
-                      >
-                        {t.sScore ?? "Score"}
+                      {gad7Score}{" "}
+                      <span style={{ fontSize: 10, fontWeight: 500 }}>
+                        ({gSev.label})
                       </span>
-                      <Bar value={phq9Score} max={27} color={pSev.color} />
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: pSev.color,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {phq9Score}{" "}
-                        <span style={{ fontSize: 10, fontWeight: 500 }}>
-                          ({pSev.label})
-                        </span>
-                      </span>
-                    </div>
-                  </>
+                    </span>
+                  </div>
+                ) : (
+                  <EmptyNote text={noDataText} />
                 )}
 
-                {/* ── Nutrition ──────────────────────────────────────────────────── */}
+                {/* ── PHQ-9 (always visible) ───────────────────────────── */}
+                <Divider
+                  label={t.sPhq9 ?? "PHQ-9 · Depression"}
+                  onReadMore={latestPhq9 ? () => setShowPhq9Modal(true) : undefined}
+                  readMoreLabel={readMoreLabel}
+                />
+                {latestPhq9 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "4px 0",
+                      borderBottom: "1px solid rgba(38,142,134,0.07)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: MU,
+                        fontWeight: 500,
+                        flexShrink: 0,
+                        paddingRight: 10,
+                      }}
+                    >
+                      {t.sScore ?? "Score"}
+                    </span>
+                    <Bar value={phq9Score} max={27} color={pSev.color} />
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: pSev.color,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {phq9Score}{" "}
+                      <span style={{ fontSize: 10, fontWeight: 500 }}>
+                        ({pSev.label})
+                      </span>
+                    </span>
+                  </div>
+                ) : (
+                  <EmptyNote text={noDataText} />
+                )}
+
+                {/* ── Nutrition (always visible) ───────────────────────── */}
                 <Divider label={t.sNutrition ?? "Nutrition"} />
                 {latestNutrition?.value != null ? (
                   (() => {
                     const v = latestNutrition.value;
-                    // 1 (poor) → red, 5 (excellent) → green
                     const nColor =
                       v <= 1
                         ? DANGER
@@ -1536,105 +1587,72 @@ export default function Sidebar({ patient, t = {} }) {
                     );
                   })()
                 ) : (
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: MU,
-                      fontStyle: "italic",
-                      padding: "4px 0",
-                    }}
-                  >
-                    {t.noData ?? "No data recorded."}
-                  </p>
+                  <EmptyNote text={noDataText} />
                 )}
 
-                {/* ── Weight ─────────────────────────────────────────────────────── */}
-                {records.some((r) => r.weight != null) && (
-                  <>
-                    <Divider
-                      label={t.sWeight ?? t.weight ?? "Weight"}
-                      onReadMore={() => setShowWeightModal(true)}
-                      readMoreLabel={readMoreLabel}
-                    />
-                    {(() => {
-                      const withWeight = records.filter(
-                        (r) => r.weight != null,
-                      );
-                      if (!withWeight.length) return null;
-                      const latestW = withWeight[withWeight.length - 1];
-                      const prevW =
-                        withWeight.length > 1
-                          ? withWeight[withWeight.length - 2]
-                          : null;
-                      const diff = prevW ? latestW.weight - prevW.weight : null;
-                      const diffStr =
-                        diff == null
-                          ? ""
-                          : diff < 0
-                            ? ` (${diff} kg)`
-                            : diff > 0
-                              ? ` (+${diff} kg)`
-                              : "";
-                      const color =
-                        diff == null
-                          ? undefined
-                          : diff < 0
-                            ? OK
-                            : diff > 0
-                              ? DANGER
-                              : undefined;
-                      return (
-                        <Row
-                          label={t.weight ?? "Weight"}
-                          value={`${latestW.weight} kg${diffStr}`}
-                          color={color}
-                        />
-                      );
+                {/* ── Weight (always visible) ──────────────────────────── */}
+                <Divider
+                  label={t.sWeight ?? t.weight ?? "Weight"}
+                  onReadMore={
+                    weightRecords.length ? () => setShowWeightModal(true) : undefined
+                  }
+                  readMoreLabel={readMoreLabel}
+                />
+                {latestWeight ? (
+                  <Row
+                    label={t.weight ?? "Weight"}
+                    value={`${latestWeight.weight} kg${weightDiffStr}`}
+                    color={weightColor}
+                    alwaysShow
+                  />
+                ) : (
+                  <EmptyNote text={noDataText} />
+                )}
+
+                {/* ── Alpha-1 (always visible) ─────────────────────────── */}
+                <Divider label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"} />
+                {latestAlpha1 ? (
+                  <Row
+                    label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"}
+                    value={(() => {
+                      if (!latestAlpha1.alpha1Tested)
+                        return t.sNotTested ?? "Not tested";
+                      if (latestAlpha1.alpha1Result == null)
+                        return t.sTested ?? "Tested";
+                      return latestAlpha1.alpha1Result === 0
+                        ? (t.sNegative ?? "Negative")
+                        : (t.sPositive ?? "Positive");
                     })()}
-                  </>
+                    color={(() => {
+                      if (!latestAlpha1.alpha1Tested) return WARN;
+                      if (latestAlpha1.alpha1Result == null) return MU;
+                      return latestAlpha1.alpha1Result === 0 ? OK : DANGER;
+                    })()}
+                    alwaysShow
+                  />
+                ) : (
+                  <Row
+                    label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"}
+                    value={t.sNotTested ?? "Not tested"}
+                    color={WARN}
+                    alwaysShow
+                  />
                 )}
 
-                {/* ── Alpha-1 ────────────────────────────────────────────────────── */}
-                {latestAlpha1 && (
-                  <>
-                    <Divider label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"} />
+                {/* ── Comorbidities (always visible, all listed) ───────── */}
+                <Divider label={t.sComorbidities ?? "Comorbidities"} />
+                {COND_FIELDS.map((c) => {
+                  const has = !!cond?.[c.key];
+                  return (
                     <Row
-                      label={t.sAlpha1 ?? "Alpha-1 Antitrypsin"}
-                      value={(() => {
-                        if (!latestAlpha1.alpha1Tested)
-                          return t.sNotTested ?? "Not tested";
-                        if (latestAlpha1.alpha1Result == null)
-                          return t.sTested ?? "Tested";
-                        return latestAlpha1.alpha1Result === 0
-                          ? (t.sNegative ?? "Negative")
-                          : (t.sPositive ?? "Positive");
-                      })()}
-                      color={(() => {
-                        if (!latestAlpha1.alpha1Tested) return WARN;
-                        if (latestAlpha1.alpha1Result == null) return MU;
-                        return latestAlpha1.alpha1Result === 0 ? OK : DANGER;
-                      })()}
+                      key={c.key}
+                      label={c.label}
+                      value={has ? (t.sYes ?? "Yes") : (t.sNo ?? "No")}
+                      color={has ? DANGER : OK}
+                      alwaysShow
                     />
-                  </>
-                )}
-
-                {/* ── Comorbidities ──────────────────────────────────────────────── */}
-                {activeConditions.length > 0 && (
-                  <>
-                    <Divider label={t.sComorbidities ?? "Comorbidities"} />
-                    {activeConditions.map((c) => (
-                      <Row
-                        key={c.key}
-                        label={c.label}
-                        value={t.sYes ?? "Yes"}
-                        color={DANGER}
-                      />
-                    ))}
-                  </>
-
-                  
-                )}
-              
+                  );
+                })}
               </>
             )}
           </div>

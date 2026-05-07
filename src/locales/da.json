@@ -24,7 +24,7 @@
   "medication": "Medicin",
   "activity": "Aktivitet",
   "exacerbation": "Eksacerbation",
-  "noData": "Ingen data registreret for denne dag.",
+  "noData": "Ingen data registreret.",
   "loading": "Indlæser...",
   "noEntries": "Ingen poster denne måned.",
   "entries": "poster",
@@ -391,5 +391,11 @@
   "recommendations15": "Ved lav SpO₂ bør der tages blodgas for at vurdere behovet for langtidsiltbehandling.",
   "recommendations16": "Overvej røntgen af thorax på diagnosetidspunktet for at udelukke anden sygdom.",
   "medicationsHeadline": "KOL-medicin",
-  "treatmentHeadline": "KOL-behandling"
+  "treatmentHeadline": "KOL-behandling",
+  "copdStatus": "KOL",
+  "asthmaStatus": "Astma",
+  "confirmed": "Bekræftet",
+  "notConfirmed": "Ikke bekræftet",
+  "moderateExacerbationSub": "(prednisolon / antibiotika)",
+  "seriousExacerbationSub": "(hospitalsindlæggelse)"
 }

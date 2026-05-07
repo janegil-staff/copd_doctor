@@ -1,17 +1,8 @@
 "use client";
 import { useMemo } from "react";
 
-export default function MonthlySummary({ t, records }) {
-  const { monthRecords, monthLabel } = useMemo(() => {
-    if (!records?.length) return { monthRecords: [], monthLabel: null };
-
-    // Find most recent record's month
-    const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
-    const latestDate = sorted[0].date;
-    const monthKey = latestDate.slice(0, 7); // "YYYY-MM"
-
-    const filtered = records.filter((r) => r.date.startsWith(monthKey));
-    const [year, month] = monthKey.split("-").map(Number);
+export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
+  const { monthRecords, monthLabel, hasData } = useMemo(() => {
     const months = t.monthNames ?? [
       "Jan",
       "Feb",
@@ -26,13 +17,35 @@ export default function MonthlySummary({ t, records }) {
       "Nov",
       "Dec",
     ];
+
+    // Determine which month to show: prefer viewYear/viewMonth from the calendar,
+    // fall back to the most recent record's month, then to current calendar month.
+    let year, month;
+    if (Number.isInteger(viewYear) && Number.isInteger(viewMonth)) {
+      year = viewYear;
+      month = viewMonth; // 0-indexed (matches CalendarPanel)
+    } else if (records?.length) {
+      const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
+      const [y, m] = sorted[0].date.slice(0, 7).split("-").map(Number);
+      year = y;
+      month = m - 1;
+    } else {
+      const now = new Date();
+      year = now.getFullYear();
+      month = now.getMonth();
+    }
+
+    const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+    const filtered = (records ?? []).filter((r) =>
+      r.date?.startsWith(monthKey),
+    );
+
     return {
       monthRecords: filtered,
-      monthLabel: `${months[month - 1]} ${year}`,
+      monthLabel: `${months[month]} ${year}`,
+      hasData: filtered.length > 0,
     };
-  }, [records, t]);
-
-  if (monthRecords.length === 0) return null;
+  }, [records, t, viewYear, viewMonth]);
 
   const catRecords = monthRecords.filter((r) => r.cat8 != null);
   const avgCat = catRecords.length
@@ -70,26 +83,21 @@ export default function MonthlySummary({ t, records }) {
       icon: "⚠",
       iconColor: "#f97316",
       label: t.moderateExacerbation,
+      sublabel: t.moderateExacerbationSub ?? "(prednisolon / antibiotika)",
       value: counts.moderateExacerbations,
     },
     {
       icon: "⚠",
       iconColor: "#ef4444",
       label: t.seriousExacerbation,
+      sublabel: t.seriousExacerbationSub ?? "(sykehusinnleggelse)",
       value: counts.seriousExacerbations,
     },
     {
       icon: "🏃",
       iconColor: "#268E86",
       label: t.physicalActivity,
-      value: (() => {
-        const vals = monthRecords.filter((r) => r.physicalActivity > 0);
-        if (!vals.length) return "–";
-        const avg = Math.round(
-          vals.reduce((s, r) => s + r.physicalActivity, 0) / vals.length,
-        );
-        return t.activityLabels?.[avg] ?? avg;
-      })(),
+      value: monthRecords.filter((r) => r.physicalActivity > 0).length,
     },
     {
       iconSrc: "/icons/ico_medicine.png",
@@ -117,7 +125,7 @@ export default function MonthlySummary({ t, records }) {
           className="text-xs font-semibold tracking-widest uppercase"
           style={{ color: "#268E86" }}
         >
-          {t.monthlySummary}
+          {t.monthlySummary ?? "Monthly summary"}
           {monthLabel && (
             <span
               style={{
@@ -134,34 +142,61 @@ export default function MonthlySummary({ t, records }) {
         </p>
       </div>
 
-      {rows.map(({ icon, iconSrc, iconColor, label, value }) => (
-        <div
-          key={label}
-          className="flex items-center px-4 py-1"
-          style={{ borderBottom: "1px solid rgba(38,142,134,0.06)" }}
+      {!hasData ? (
+        <p
+          style={{
+            fontSize: 12,
+            color: "#7a9a98",
+            fontStyle: "italic",
+            padding: "12px 16px",
+            margin: 0,
+            opacity: 0.75,
+          }}
         >
-          <span
-            className="w-6 text-base flex items-center"
-            style={{ color: iconColor }}
-          >
-            {iconSrc ? (
-              <img
-                src={iconSrc}
-                alt=""
-                style={{ width: 18, height: 18, objectFit: "contain" }}
-              />
-            ) : (
-              icon
-            )}
-          </span>
-          <span className="flex-1 text-sm ml-2" style={{ color: "#4a7a78" }}>
-            {label}
-          </span>
-          <span className="text-sm font-bold" style={{ color: "#b91c1c" }}>
-            {value}
-          </span>
-        </div>
-      ))}
+          {t.noData ?? "No data registered."}
+        </p>
+      ) : (
+        rows.map(({ icon, iconSrc, iconColor, label, sublabel, value }) => {
+          const isEmpty = value === "–" || value === 0;
+          return (
+            <div
+              key={label}
+              className="flex items-center px-4 py-1"
+              style={{ borderBottom: "1px solid rgba(38,142,134,0.06)" }}
+            >
+              <span
+                className="flex-1 text-sm ml-2"
+                style={{ color: "#4a7a78" }}
+              >
+                {label}
+                {sublabel && (
+                  <span
+                    style={{
+                      marginLeft: 4,
+                      fontSize: 11,
+                      color: "#7a9a98",
+                      fontWeight: 500,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {sublabel}
+                  </span>
+                )}
+              </span>
+              <span
+                className="text-sm font-bold"
+                style={{
+                  color: isEmpty ? "#7a9a98" : "#b91c1c",
+                  fontStyle: isEmpty ? "italic" : "normal",
+                  opacity: isEmpty ? 0.7 : 1,
+                }}
+              >
+                {value}
+              </span>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }

@@ -23,7 +23,7 @@
   "medication": "Medisin",
   "activity": "Aktivitet",
   "exacerbation": "Eksaserbasjon",
-  "noData": "Ingen data registrert for denne dagen.",
+  "noData": "Ingen data registrert.",
   "loading": "Laster...",
   "noEntries": "Ingen oppføringer denne måneden.",
   "entries": "oppføringer",
@@ -404,5 +404,11 @@
   "recommendations15": "Hvis lav SpO₂ bør blodgass tas for vurdering av behov for langtids oksygenbehandling.",
   "recommendations16": "Vurder om røntgen thorax skal tas på diagnosetidspunkt for å utelukke annen sykdom.",
   "medicationsHeadline": "KOLS-medisiner",
-  "treatmentHeadline": "KOLS-behandling"
+  "treatmentHeadline": "KOLS-behandling",
+  "copdStatus": "KOLS",
+  "asthmaStatus": "Astma",
+  "confirmed": "Bekreftet",
+  "notConfirmed": "Ikke bekreftet",
+  "moderateExacerbationSub": "(prednisolon / antibiotika)",
+  "seriousExacerbationSub": "(sykehusinnleggelse)"
 }

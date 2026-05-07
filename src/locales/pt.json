@@ -23,7 +23,7 @@
   "medication": "Medicamento",
   "activity": "Atividade",
   "exacerbation": "Exacerbação",
-  "noData": "Sem dados registados para este dia.",
+  "noData": "Nenhum dado registado.",
   "loading": "A carregar...",
   "noEntries": "Sem entradas este mês.",
   "weeksRecorded": "Semanas registadas",
@@ -391,5 +391,11 @@
   "recommendations15": "Se a SpO₂ estiver baixa, deve ser feita gasometria arterial para avaliar a necessidade de oxigenoterapia de longa duração.",
   "recommendations16": "Considerar a realização de radiografia do tórax no momento do diagnóstico para excluir outras doenças.",
   "medicationsHeadline": "Medicamentos para a DPOC",
-  "treatmentHeadline": "Tratamento da DPOC"
+  "treatmentHeadline": "Tratamento da DPOC",
+  "copdStatus": "DPOC",
+  "asthmaStatus": "Asma",
+  "confirmed": "Confirmado",
+  "notConfirmed": "Não confirmado",
+  "moderateExacerbationSub": "(prednisolona / antibióticos)",
+  "seriousExacerbationSub": "(hospitalização)"
 }

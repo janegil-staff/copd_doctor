@@ -23,7 +23,7 @@
   "medication": "Médicament",
   "activity": "Activité",
   "exacerbation": "Exacerbation",
-  "noData": "Aucune donnée enregistrée pour ce jour.",
+  "noData": "Aucune donnée enregistrée.",
   "weeksRecorded": "Semaines enregistrées",
   "loading": "Chargement...",
   "noEntries": "Aucune entrée ce mois.",
@@ -391,5 +391,11 @@
   "recommendations15": "En cas de SpO₂ basse, une gazométrie artérielle doit être réalisée pour évaluer le besoin d'une oxygénothérapie de longue durée.",
   "recommendations16": "Envisager une radiographie thoracique au moment du diagnostic afin d'exclure d'autres pathologies.",
   "medicationsHeadline": "Médicaments BPCO",
-  "treatmentHeadline": "Traitement BPCO"
+  "treatmentHeadline": "Traitement BPCO",
+  "copdStatus": "BPCO",
+  "asthmaStatus": "Asthme",
+  "confirmed": "Confirmé",
+  "notConfirmed": "Non confirmé",
+  "moderateExacerbationSub": "(prednisolone / antibiotiques)",
+  "seriousExacerbationSub": "(hospitalisation)"
 }

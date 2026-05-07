@@ -24,7 +24,7 @@
   "medication": "Lääke",
   "activity": "Aktiviteetti",
   "exacerbation": "Paheneminen",
-  "noData": "Ei tietoja tälle päivälle.",
+  "noData": "Ei rekisteröityjä tietoja.",
   "loading": "Ladataan...",
   "noEntries": "Ei merkintöjä tässä kuussa.",
   "entries": "merkintää",
@@ -391,5 +391,11 @@
   "recommendations15": "Matalan SpO₂:n yhteydessä tulisi ottaa verikaasu pitkäaikaisen happihoidon tarpeen arvioimiseksi.",
   "recommendations16": "Harkitse keuhkokuvan ottamista diagnoosihetkellä muiden sairauksien poissulkemiseksi.",
   "medicationsHeadline": "COPD-lääkkeet",
-  "treatmentHeadline": "COPD:n hoito"
+  "treatmentHeadline": "COPD:n hoito",
+  "copdStatus": "COPD",
+  "asthmaStatus": "Astma",
+  "confirmed": "Vahvistettu",
+  "notConfirmed": "Ei vahvistettu",
+  "moderateExacerbationSub": "(prednisoloni / antibiootit)",
+  "seriousExacerbationSub": "(sairaalahoito)"
 }

@@ -23,7 +23,7 @@
   "medication": "Farmaco",
   "activity": "Attività",
   "exacerbation": "Riacutizzazione",
-  "noData": "Nessun dato registrato per questo giorno.",
+  "noData": "Nessun dato registrato.",
   "weeksRecorded": "Settimane registrate",
   "loading": "Caricamento...",
   "noEntries": "Nessuna voce questo mese.",
@@ -391,5 +391,11 @@
   "recommendations15": "Se la SpO₂ è bassa, eseguire un'emogasanalisi per valutare la necessità di ossigenoterapia a lungo termine.",
   "recommendations16": "Valutare se eseguire una radiografia del torace al momento della diagnosi per escludere altre patologie.",
   "medicationsHeadline": "Farmaci per la BPCO",
-  "treatmentHeadline": "Trattamento della BPCO"
+  "treatmentHeadline": "Trattamento della BPCO",
+  "copdStatus": "BPCO",
+  "asthmaStatus": "Asma",
+  "confirmed": "Confermato",
+  "notConfirmed": "Non confermato",
+  "moderateExacerbationSub": "(prednisolone / antibiotici)",
+  "seriousExacerbationSub": "(ricovero ospedaliero)"
 }

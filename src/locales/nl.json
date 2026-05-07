@@ -24,7 +24,7 @@
   "medication": "Medicatie",
   "activity": "Activiteit",
   "exacerbation": "Exacerbatie",
-  "noData": "Geen gegevens geregistreerd voor deze dag.",
+  "noData": "Geen gegevens geregistreerd.",
   "loading": "Laden...",
   "noEntries": "Geen vermeldingen deze maand.",
   "entries": "vermeldingen",
@@ -391,5 +391,11 @@
   "recommendations15": "Bij een lage SpO₂ moet een bloedgas worden afgenomen om de behoefte aan langdurige zuurstoftherapie te beoordelen.",
   "recommendations16": "Overweeg of een thoraxfoto moet worden gemaakt bij diagnose om andere ziekten uit te sluiten.",
   "medicationsHeadline": "COPD-medicatie",
-  "treatmentHeadline": "COPD-behandeling"
+  "treatmentHeadline": "COPD-behandeling",
+  "copdStatus": "COPD",
+  "asthmaStatus": "Astma",
+  "confirmed": "Bevestigd",
+  "notConfirmed": "Niet bevestigd",
+  "moderateExacerbationSub": "(prednisolon / antibiotica)",
+  "seriousExacerbationSub": "(ziekenhuisopname)"
 }

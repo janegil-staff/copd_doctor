@@ -23,7 +23,7 @@
   "medication": "Medikament",
   "activity": "Aktivität",
   "exacerbation": "Exazerbation",
-  "noData": "Keine Daten für diesen Tag erfasst.",
+  "noData": "Keine Daten erfasst.",
   "loading": "Laden...",
   "noEntries": "Keine Einträge diesen Monat.",
   "entries": "Einträge",
@@ -385,5 +385,11 @@
   "recommendations15": "Bei niedriger SpO₂ sollte eine Blutgasanalyse zur Beurteilung einer Langzeitsauerstofftherapie erfolgen.",
   "recommendations16": "Erwägen, zum Diagnosezeitpunkt ein Röntgen-Thorax zum Ausschluss anderer Erkrankungen durchzuführen.",
   "medicationsHeadline": "COPD-Medikamente",
-  "treatmentHeadline": "COPD-Behandlung"
+  "treatmentHeadline": "COPD-Behandlung",
+  "copdStatus": "COPD",
+  "asthmaStatus": "Asthma",
+  "confirmed": "Bestätigt",
+  "notConfirmed": "Nicht bestätigt",
+  "moderateExacerbationSub": "(Prednisolon / Antibiotika)",
+  "seriousExacerbationSub": "(Krankenhausaufenthalt)"
 }
