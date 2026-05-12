@@ -730,43 +730,41 @@ function ActiveMedicationsList({
                           {um.startedUsage}
                         </p>
                       )}
-                      {/* Training: only shown for inhalers (type 1) */}
-                      {um.medicine?.type === 1 && (
-                        <div
+                      {/* Training: shown for all medicine types */}
+                      <div
+                        style={{
+                          marginTop: 4,
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <span
                           style={{
-                            marginTop: 4,
-                            display: "flex",
-                            flexWrap: "wrap",
-                            alignItems: "center",
-                            gap: 4,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            color: MU,
                           }}
                         >
+                          {t.sTrainingLabel ?? "Training:"}
+                        </span>
+                        {hasTrain ? (
+                          trainSources.map((s) => (
+                            <Chip key={s.key} label={s.label} />
+                          ))
+                        ) : (
                           <span
                             style={{
                               fontSize: 10,
                               fontWeight: 600,
-                              color: MU,
+                              color: DANGER,
                             }}
                           >
-                            {t.sTrainingLabel ?? "Training:"}
+                            {t.sNoTraining ?? "✗ No training"}
                           </span>
-                          {hasTrain ? (
-                            trainSources.map((s) => (
-                              <Chip key={s.key} label={s.label} />
-                            ))
-                          ) : (
-                            <span
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 600,
-                                color: DANGER,
-                              }}
-                            >
-                              {t.sNoTraining ?? "✗ No training"}
-                            </span>
-                          )}
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                     {satMap[um.medicineId] != null && (
                       <SatDice value={satMap[um.medicineId]} />
