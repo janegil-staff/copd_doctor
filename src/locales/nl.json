@@ -397,5 +397,7 @@
   "confirmed": "Bevestigd",
   "notConfirmed": "Niet bevestigd",
   "moderateExacerbationSub": "(prednisolon / antibiotica)",
-  "seriousExacerbationSub": "(ziekenhuisopname)"
+  "seriousExacerbationSub": "(ziekenhuisopname)",
+  "sShowMore": "Meer tonen",
+  "sShowLess": "Minder tonen"
 }

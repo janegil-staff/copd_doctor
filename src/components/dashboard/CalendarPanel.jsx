@@ -150,8 +150,16 @@ function SatDice({ value = 0 }) {
       [5, 13],
       [13, 13],
     ],
+    6: [
+      [5, 4],
+      [13, 4],
+      [5, 9],
+      [13, 9],
+      [5, 14],
+      [13, 14],
+    ],
   };
-  const v = Math.min(5, Math.max(1, Math.round(value)));
+  const v = Math.min(6, Math.max(1, Math.round(value)));
   const positions = dots[v] ?? dots[1];
   return (
     <svg width="22" height="22" viewBox="0 0 22 22" style={{ flexShrink: 0 }}>

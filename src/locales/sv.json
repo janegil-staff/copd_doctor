@@ -397,5 +397,7 @@
   "confirmed": "Bekräftad",
   "notConfirmed": "Inte bekräftad",
   "moderateExacerbationSub": "(prednisolon / antibiotika)",
-  "seriousExacerbationSub": "(sjukhusinläggning)"
+  "seriousExacerbationSub": "(sjukhusinläggning)",
+  "sShowMore": "Visa mer",
+  "sShowLess": "Visa mindre"
 }

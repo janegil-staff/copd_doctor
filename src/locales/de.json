@@ -391,5 +391,7 @@
   "confirmed": "Bestätigt",
   "notConfirmed": "Nicht bestätigt",
   "moderateExacerbationSub": "(Prednisolon / Antibiotika)",
-  "seriousExacerbationSub": "(Krankenhausaufenthalt)"
+  "seriousExacerbationSub": "(Krankenhausaufenthalt)",
+  "sShowMore": "Mehr anzeigen",
+  "sShowLess": "Weniger anzeigen"
 }

@@ -397,5 +397,7 @@
   "confirmed": "Confermato",
   "notConfirmed": "Non confermato",
   "moderateExacerbationSub": "(prednisolone / antibiotici)",
-  "seriousExacerbationSub": "(ricovero ospedaliero)"
+  "seriousExacerbationSub": "(ricovero ospedaliero)",
+  "sShowMore": "Mostra di più",
+  "sShowLess": "Mostra di meno"
 }

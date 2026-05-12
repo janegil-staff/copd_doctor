@@ -100,9 +100,7 @@ function Divider({ label, onReadMore, readMoreLabel, extra, disabled }) {
       <div
         style={{ flex: 1, height: 1, background: "rgba(38,142,134,0.15)" }}
       />
-      {extra && (
-        <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
-      )}
+      {extra && <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>}
       {onReadMore && !disabled && (
         <button
           onClick={onReadMore}
@@ -151,6 +149,16 @@ function Bar({ value, max, color }) {
       />
     </div>
   );
+}
+
+// ── eosinophil severity ──────────────────────────────────────────────────────
+
+function eosColor(v) {
+  if (v == null) return MU;
+  if (v >= 0.5) return DANGER;
+  if (v >= 0.3) return "#e07a30";
+  if (v >= 0.1) return WARN;
+  return OK;
 }
 
 // ── Spirometry modal ─────────────────────────────────────────────────────────
@@ -427,6 +435,138 @@ function Spo2Modal({ entries, t, onClose }) {
                       {t.sPulseRate ?? "Pulse rate"}:{" "}
                     </span>
                     <strong>{entry.pulseRate} bpm</strong>
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Eosinophil modal ─────────────────────────────────────────────────────────
+
+function EosinophilModal({ entries, t, onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        background: "rgba(0,0,0,0.45)",
+        backdropFilter: "blur(3px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff",
+          borderRadius: 16,
+          padding: 24,
+          width: "100%",
+          maxWidth: 480,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 16,
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 18,
+              fontWeight: 700,
+              color: TX,
+              fontFamily: "'Playfair Display', Georgia, serif",
+              letterSpacing: "0.025em",
+            }}
+          >
+            {t.sEosinophil ?? "Eosinophils"}
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: 18,
+              color: MU,
+              lineHeight: 1,
+              padding: "0 4px",
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {[...entries].reverse().map((entry, i) => {
+          const c = eosColor(entry.value);
+          return (
+            <div
+              key={i}
+              style={{
+                borderRadius: 10,
+                border: "1px solid rgba(38,142,134,0.14)",
+                padding: "10px 14px",
+                marginBottom: 10,
+                background: i === 0 ? "rgba(38,142,134,0.04)" : "#fff",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 6px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: A,
+                }}
+              >
+                {entry.date ?? "–"}
+                {i === 0 && (
+                  <span
+                    style={{
+                      marginLeft: 8,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      background: A,
+                      color: "#fff",
+                      borderRadius: 20,
+                      padding: "1px 8px",
+                    }}
+                  >
+                    Latest
+                  </span>
+                )}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "4px 16px",
+                  alignItems: "center",
+                }}
+              >
+                {entry.value != null && (
+                  <span style={{ fontSize: 11, color: TX }}>
+                    <span style={{ color: MU, fontWeight: 500 }}>
+                      {t.sEosinophilCount ?? "Count"}:{" "}
+                    </span>
+                    <strong style={{ color: c }}>
+                      {Number(entry.value).toFixed(1)} ×10⁹/L
+                    </strong>
                   </span>
                 )}
               </div>
@@ -967,6 +1107,7 @@ export default function Sidebar({ patient, t = {} }) {
 
   const [showSpirometryModal, setShowSpirometryModal] = useState(false);
   const [showSpo2Modal, setShowSpo2Modal] = useState(false);
+  const [showEosinophilModal, setShowEosinophilModal] = useState(false);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showGad7Modal, setShowGad7Modal] = useState(false);
   const [showPhq9Modal, setShowPhq9Modal] = useState(false);
@@ -980,6 +1121,7 @@ export default function Sidebar({ patient, t = {} }) {
     ? patient.spirometry
     : [];
   const spo2arr = Array.isArray(patient.spo2) ? patient.spo2 : [];
+  const eosArr = Array.isArray(patient.eosinophil) ? patient.eosinophil : [];
   const vaccinations = Array.isArray(patient.vaccinations)
     ? patient.vaccinations
     : [];
@@ -999,6 +1141,7 @@ export default function Sidebar({ patient, t = {} }) {
     ? spirometry[spirometry.length - 1]
     : null;
   const latestSpo2v = spo2arr.length ? spo2arr[spo2arr.length - 1] : null;
+  const latestEos = eosArr.length ? eosArr[eosArr.length - 1] : null;
 
   const gad7Score = sumKeys(latestGad7, GAD7_KEYS);
   const phq9Score = sumKeys(latestPhq9, PHQ9_KEYS);
@@ -1061,9 +1204,7 @@ export default function Sidebar({ patient, t = {} }) {
     ? weightRecords[weightRecords.length - 1]
     : null;
   const prevWeight =
-    weightRecords.length > 1
-      ? weightRecords[weightRecords.length - 2]
-      : null;
+    weightRecords.length > 1 ? weightRecords[weightRecords.length - 2] : null;
   const weightDiff =
     latestWeight && prevWeight ? latestWeight.weight - prevWeight.weight : null;
   const weightDiffStr =
@@ -1097,6 +1238,13 @@ export default function Sidebar({ patient, t = {} }) {
           entries={spo2arr}
           t={t}
           onClose={() => setShowSpo2Modal(false)}
+        />
+      )}
+      {showEosinophilModal && eosArr.length > 0 && (
+        <EosinophilModal
+          entries={eosArr}
+          t={t}
+          onClose={() => setShowEosinophilModal(false)}
         />
       )}
       {showSpirometryModal && spirometry.length > 0 && (
@@ -1195,7 +1343,9 @@ export default function Sidebar({ patient, t = {} }) {
             {/* ── Spirometry (always visible) ─────────────────────────────── */}
             <Divider
               label={t.sSpirometry ?? "Spirometry"}
-              onReadMore={latestSpiro ? () => setShowSpirometryModal(true) : undefined}
+              onReadMore={
+                latestSpiro ? () => setShowSpirometryModal(true) : undefined
+              }
               readMoreLabel={readMoreLabel}
             />
             {latestSpiro ? (
@@ -1298,7 +1448,9 @@ export default function Sidebar({ patient, t = {} }) {
                   ? `${t.sSpo2 ?? "SPO₂"} · ${latestSpo2v.date}`
                   : (t.sSpo2 ?? "SPO₂")
               }
-              onReadMore={latestSpo2v ? () => setShowSpo2Modal(true) : undefined}
+              onReadMore={
+                latestSpo2v ? () => setShowSpo2Modal(true) : undefined
+              }
               readMoreLabel={readMoreLabel}
               extra={
                 latestSpo2v?.value != null ? (
@@ -1319,6 +1471,32 @@ export default function Sidebar({ patient, t = {} }) {
               }
             />
             {!latestSpo2v && <EmptyNote text={noDataText} />}
+
+            {/* ── Eosinophil (always visible) ───────────────────────────── */}
+            <Divider
+              label={
+                latestEos?.date
+                  ? `${t.sEosinophil ?? "Eosinophils"} · ${latestEos.date}`
+                  : (t.sEosinophil ?? "Eosinophils")
+              }
+              onReadMore={
+                latestEos ? () => setShowEosinophilModal(true) : undefined
+              }
+              readMoreLabel={readMoreLabel}
+              extra={
+                latestEos?.value != null ? (
+                  <strong
+                    style={{
+                      fontWeight: 700,
+                      color: eosColor(latestEos.value),
+                    }}
+                  >
+                    {fmt1(latestEos.value)} ×10⁹/L
+                  </strong>
+                ) : null
+              }
+            />
+            {!latestEos && <EmptyNote text={noDataText} />}
 
             {/* ── Smoking (always visible) ───────────────────────────────── */}
             <Divider label={t.sSmoking ?? "Smoking"} />
@@ -1410,31 +1588,26 @@ export default function Sidebar({ patient, t = {} }) {
 
                 {/* ── Vaccinations (always visible) ─────────────────────── */}
                 <Divider label={t.sVaccinations ?? "Vaccinations"} />
-                {latestVax ? (
-                  VAX_FIELDS.map(({ key, label }) => (
-                    <Row
-                      key={key}
-                      label={label}
-                      value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
-                      color={latestVax[key] ? OK : MU}
-                      alwaysShow
-                    />
-                  ))
-                ) : (
-                  VAX_FIELDS.map(({ key, label }) => (
-                    <Row
-                      key={key}
-                      label={label}
-                      value={null}
-                      alwaysShow
-                    />
-                  ))
-                )}
+                {latestVax
+                  ? VAX_FIELDS.map(({ key, label }) => (
+                      <Row
+                        key={key}
+                        label={label}
+                        value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
+                        color={latestVax[key] ? OK : MU}
+                        alwaysShow
+                      />
+                    ))
+                  : VAX_FIELDS.map(({ key, label }) => (
+                      <Row key={key} label={label} value={null} alwaysShow />
+                    ))}
 
                 {/* ── GAD-7 (always visible) ───────────────────────────── */}
                 <Divider
                   label={t.sGad7 ?? "GAD-7 · Anxiety"}
-                  onReadMore={latestGad7 ? () => setShowGad7Modal(true) : undefined}
+                  onReadMore={
+                    latestGad7 ? () => setShowGad7Modal(true) : undefined
+                  }
                   readMoreLabel={readMoreLabel}
                 />
                 {latestGad7 ? (
@@ -1480,7 +1653,9 @@ export default function Sidebar({ patient, t = {} }) {
                 {/* ── PHQ-9 (always visible) ───────────────────────────── */}
                 <Divider
                   label={t.sPhq9 ?? "PHQ-9 · Depression"}
-                  onReadMore={latestPhq9 ? () => setShowPhq9Modal(true) : undefined}
+                  onReadMore={
+                    latestPhq9 ? () => setShowPhq9Modal(true) : undefined
+                  }
                   readMoreLabel={readMoreLabel}
                 />
                 {latestPhq9 ? (
@@ -1528,24 +1703,16 @@ export default function Sidebar({ patient, t = {} }) {
                 {latestNutrition?.value != null ? (
                   (() => {
                     const v = latestNutrition.value;
-                    const nColor =
-                      v <= 1
-                        ? DANGER
-                        : v === 2
-                          ? "#e07a30"
-                          : v === 3
-                            ? WARN
-                            : v === 4
-                              ? A
-                              : OK;
+                    // 1 = No, 2-4 = Yes, 5 = Unsure
+                    const nColor = v === 1 ? DANGER : v === 5 ? WARN : OK;
                     const label =
                       t.nutritionLabels?.[v] ??
                       [
-                        t.sNutritionPoor ?? "Poor",
-                        t.sNutritionFair ?? "Fair",
-                        t.sNutritionOk ?? "OK",
-                        t.sNutritionGood ?? "Good",
-                        t.sNutritionExcellent ?? "Excellent",
+                        t.sNutritionNo ?? "No",
+                        t.sNutritionYes ?? "Yes",
+                        t.sNutritionYes ?? "Yes",
+                        t.sNutritionYes ?? "Yes",
+                        t.sNutritionUnsure ?? "Unsure",
                       ][v - 1] ??
                       String(v);
                     return (
@@ -1594,7 +1761,9 @@ export default function Sidebar({ patient, t = {} }) {
                 <Divider
                   label={t.sWeight ?? t.weight ?? "Weight"}
                   onReadMore={
-                    weightRecords.length ? () => setShowWeightModal(true) : undefined
+                    weightRecords.length
+                      ? () => setShowWeightModal(true)
+                      : undefined
                   }
                   readMoreLabel={readMoreLabel}
                 />

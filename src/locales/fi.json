@@ -397,5 +397,7 @@
   "confirmed": "Vahvistettu",
   "notConfirmed": "Ei vahvistettu",
   "moderateExacerbationSub": "(prednisoloni / antibiootit)",
-  "seriousExacerbationSub": "(sairaalahoito)"
+  "seriousExacerbationSub": "(sairaalahoito)",
+  "sShowMore": "Näytä lisää",
+  "sShowLess": "Näytä vähemmän"
 }

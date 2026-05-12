@@ -31,7 +31,7 @@
   "avgSymptoms": "Gj.snitt symptomer",
   "moderateExacerbation": "Moderat eksaserbasjon",
   "seriousExacerbation": "Alvorlig eksaserbasjon",
-  "physicalActivity": "Fysisk aktivitet",
+  "physicalActivity": "Uker med fysisnk aktivitet",
   "notes": "Notater",
   "daysRecorded": "Dager registrert",
   "weeksRecorded": "Uker registrert",
@@ -410,5 +410,7 @@
   "confirmed": "Bekreftet",
   "notConfirmed": "Ikke bekreftet",
   "moderateExacerbationSub": "(prednisolon / antibiotika)",
-  "seriousExacerbationSub": "(sykehusinnleggelse)"
+  "seriousExacerbationSub": "(sykehusinnleggelse)",
+  "sShowMore": "Vis mer",
+  "sShowLess": "Vis mindre"
 }
