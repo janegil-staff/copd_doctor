@@ -1,8 +1,27 @@
 "use client";
 import { useMemo } from "react";
 
+// ── helpers (mirror CalendarPanel's week logic) ────────────────────────────
+
+const parseLocal = (dateStr) => {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
+
+const toKey = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
+
+// Monday key for a given date (matches CalendarPanel's `(dow + 6) % 7` logic).
+const mondayKeyOf = (date) => {
+  const dow = (date.getDay() + 6) % 7;
+  const mon = new Date(date.getFullYear(), date.getMonth(), date.getDate() - dow);
+  return toKey(mon);
+};
+
 export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
-  const { monthRecords, monthLabel, hasData } = useMemo(() => {
+  const { monthRecords, weekRecords, monthLabel, hasData } = useMemo(() => {
     const months = t.monthNames ?? [
       "Jan",
       "Feb",
@@ -40,13 +59,41 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
       r.date?.startsWith(monthKey),
     );
 
+    // ── Build the set of Monday-keys that the calendar shows for this month ──
+    // CalendarPanel renders every week that contains at least one day of the
+    // viewed month. Mirror that exactly so the summary counts match what the
+    // user sees on screen.
+    const visibleMondayKeys = new Set();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      visibleMondayKeys.add(mondayKeyOf(new Date(year, month, d)));
+    }
+
+    // For each record, find its week's Monday. If that Monday is one of the
+    // weeks shown in this month, attach the record to that week.
+    // (A record can only belong to one week, so no double-counting.)
+    const weekToRecords = {};
+    (records ?? []).forEach((r) => {
+      if (!r.date) return;
+      const mKey = mondayKeyOf(parseLocal(r.date));
+      if (!visibleMondayKeys.has(mKey)) return;
+      if (!weekToRecords[mKey]) weekToRecords[mKey] = [];
+      weekToRecords[mKey].push(r);
+    });
+
+    // Flatten to a list of records that the calendar would associate with a
+    // visible week row this month. Each week contributes its records once.
+    const flatWeekRecords = Object.values(weekToRecords).flat();
+
     return {
       monthRecords: filtered,
+      weekRecords: { byWeek: weekToRecords, flat: flatWeekRecords },
       monthLabel: `${months[month]} ${year}`,
-      hasData: filtered.length > 0,
+      hasData: filtered.length > 0 || flatWeekRecords.length > 0,
     };
   }, [records, t, viewYear, viewMonth]);
 
+  // ── CAT average uses strict month records (one value per registration) ──
   const catRecords = monthRecords.filter((r) => r.cat8 != null);
   const avgCat = catRecords.length
     ? Math.round(catRecords.reduce((s, r) => s + r.cat8, 0) / catRecords.length)
@@ -55,13 +102,22 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
     ? catRecords.reduce((s, r) => s + r.cat8, 0) / catRecords.length
     : null;
 
-  const counts = {
-    moderateExacerbations: monthRecords.filter(
-      (r) => r.moderateExacerbations && !r.seriousExacerbations,
-    ).length,
-    seriousExacerbations: monthRecords.filter((r) => r.seriousExacerbations)
-      .length,
-  };
+  // ── Exacerbations: count weeks (matches the ⚠ icons on the calendar) ──
+  let moderateWeeks = 0;
+  let seriousWeeks = 0;
+  let activityWeeks = 0;
+  let medicineWeeks = 0;
+
+  for (const recs of Object.values(weekRecords.byWeek)) {
+    // For each visible week, ask: does any record in this week trigger…?
+    const anySerious = recs.some((r) => r.seriousExacerbations);
+    const anyModerate =
+      !anySerious && recs.some((r) => r.moderateExacerbations);
+    if (anySerious) seriousWeeks++;
+    if (anyModerate) moderateWeeks++;
+    if (recs.some((r) => r.physicalActivity > 0)) activityWeeks++;
+    if (recs.some((r) => r.medicines?.length > 0)) medicineWeeks++;
+  }
 
   const rows = [
     {
@@ -84,27 +140,27 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
       iconColor: "#f97316",
       label: t.moderateExacerbation,
       sublabel: t.moderateExacerbationSub ?? "(prednisolon / antibiotika)",
-      value: counts.moderateExacerbations,
+      value: moderateWeeks,
     },
     {
       icon: "⚠",
       iconColor: "#ef4444",
       label: t.seriousExacerbation,
       sublabel: t.seriousExacerbationSub ?? "(sykehusinnleggelse)",
-      value: counts.seriousExacerbations,
+      value: seriousWeeks,
     },
     {
       icon: "🏃",
       iconColor: "#268E86",
       label: t.physicalActivity,
-      value: monthRecords.filter((r) => r.physicalActivity > 0).length,
+      value: activityWeeks,
     },
     {
       iconSrc: "/icons/ico_medicine.png",
       icon: "💊",
       iconColor: "#0ea5e9",
       label: t.weeksWithMedicine ?? t.medicines,
-      value: monthRecords.filter((r) => r.medicines?.length > 0).length,
+      value: medicineWeeks,
     },
   ];
 
