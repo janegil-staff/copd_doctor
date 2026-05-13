@@ -100,7 +100,9 @@ function Divider({ label, onReadMore, readMoreLabel, extra, disabled }) {
       <div
         style={{ flex: 1, height: 1, background: "rgba(38,142,134,0.15)" }}
       />
-      {extra && <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>}
+      {extra && (
+        <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
+      )}
       {onReadMore && !disabled && (
         <button
           onClick={onReadMore}
@@ -159,6 +161,30 @@ function eosColor(v) {
   if (v >= 0.3) return "#e07a30";
   if (v >= 0.1) return WARN;
   return OK;
+}
+
+// ── weight-loss severity (1=No good, 2=Unsure, 3=Yes, 4=Yes worse, 5=Yes unsure) ─
+
+function weightLossColor(v) {
+  if (v == null) return MU;
+  if (v === 1) return OK;
+  if (v === 2) return WARN;
+  if (v === 3) return "#e07a30";
+  if (v === 4) return DANGER;
+  if (v === 5) return WARN;
+  return MU;
+}
+
+function weightLossLabel(v, t) {
+  if (v == null) return "–";
+  const arr = [
+    t.sWeightLossNo ?? "Nei",
+    t.sWeightLossUnsure ?? "Usikker",
+    t.sWeightLossYes ?? "Ja",
+    t.sWeightLossYes ?? "Ja",
+    t.sWeightLossYesUnsure ?? "Ja, men usikker",
+  ];
+  return t.weightLossLabels?.[v] ?? arr[v - 1] ?? String(v);
 }
 
 // ── Spirometry modal ─────────────────────────────────────────────────────────
@@ -1204,7 +1230,9 @@ export default function Sidebar({ patient, t = {} }) {
     ? weightRecords[weightRecords.length - 1]
     : null;
   const prevWeight =
-    weightRecords.length > 1 ? weightRecords[weightRecords.length - 2] : null;
+    weightRecords.length > 1
+      ? weightRecords[weightRecords.length - 2]
+      : null;
   const weightDiff =
     latestWeight && prevWeight ? latestWeight.weight - prevWeight.weight : null;
   const weightDiffStr =
@@ -1343,9 +1371,7 @@ export default function Sidebar({ patient, t = {} }) {
             {/* ── Spirometry (always visible) ─────────────────────────────── */}
             <Divider
               label={t.sSpirometry ?? "Spirometry"}
-              onReadMore={
-                latestSpiro ? () => setShowSpirometryModal(true) : undefined
-              }
+              onReadMore={latestSpiro ? () => setShowSpirometryModal(true) : undefined}
               readMoreLabel={readMoreLabel}
             />
             {latestSpiro ? (
@@ -1448,9 +1474,7 @@ export default function Sidebar({ patient, t = {} }) {
                   ? `${t.sSpo2 ?? "SPO₂"} · ${latestSpo2v.date}`
                   : (t.sSpo2 ?? "SPO₂")
               }
-              onReadMore={
-                latestSpo2v ? () => setShowSpo2Modal(true) : undefined
-              }
+              onReadMore={latestSpo2v ? () => setShowSpo2Modal(true) : undefined}
               readMoreLabel={readMoreLabel}
               extra={
                 latestSpo2v?.value != null ? (
@@ -1479,9 +1503,7 @@ export default function Sidebar({ patient, t = {} }) {
                   ? `${t.sEosinophil ?? "Eosinophils"} · ${latestEos.date}`
                   : (t.sEosinophil ?? "Eosinophils")
               }
-              onReadMore={
-                latestEos ? () => setShowEosinophilModal(true) : undefined
-              }
+              onReadMore={latestEos ? () => setShowEosinophilModal(true) : undefined}
               readMoreLabel={readMoreLabel}
               extra={
                 latestEos?.value != null ? (
@@ -1588,26 +1610,31 @@ export default function Sidebar({ patient, t = {} }) {
 
                 {/* ── Vaccinations (always visible) ─────────────────────── */}
                 <Divider label={t.sVaccinations ?? "Vaccinations"} />
-                {latestVax
-                  ? VAX_FIELDS.map(({ key, label }) => (
-                      <Row
-                        key={key}
-                        label={label}
-                        value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
-                        color={latestVax[key] ? OK : MU}
-                        alwaysShow
-                      />
-                    ))
-                  : VAX_FIELDS.map(({ key, label }) => (
-                      <Row key={key} label={label} value={null} alwaysShow />
-                    ))}
+                {latestVax ? (
+                  VAX_FIELDS.map(({ key, label }) => (
+                    <Row
+                      key={key}
+                      label={label}
+                      value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
+                      color={latestVax[key] ? OK : MU}
+                      alwaysShow
+                    />
+                  ))
+                ) : (
+                  VAX_FIELDS.map(({ key, label }) => (
+                    <Row
+                      key={key}
+                      label={label}
+                      value={null}
+                      alwaysShow
+                    />
+                  ))
+                )}
 
                 {/* ── GAD-7 (always visible) ───────────────────────────── */}
                 <Divider
                   label={t.sGad7 ?? "GAD-7 · Anxiety"}
-                  onReadMore={
-                    latestGad7 ? () => setShowGad7Modal(true) : undefined
-                  }
+                  onReadMore={latestGad7 ? () => setShowGad7Modal(true) : undefined}
                   readMoreLabel={readMoreLabel}
                 />
                 {latestGad7 ? (
@@ -1653,9 +1680,7 @@ export default function Sidebar({ patient, t = {} }) {
                 {/* ── PHQ-9 (always visible) ───────────────────────────── */}
                 <Divider
                   label={t.sPhq9 ?? "PHQ-9 · Depression"}
-                  onReadMore={
-                    latestPhq9 ? () => setShowPhq9Modal(true) : undefined
-                  }
+                  onReadMore={latestPhq9 ? () => setShowPhq9Modal(true) : undefined}
                   readMoreLabel={readMoreLabel}
                 />
                 {latestPhq9 ? (
@@ -1698,72 +1723,27 @@ export default function Sidebar({ patient, t = {} }) {
                   <EmptyNote text={noDataText} />
                 )}
 
-                {/* ── Weight loss (always visible) ─────────────────────── */}
-                <Divider label={t.sWeightLoss ?? "Vektnedgang"} />
-                {latestNutrition?.value != null ? (
-                  (() => {
-                    const v = latestNutrition.value;
-                    // 1 = No weight loss (good), 2 = Unsure, 3-4 = Yes (concerning),
-                    // 5 = Yes but unsure
-                    const nColor =
-                      v === 1
-                        ? OK
-                        : v === 2
-                          ? WARN
-                          : v === 3
-                            ? "#e07a30"
-                            : v === 4
-                              ? DANGER
-                              : WARN;
-                    const label =
-                      t.weightLossLabels?.[v] ??
-                      [
-                        t.sWeightLossNo ?? "Nei",
-                        t.sWeightLossUnsure ?? "Usikker",
-                        t.sWeightLossYes ?? "Ja",
-                        t.sWeightLossYes ?? "Ja",
-                        t.sWeightLossYesUnsure ?? "Ja, men usikker",
-                      ][v - 1] ??
-                      String(v);
-                    return (
-                      <div
+                {/* ── Weight loss (single-line divider) ────────────────── */}
+                <Divider
+                  label={
+                    latestNutrition?.date
+                      ? `${t.sWeightLoss ?? "Vektnedgang"} · ${latestNutrition.date}`
+                      : (t.sWeightLoss ?? "Vektnedgang")
+                  }
+                  extra={
+                    latestNutrition?.value != null ? (
+                      <strong
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          padding: "4px 0",
-                          borderBottom: "1px solid rgba(38,142,134,0.07)",
+                          fontWeight: 700,
+                          color: weightLossColor(latestNutrition.value),
                         }}
                       >
-                        <span
-                          style={{
-                            fontSize: 11,
-                            color: MU,
-                            fontWeight: 500,
-                            flexShrink: 0,
-                            paddingRight: 10,
-                          }}
-                        >
-                          {t.sStatus ?? "Status"}
-                        </span>
-                        <Bar value={v} max={5} color={nColor} />
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: nColor,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {v}{" "}
-                          <span style={{ fontSize: 10, fontWeight: 500 }}>
-                            ({label})
-                          </span>
-                        </span>
-                      </div>
-                    );
-                  })()
-                ) : (
+                        {weightLossLabel(latestNutrition.value, t)}
+                      </strong>
+                    ) : null
+                  }
+                />
+                {latestNutrition?.value == null && (
                   <EmptyNote text={noDataText} />
                 )}
 
@@ -1771,9 +1751,7 @@ export default function Sidebar({ patient, t = {} }) {
                 <Divider
                   label={t.sWeight ?? t.weight ?? "Weight"}
                   onReadMore={
-                    weightRecords.length
-                      ? () => setShowWeightModal(true)
-                      : undefined
+                    weightRecords.length ? () => setShowWeightModal(true) : undefined
                   }
                   readMoreLabel={readMoreLabel}
                 />
