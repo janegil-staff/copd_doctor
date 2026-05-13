@@ -399,5 +399,10 @@
   "moderateExacerbationSub": "(prednisolon / antibiotica)",
   "seriousExacerbationSub": "(ziekenhuisopname)",
   "sShowMore": "Meer tonen",
-  "sShowLess": "Minder tonen"
+  "sShowLess": "Minder tonen",
+  "sWeightLoss": "Gewichtsverlies",
+  "sWeightLossNo": "Nee",
+  "sWeightLossUnsure": "Onzeker",
+  "sWeightLossYes": "Ja",
+  "sWeightLossYesUnsure": "Ja, maar onzeker"
 }

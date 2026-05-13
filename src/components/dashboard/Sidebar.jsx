@@ -1698,21 +1698,31 @@ export default function Sidebar({ patient, t = {} }) {
                   <EmptyNote text={noDataText} />
                 )}
 
-                {/* ── Nutrition (always visible) ───────────────────────── */}
-                <Divider label={t.sNutrition ?? "Nutrition"} />
+                {/* ── Weight loss (always visible) ─────────────────────── */}
+                <Divider label={t.sWeightLoss ?? "Vektnedgang"} />
                 {latestNutrition?.value != null ? (
                   (() => {
                     const v = latestNutrition.value;
-                    // 1 = No, 2-4 = Yes, 5 = Unsure
-                    const nColor = v === 1 ? DANGER : v === 5 ? WARN : OK;
+                    // 1 = No weight loss (good), 2 = Unsure, 3-4 = Yes (concerning),
+                    // 5 = Yes but unsure
+                    const nColor =
+                      v === 1
+                        ? OK
+                        : v === 2
+                          ? WARN
+                          : v === 3
+                            ? "#e07a30"
+                            : v === 4
+                              ? DANGER
+                              : WARN;
                     const label =
-                      t.nutritionLabels?.[v] ??
+                      t.weightLossLabels?.[v] ??
                       [
-                        t.sNutritionNo ?? "No",
-                        t.sNutritionYes ?? "Yes",
-                        t.sNutritionYes ?? "Yes",
-                        t.sNutritionYes ?? "Yes",
-                        t.sNutritionUnsure ?? "Unsure",
+                        t.sWeightLossNo ?? "Nei",
+                        t.sWeightLossUnsure ?? "Usikker",
+                        t.sWeightLossYes ?? "Ja",
+                        t.sWeightLossYes ?? "Ja",
+                        t.sWeightLossYesUnsure ?? "Ja, men usikker",
                       ][v - 1] ??
                       String(v);
                     return (
@@ -1734,7 +1744,7 @@ export default function Sidebar({ patient, t = {} }) {
                             paddingRight: 10,
                           }}
                         >
-                          {t.sScore ?? "Score"}
+                          {t.sStatus ?? "Status"}
                         </span>
                         <Bar value={v} max={5} color={nColor} />
                         <span

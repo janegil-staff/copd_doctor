@@ -393,5 +393,10 @@
   "moderateExacerbationSub": "(Prednisolon / Antibiotika)",
   "seriousExacerbationSub": "(Krankenhausaufenthalt)",
   "sShowMore": "Mehr anzeigen",
-  "sShowLess": "Weniger anzeigen"
+  "sShowLess": "Weniger anzeigen",
+  "sWeightLoss": "Gewichtsverlust",
+  "sWeightLossNo": "Nein",
+  "sWeightLossUnsure": "Unsicher",
+  "sWeightLossYes": "Ja",
+  "sWeightLossYesUnsure": "Ja, aber unsicher"
 }

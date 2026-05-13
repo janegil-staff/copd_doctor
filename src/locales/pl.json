@@ -393,5 +393,10 @@
   "moderateExacerbationSub": "(prednizolon / antybiotyki)",
   "seriousExacerbationSub": "(hospitalizacja)",
   "sShowMore": "Pokaż więcej",
-  "sShowLess": "Pokaż mniej"
+  "sShowLess": "Pokaż mniej",
+  "sWeightLoss": "Utrata wagi",
+  "sWeightLossNo": "Nie",
+  "sWeightLossUnsure": "Niepewne",
+  "sWeightLossYes": "Tak",
+  "sWeightLossYesUnsure": "Tak, ale niepewne"
 }

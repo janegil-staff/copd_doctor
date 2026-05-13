@@ -399,5 +399,10 @@
   "moderateExacerbationSub": "(prednisoloni / antibiootit)",
   "seriousExacerbationSub": "(sairaalahoito)",
   "sShowMore": "Näytä lisää",
-  "sShowLess": "Näytä vähemmän"
+  "sShowLess": "Näytä vähemmän",
+  "sWeightLoss": "Painonlasku",
+  "sWeightLossNo": "Ei",
+  "sWeightLossUnsure": "Epävarma",
+  "sWeightLossYes": "Kyllä",
+  "sWeightLossYesUnsure": "Kyllä, mutta epävarma"
 }

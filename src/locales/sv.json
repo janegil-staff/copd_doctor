@@ -399,5 +399,10 @@
   "moderateExacerbationSub": "(prednisolon / antibiotika)",
   "seriousExacerbationSub": "(sjukhusinläggning)",
   "sShowMore": "Visa mer",
-  "sShowLess": "Visa mindre"
+  "sShowLess": "Visa mindre",
+  "sWeightLoss": "Viktnedgång",
+  "sWeightLossNo": "Nej",
+  "sWeightLossUnsure": "Osäker",
+  "sWeightLossYes": "Ja",
+  "sWeightLossYesUnsure": "Ja, men osäker"
 }

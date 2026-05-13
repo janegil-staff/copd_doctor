@@ -399,5 +399,10 @@
   "moderateExacerbationSub": "(prednisolona / antibióticos)",
   "seriousExacerbationSub": "(hospitalización)",
   "sShowMore": "Mostrar más",
-  "sShowLess": "Mostrar menos"
+  "sShowLess": "Mostrar menos",
+  "sWeightLoss": "Pérdida de peso",
+  "sWeightLossNo": "No",
+  "sWeightLossUnsure": "Inseguro",
+  "sWeightLossYes": "Sí",
+  "sWeightLossYesUnsure": "Sí, pero inseguro"
 }
