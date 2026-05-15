@@ -1357,16 +1357,6 @@ export default function Sidebar({ patient, t = {} }) {
               color={copdDiagnosed ? OK : DANGER}
               alwaysShow
             />
-            <Row
-              label={t.sAsthma ?? "Asthma"}
-              value={
-                asthma
-                  ? `${t.sConfirmed ?? "Confirmed"}${asthmaDate ? ` · ${asthmaDate}` : ""}`
-                  : (t.sNotConfirmed ?? "Not confirmed")
-              }
-              color={asthma ? DANGER : DANGER}
-              alwaysShow
-            />
 
             {/* ── Spirometry (always visible) ─────────────────────────────── */}
             <Divider
@@ -1798,6 +1788,17 @@ export default function Sidebar({ patient, t = {} }) {
 
                 {/* ── Comorbidities (always visible, all listed) ───────── */}
                 <Divider label={t.sComorbidities ?? "Comorbidities"} />
+                {/* ASTHMA_MOVED_TO_COMORBID */}
+                <Row
+                  label={t.sAsthma ?? "Asthma"}
+                  value={
+                    asthma
+                      ? `${t.sYes ?? "Yes"}${asthmaDate ? ` · ${asthmaDate}` : ""}`
+                      : (t.sNo ?? "No")
+                  }
+                  color={asthma ? DANGER : OK}
+                  alwaysShow
+                />
                 {COND_FIELDS.map((c) => {
                   const has = !!cond?.[c.key];
                   return (

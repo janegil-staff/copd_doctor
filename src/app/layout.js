@@ -17,7 +17,7 @@ export async function generateMetadata() {
   const isEnglish = host.includes("copdcalendar.com");
 
   return {
-    title: isEnglish ? "COPD Calendar" : "Kolskalendar",
+    title: isEnglish ? "COPD Calendar" : "Kolskalender",
     description: isEnglish
       ? "COPD symptom calendar"
       : "Symptomkalender for kols",
