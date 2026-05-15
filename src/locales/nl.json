@@ -129,7 +129,7 @@
   "mediumImpact": "Middel (11–20)",
   "highImpact": "Hoog (21–30)",
   "veryHighImpact": "Zeer hoog (>30)",
-  "patientInformation": "Patiëntinformatie",
+  "patientInformation": "Zelf geregistreerde gegevens",
   "low": "Laag",
   "high": "Hoog",
   "veryHigh": "Zeer hoog",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "Nee",
   "sWeightLossUnsure": "Onzeker",
   "sWeightLossYes": "Ja",
-  "sWeightLossYesUnsure": "Ja, maar onzeker"
+  "sWeightLossYesUnsure": "Ja, maar onzeker",
+  "sEdit": "Bewerken",
+  "sEditNotImplemented": "Bewerken nog niet beschikbaar",
+  "sOk": "OK",
+  "sEosinophil": "Eosinofielen"
 }

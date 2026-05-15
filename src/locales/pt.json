@@ -52,7 +52,7 @@
   "allRecords": "Todos os registos",
   "monthlySummary": "Resumo mensal",
   "filledDays": "Dias preenchidos",
-  "patientInformation": "Informação do paciente",
+  "patientInformation": "Dados auto-registados",
   "lowImpact": "Baixo (≤10)",
   "sDiagnosis": "Diagnóstico",
   "sComorbidities": "Comorbilidades",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "Não",
   "sWeightLossUnsure": "Incerto",
   "sWeightLossYes": "Sim",
-  "sWeightLossYesUnsure": "Sim, mas incerto"
+  "sWeightLossYesUnsure": "Sim, mas incerto",
+  "sEdit": "Editar",
+  "sEditNotImplemented": "Edição ainda não implementada",
+  "sOk": "OK",
+  "sEosinophil": "Eosinófilos"
 }

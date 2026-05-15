@@ -137,7 +137,7 @@
   "male": "Hombre",
   "female": "Mujer",
   "registrations": "registros",
-  "patientInformation": "Información del paciente",
+  "patientInformation": "Datos autoregistrados",
   "logout": "Cerrar sesión",
   "catScore": "Puntuación CAT",
   "catSubScores": "Subpuntuaciones CAT",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "No",
   "sWeightLossUnsure": "Inseguro",
   "sWeightLossYes": "Sí",
-  "sWeightLossYesUnsure": "Sí, pero inseguro"
+  "sWeightLossYesUnsure": "Sí, pero inseguro",
+  "sEdit": "Editar",
+  "sEditNotImplemented": "Edición aún no implementada",
+  "sOk": "OK",
+  "sEosinophil": "Eosinófilos"
 }

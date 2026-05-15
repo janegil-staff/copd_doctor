@@ -140,7 +140,7 @@
   "logout": "Disconnettersi",
   "catScore": "Punteggio CAT",
   "catSubScores": "Sotto-punteggi CAT",
-  "patientInformation": "Informazioni paziente",
+  "patientInformation": "Dati auto-registrati",
   "allRecords": "Tutti i record",
   "monthlySummary": "Riepilogo mensile",
   "filledDays": "Giorni compilati",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "No",
   "sWeightLossUnsure": "Incerto",
   "sWeightLossYes": "Sì",
-  "sWeightLossYesUnsure": "Sì, ma incerto"
+  "sWeightLossYesUnsure": "Sì, ma incerto",
+  "sEdit": "Modifica",
+  "sEditNotImplemented": "Modifica non ancora disponibile",
+  "sOk": "OK",
+  "sEosinophil": "Eosinofili"
 }

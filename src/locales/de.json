@@ -132,7 +132,7 @@
   "female": "Frau",
   "registrations": "Registrierungen",
   "logout": "Abmelden",
-  "patientInformation": "Patienteninformation",
+  "patientInformation": "Selbst erfasste Daten",
   "catScore": "CAT-Score",
   "catSubScores": "CAT-Teilscores",
   "allRecords": "Alle Einträge",
@@ -398,5 +398,9 @@
   "sWeightLossNo": "Nein",
   "sWeightLossUnsure": "Unsicher",
   "sWeightLossYes": "Ja",
-  "sWeightLossYesUnsure": "Ja, aber unsicher"
+  "sWeightLossYesUnsure": "Ja, aber unsicher",
+  "sEdit": "Bearbeiten",
+  "sEditNotImplemented": "Bearbeiten noch nicht verfügbar",
+  "sOk": "OK",
+  "sEosinophil": "Eosinophile"
 }

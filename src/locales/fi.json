@@ -43,7 +43,7 @@
   "symptomLog": "Oireloki",
   "invalidCode": "Virheellinen koodi",
   "current": "nyt",
-  "patientInformation": "Potilastiedot",
+  "patientInformation": "Itse rekisteröidyt tiedot",
   "sDiagnosis": "Diagnoosi",
   "sComorbidities": "Liitännäissairaudet",
   "sSpirometry": "Spirometria",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "Ei",
   "sWeightLossUnsure": "Epävarma",
   "sWeightLossYes": "Kyllä",
-  "sWeightLossYesUnsure": "Kyllä, mutta epävarma"
+  "sWeightLossYesUnsure": "Kyllä, mutta epävarma",
+  "sEdit": "Muokkaa",
+  "sEditNotImplemented": "Muokkaaminen ei ole vielä käytössä",
+  "sOk": "OK",
+  "sEosinophil": "Eosinofiilit"
 }

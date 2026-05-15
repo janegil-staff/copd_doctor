@@ -230,7 +230,7 @@
     "Su"
   ],
   "downloadSummaryPdf": "Download Summary PDF",
-  "patientInformation": "Patient Information",
+  "patientInformation": "Self-registered data",
   "summaryReport": "COPD Summary",
   "generating": "Generating…",
   "pdfName": "Name: _________________________________",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "No",
   "sWeightLossUnsure": "Unsure",
   "sWeightLossYes": "Yes",
-  "sWeightLossYesUnsure": "Yes, but unsure"
+  "sWeightLossYesUnsure": "Yes, but unsure",
+  "sEdit": "Edit",
+  "sEditNotImplemented": "Edit not yet implemented",
+  "sOk": "OK",
+  "sEosinophil": "Eosinophils"
 }

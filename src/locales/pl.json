@@ -46,7 +46,7 @@
   "male": "Mężczyzna",
   "female": "Kobieta",
   "registrations": "rejestracje",
-  "patientInformation": "Informacje o pacjencie",
+  "patientInformation": "Dane zarejestrowane samodzielnie",
   "sDiagnosis": "Diagnoza",
   "sComorbidities": "Choroby współistniejące",
   "sSpirometry": "Spirometria",
@@ -398,5 +398,9 @@
   "sWeightLossNo": "Nie",
   "sWeightLossUnsure": "Niepewne",
   "sWeightLossYes": "Tak",
-  "sWeightLossYesUnsure": "Tak, ale niepewne"
+  "sWeightLossYesUnsure": "Tak, ale niepewne",
+  "sEdit": "Edytuj",
+  "sEditNotImplemented": "Edycja nie jest jeszcze dostępna",
+  "sOk": "OK",
+  "sEosinophil": "Eozynofile"
 }

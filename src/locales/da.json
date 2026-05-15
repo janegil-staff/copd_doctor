@@ -42,7 +42,7 @@
   "scoreHeader": "Score*",
   "symptomLog": "Symptomlog",
   "invalidCode": "Ugyldig kode",
-  "patientInformation": "Patientinformation",
+  "patientInformation": "Egenregistrerede data",
   "sDiagnosis": "Diagnose",
   "sComorbidities": "Komorbiditeter",
   "sSpirometry": "Spirometri",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "Nej",
   "sWeightLossUnsure": "Usikker",
   "sWeightLossYes": "Ja",
-  "sWeightLossYesUnsure": "Ja, men usikker"
+  "sWeightLossYesUnsure": "Ja, men usikker",
+  "sEdit": "Rediger",
+  "sEditNotImplemented": "Redigering er endnu ikke implementeret",
+  "sOk": "OK",
+  "sEosinophil": "Eosinofiler"
 }

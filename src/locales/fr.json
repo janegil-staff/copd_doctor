@@ -197,7 +197,7 @@
   "hours": "heures",
   "searchPlaceholder": "Rechercher...",
   "weeksWithMedicine": "Semaines avec médicaments",
-  "patientInformation": "Informations patient",
+  "patientInformation": "Données auto-enregistrées",
   "hourSingular": "heure",
   "activityLabels": [
     "Aucune",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "Non",
   "sWeightLossUnsure": "Incertain",
   "sWeightLossYes": "Oui",
-  "sWeightLossYesUnsure": "Oui, mais incertain"
+  "sWeightLossYesUnsure": "Oui, mais incertain",
+  "sEdit": "Modifier",
+  "sEditNotImplemented": "Modification pas encore disponible",
+  "sOk": "OK",
+  "sEosinophil": "Éosinophiles"
 }

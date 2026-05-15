@@ -147,7 +147,7 @@
   "mediumImpact": "Medel (11–20)",
   "highImpact": "Hög (21–30)",
   "veryHighImpact": "Mycket hög (>30)",
-  "patientInformation": "Patientinformation",
+  "patientInformation": "Egenregistrerade data",
   "low": "Låg",
   "high": "Hög",
   "veryHigh": "Mycket hög",
@@ -404,5 +404,9 @@
   "sWeightLossNo": "Nej",
   "sWeightLossUnsure": "Osäker",
   "sWeightLossYes": "Ja",
-  "sWeightLossYesUnsure": "Ja, men osäker"
+  "sWeightLossYesUnsure": "Ja, men osäker",
+  "sEdit": "Redigera",
+  "sEditNotImplemented": "Redigering är ännu inte implementerad",
+  "sOk": "OK",
+  "sEosinophil": "Eosinofiler"
 }

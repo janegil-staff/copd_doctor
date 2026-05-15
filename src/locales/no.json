@@ -349,7 +349,7 @@
   "pdfAsthmaStatus": "Astmastatus",
   "pdfAsthmaDiagnosed": "Diagnostisert med astma av lege",
   "pdfAsthmaNotDiagnosed": "Ikke diagnostisert med astma",
-  "patientInformation": "Pasientinformasjon",
+  "patientInformation": "Egen registrerte data",
   "stoppedMedications": "Tidligere brukte medisiner",
   "noStoppedMedications": "Ingen sluttede medisiner registrert",
   "sideEffects": "Uhensmessig virkning",
@@ -417,5 +417,9 @@
   "sWeightLossNo": "Nei",
   "sWeightLossUnsure": "Usikker",
   "sWeightLossYes": "Ja",
-  "sWeightLossYesUnsure": "Ja, men usikker"
+  "sWeightLossYesUnsure": "Ja, men usikker",
+  "sEdit": "Editer",
+  "sEditNotImplemented": "Redigering er ikke implementert ennå",
+  "sOk": "OK",
+  "sEosinophil": "Eosinofiler"
 }

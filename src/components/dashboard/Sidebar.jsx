@@ -75,53 +75,126 @@ function EmptyNote({ text }) {
   );
 }
 
-function Divider({ label, onReadMore, readMoreLabel, extra, disabled }) {
+function Divider({ label, subLabel, onReadMore, readMoreLabel, onEdit, editLabel, extra, disabled }) { /* EDIT_BUTTON_V1 */
+  const headerExtras = !subLabel && (extra || (onReadMore && !disabled));
+
   return (
     <div
       style={{
         display: "flex",
-        alignItems: "center",
-        gap: 8,
+        flexDirection: "column",
+        gap: 2,
         padding: "8px 0 4px",
       }}
     >
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: A,
-          textTransform: "uppercase",
-          letterSpacing: 0.8,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {label}
-      </span>
-      <div
-        style={{ flex: 1, height: 1, background: "rgba(38,142,134,0.15)" }}
-      />
-      {extra && (
-        <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
-      )}
-      {onReadMore && !disabled && (
-        <button
-          onClick={onReadMore}
+      {/* Row 1 — title, divider line, optional Edit (and on single-line dividers, extras) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span
           style={{
-            background: "none",
-            border: "none",
-            padding: 0,
             fontSize: 10,
             fontWeight: 700,
             color: A,
-            cursor: "pointer",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
             whiteSpace: "nowrap",
-            flexShrink: 0,
-            textDecoration: "underline",
-            letterSpacing: 0.3,
           }}
         >
-          {readMoreLabel ?? "Read more"}
-        </button>
+          {label}
+        </span>
+        <div
+          style={{ flex: 1, height: 1, background: "rgba(38,142,134,0.15)" }}
+        />
+        {headerExtras && extra && (
+          <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
+        )}
+        {headerExtras && onReadMore && !disabled && (
+          <button
+            onClick={onReadMore}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              fontSize: 10,
+              fontWeight: 700,
+              color: A,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              textDecoration: "underline",
+              letterSpacing: 0.3,
+            }}
+          >
+            {readMoreLabel ?? "Read more"}
+          </button>
+        )}
+        {onEdit && !disabled && (
+          <button
+            onClick={onEdit}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              fontSize: 10,
+              fontWeight: 700,
+              color: A,
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              textDecoration: "underline",
+              letterSpacing: 0.3,
+            }}
+          >
+            {editLabel ?? "Edit"}
+          </button>
+        )}
+      </div>
+
+      {/* Row 2 — date + value on the left, Read more on the far right */}
+      {subLabel && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            paddingLeft: 1,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              color: MU,
+              fontStyle: "italic",
+              letterSpacing: 0.2,
+              flexShrink: 0,
+            }}
+          >
+            {subLabel}
+          </span>
+          {extra && (
+            <span style={{ flexShrink: 0, fontSize: 11 }}>{extra}</span>
+          )}
+          <div style={{ flex: 1 }} />
+          {onReadMore && !disabled && (
+            <button
+              onClick={onReadMore}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                fontSize: 10,
+                fontWeight: 700,
+                color: A,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                textDecoration: "underline",
+                letterSpacing: 0.3,
+              }}
+            >
+              {readMoreLabel ?? "Read more"}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -1126,6 +1199,73 @@ function phq9Sev(s, t) {
   return { label: t.sSevSevere ?? "Severe", color: DANGER };
 }
 
+// ── Edit placeholder modal ───────────────────────────────────────────────────
+
+function EditPlaceholderModal({ t, onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        background: "rgba(0,0,0,0.45)",
+        backdropFilter: "blur(3px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff",
+          borderRadius: 16,
+          padding: 24,
+          width: "100%",
+          maxWidth: 360,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+          textAlign: "center",
+        }}
+      >
+        <h3
+          style={{
+            margin: 0,
+            fontSize: 18,
+            fontWeight: 700,
+            color: TX,
+            fontFamily: "'Playfair Display', Georgia, serif",
+            letterSpacing: "0.025em",
+            marginBottom: 12,
+          }}
+        >
+          {t.sEdit ?? "Edit"}
+        </h3>
+        <p style={{ margin: "0 0 18px", fontSize: 13, color: MU }}>
+          {t.sEditNotImplemented ?? "Edit not yet implemented"}
+        </p>
+        <button
+          onClick={onClose}
+          style={{
+            background: A,
+            color: "#fff",
+            border: "none",
+            borderRadius: 10,
+            padding: "8px 22px",
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: "pointer",
+            letterSpacing: 0.3,
+          }}
+        >
+          {t.sOk ?? "OK"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 
 export default function Sidebar({ patient, t = {} }) {
@@ -1138,6 +1278,7 @@ export default function Sidebar({ patient, t = {} }) {
   const [showGad7Modal, setShowGad7Modal] = useState(false);
   const [showPhq9Modal, setShowPhq9Modal] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [showEditPlaceholder, setShowEditPlaceholder] = useState(false);
 
   const copdDiagnosed = patient.copdDiagnosed ?? false;
   const copdDiagnosedDate = patient.copdDiagnosedDate ?? null;
@@ -1254,6 +1395,12 @@ export default function Sidebar({ patient, t = {} }) {
 
   return (
     <>
+      {showEditPlaceholder && (
+        <EditPlaceholderModal
+          t={t}
+          onClose={() => setShowEditPlaceholder(false)}
+        />
+      )}
       {showWeightModal && (
         <WeightModal
           records={records}
@@ -1361,9 +1508,9 @@ export default function Sidebar({ patient, t = {} }) {
             {/* ── Spirometry (always visible) ─────────────────────────────── */}
             <Divider
               label={t.sSpirometry ?? "Spirometry"}
-              onReadMore={latestSpiro ? () => setShowSpirometryModal(true) : undefined}
-              readMoreLabel={readMoreLabel}
-            />
+              onEdit={() => setShowEditPlaceholder(true)}
+              editLabel={t.sEdit ?? "Edit"}
+            />{/* SPIROMETRY_EDIT_V1 */}
             {latestSpiro ? (
               <div
                 style={{
@@ -1452,6 +1599,27 @@ export default function Sidebar({ patient, t = {} }) {
                     </strong>
                   </>
                 )}
+              <div style={{ flex: 1, minWidth: 8 }} />
+              {latestSpiro && (
+                <button
+                  onClick={() => setShowSpirometryModal(true)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: A,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                    textDecoration: "underline",
+                    letterSpacing: 0.3,
+                  }}
+                >
+                  {readMoreLabel}
+                </button>
+              )}
               </div>
             ) : (
               <EmptyNote text={noDataText} />
@@ -1459,11 +1627,10 @@ export default function Sidebar({ patient, t = {} }) {
 
             {/* ── SPO2 (always visible) ─────────────────────────────────── */}
             <Divider
-              label={
-                latestSpo2v?.date
-                  ? `${t.sSpo2 ?? "SPO₂"} · ${latestSpo2v.date}`
-                  : (t.sSpo2 ?? "SPO₂")
-              }
+              label={t.sSpo2 ?? "SPO₂"}
+              subLabel={latestSpo2v?.date ?? undefined}
+              onEdit={() => setShowEditPlaceholder(true)}
+              editLabel={t.sEdit ?? "Edit"}
               onReadMore={latestSpo2v ? () => setShowSpo2Modal(true) : undefined}
               readMoreLabel={readMoreLabel}
               extra={
@@ -1488,11 +1655,10 @@ export default function Sidebar({ patient, t = {} }) {
 
             {/* ── Eosinophil (always visible) ───────────────────────────── */}
             <Divider
-              label={
-                latestEos?.date
-                  ? `${t.sEosinophil ?? "Eosinophils"} · ${latestEos.date}`
-                  : (t.sEosinophil ?? "Eosinophils")
-              }
+              label={t.sEosinophil ?? "Eosinophils"}
+              subLabel={latestEos?.date ?? undefined}
+              onEdit={() => setShowEditPlaceholder(true)}
+              editLabel={t.sEdit ?? "Edit"}
               onReadMore={latestEos ? () => setShowEosinophilModal(true) : undefined}
               readMoreLabel={readMoreLabel}
               extra={
