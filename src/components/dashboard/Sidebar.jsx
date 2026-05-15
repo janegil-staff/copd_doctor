@@ -1524,7 +1524,15 @@ export default function Sidebar({ patient, t = {} }) {
                 }}
               >
                 {latestSpiro.date && (
-                  <span style={{ color: MU, fontWeight: 600 }}>
+                  <span /* SPIROMETRY_DATE_STYLE_V1 */
+                    style={{
+                      fontSize: 10,
+                      color: MU,
+                      fontStyle: "italic",
+                      letterSpacing: 0.2,
+                      flexShrink: 0,
+                    }}
+                  >
                     {latestSpiro.date}
                   </span>
                 )}
