@@ -177,16 +177,16 @@ function weightLossColor(v) {
 
 function weightLossLabel(v, t) {
   if (v == null) return "–";
-  const arr = [
-    t.sWeightLossNo ?? "Nei",
-    t.sWeightLossUnsure ?? "Usikker",
-    t.sWeightLossYes ?? "Ja",
-    t.sWeightLossYes ?? "Ja",
-    t.sWeightLossYesUnsure ?? "Ja, men usikker",
-  ];
-  return t.weightLossLabels?.[v] ?? arr[v - 1] ?? String(v);
+  const map = {
+    1: t.sWeightLossNo ?? "Nei",
+    2: t.sWeightLossUnsure ?? "Usikker",
+    3: t.sWeightLossYes ?? "Ja",
+    4: t.sWeightLossYes ?? "Ja",
+    5: t.sWeightLossYes ?? "Ja",
+    6: t.sWeightLossYesUnsure ?? "Ja, men usikker",
+  };
+  return map[v] ?? String(v);
 }
-
 // ── Spirometry modal ─────────────────────────────────────────────────────────
 
 function SpirometryModal({ entries, t, onClose }) {
