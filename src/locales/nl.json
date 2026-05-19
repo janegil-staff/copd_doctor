@@ -412,5 +412,7 @@
   "sNo": "Nee",
   "weeksWithLowActivity": "Weken met lage activiteit",
   "weeksWithActivity": "Actieve weken",
-  "weeksWithoutMedicine": "Weken zonder medicatie"
+  "weeksWithoutMedicine": "Weken zonder medicatie",
+  "sPackYears": "Pakjaren",
+  "sSmokingStop": "Gestopt"
 }

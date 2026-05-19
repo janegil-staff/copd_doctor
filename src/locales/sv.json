@@ -412,5 +412,7 @@
   "sNo": "Nej",
   "weeksWithLowActivity": "Veckor med låg aktivitet",
   "weeksWithActivity": "Aktiva veckor",
-  "weeksWithoutMedicine": "Veckor utan medicin"
+  "weeksWithoutMedicine": "Veckor utan medicin",
+  "sPackYears": "Paketår",
+  "sSmokingStop": "Slutade"
 }

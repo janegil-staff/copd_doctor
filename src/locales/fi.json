@@ -412,5 +412,7 @@
   "sNo": "Ei",
   "weeksWithLowActivity": "Viikot, joina aktiivisuus oli vähäistä",
   "weeksWithActivity": "Aktiiviset viikot",
-  "weeksWithoutMedicine": "Viikot ilman lääkettä"
+  "weeksWithoutMedicine": "Viikot ilman lääkettä",
+  "sPackYears": "Askivuodet",
+  "sSmokingStop": "Lopetti"
 }

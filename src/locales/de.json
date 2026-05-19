@@ -406,5 +406,7 @@
   "sNo": "Nein",
   "weeksWithLowActivity": "Wochen mit geringer Aktivität",
   "weeksWithActivity": "Aktive Wochen",
-  "weeksWithoutMedicine": "Wochen ohne Medikament"
+  "weeksWithoutMedicine": "Wochen ohne Medikament",
+  "sPackYears": "Packungsjahre",
+  "sSmokingStop": "Aufgehört"
 }

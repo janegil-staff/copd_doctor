@@ -412,5 +412,7 @@
   "sNo": "Non",
   "weeksWithLowActivity": "Semaines à faible activité",
   "weeksWithActivity": "Semaines actives",
-  "weeksWithoutMedicine": "Semaines sans médicament"
+  "weeksWithoutMedicine": "Semaines sans médicament",
+  "sPackYears": "Paquets-années",
+  "sSmokingStop": "Arrêté"
 }

@@ -1700,20 +1700,47 @@ export default function Sidebar({ patient, t = {} }) {
                     value={`${t.sAge ?? "Age"} ${smoking.startAge}`}
                   />
                 )}
-                {smoking.smoking === 1 && smoking.endAge > 0 && (
+                {smoking.smoking === 3 && smoking.endAge > 0 && (
                   <Row
-                    label={t.sSmokingQuit ?? "Quit"}
+                    label={t.sSmokingStop ?? "Stopped"}
                     value={`${t.sAge ?? "Age"} ${smoking.endAge}`}
                     color={OK}
                   />
                 )}
-                {smoking.smoking === 2 && smoking.frequency > 0 && (
+                {(smoking.smoking === 1 || smoking.smoking === 3) && smoking.frequency > 0 && (
                   <Row
                     label={t.sSmokingAverage ?? "Average"}
                     value={`${smoking.frequency} ${t.sCigarettesPerDay ?? "cig/day"}`}
-                    color={DANGER}
+                    color={smoking.smoking === 1 ? DANGER : MU}
                   />
                 )}
+                {(smoking.smoking === 1 || smoking.smoking === 3) && (() => {
+                  /* PATCH:smoking-section v2 */
+                  // Pack-years: (cig/day ÷ 20) × years smoked.
+                  // Current (1): years = patient.age - startAge.
+                  // Ex (3):      years = endAge - startAge.
+                  const cpd = Number(smoking.frequency) || 0;
+                  const start = Number(smoking.startAge) || 0;
+                  const end = Number(smoking.endAge) || 0;
+                  const currentAge = Number(patient.age) || 0;
+                  let years = 0;
+                  if (smoking.smoking === 3 && end > start) years = end - start;
+                  else if (smoking.smoking === 1 && currentAge > start) years = currentAge - start;
+                  const packYears = (cpd / 20) * years;
+                  const py = Number.isFinite(packYears)
+                    ? Math.round(packYears * 10) / 10
+                    : 0;
+                  const pyColor =
+                    py < 10 ? OK : py < 20 ? WARN : py < 40 ? "#e07a30" : DANGER;
+                  return (
+                    <Row
+                      label={t.sPackYears ?? "Pack-years"}
+                      value={`${py}`}
+                      color={pyColor}
+                      alwaysShow
+                    />
+                  );
+                })()}
               </>
             ) : (
               <EmptyNote text={noDataText} />
