@@ -53,9 +53,7 @@ export default function DrawerContent({ t, record, catColor, usedMedicines, onCl
             <div
               className="text-2xl font-black px-4 py-2 rounded-xl"
               style={{ background: catColor.bg, color: catColor.text, border: `1px solid ${catColor.border}` }}
-            >
-              {record.cat8}
-            </div>
+            >{record.cat8}<span style={{ fontSize: "0.55em", fontWeight: 600, opacity: 0.65, marginLeft: 2 }}>/40</span></div> /* PATCH:drawer-cat-max v1 */
           )}
           <button
             onClick={onClose}

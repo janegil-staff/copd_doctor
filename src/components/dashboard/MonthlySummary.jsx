@@ -134,6 +134,7 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
                 : "#BE3830",
       label: t.avgSymptoms,
       value: avgCat ?? "–",
+      suffix: avgCat != null ? "/40" : null, /* PATCH:cat-max-suffix v1 */
     },
     {
       icon: "⚠",
@@ -212,7 +213,7 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
           {t.noData ?? "No data registered."}
         </p>
       ) : (
-        rows.map(({ icon, iconSrc, iconColor, label, sublabel, value }) => {
+        rows.map(({ icon, iconSrc, iconColor, label, sublabel, value, suffix }) => {
           /* PATCH:monthly-summary-icons v1 */
           const isEmpty = value === "–" || value === 0;
           return (
@@ -278,6 +279,19 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
                 }}
               >
                 {value}
+                {suffix && (
+                  <span
+                    style={{
+                      marginLeft: 2,
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: "#7a9a98",
+                      opacity: 0.8,
+                    }}
+                  >
+                    {suffix}
+                  </span>
+                )}
               </span>
             </div>
           );
