@@ -105,8 +105,13 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
   // ── Exacerbations: count weeks (matches the ⚠ icons on the calendar) ──
   let moderateWeeks = 0;
   let seriousWeeks = 0;
-  let activityWeeks = 0;
+  let lowActivityWeeks = 0;
+  let activeWeeks = 0;
   let medicineWeeks = 0;
+  /* PATCH:monthly-summary v1.1 */
+
+  // Total visible weeks shown for this month (denominator for "without medicine").
+  const totalWeeks = Object.keys(weekRecords.byWeek).length;
 
   for (const recs of Object.values(weekRecords.byWeek)) {
     // For each visible week, ask: does any record in this week trigger…?
@@ -115,9 +120,21 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
       !anySerious && recs.some((r) => r.moderateExacerbations);
     if (anySerious) seriousWeeks++;
     if (anyModerate) moderateWeeks++;
-    if (recs.some((r) => r.physicalActivity > 0)) activityWeeks++;
+
+    // Activity: take the MAX level across the week. 1–2 = low, 3+ = active.
+    // Weeks with no activity at all (max = 0 or null) count toward neither.
+    let maxActivity = 0;
+    for (const r of recs) {
+      const v = Number(r.physicalActivity) || 0;
+      if (v > maxActivity) maxActivity = v;
+    }
+    if (maxActivity >= 1 && maxActivity <= 2) lowActivityWeeks++;
+    else if (maxActivity >= 3) activeWeeks++;
+
     if (recs.some((r) => r.medicines?.length > 0)) medicineWeeks++;
   }
+
+  const noMedicineWeeks = Math.max(0, totalWeeks - medicineWeeks);
 
   const rows = [
     {
@@ -152,16 +169,31 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
     },
     {
       icon: "🏃",
-      iconColor: "#268E86",
-      label: t.physicalActivity,
-      value: activityWeeks,
+      iconColor: "#a16200",
+      label: t.weeksWithLowActivity ?? "Weeks with low activity",
+      value: lowActivityWeeks,
     },
+    {
+      icon: "🏃",
+      iconColor: "#4aba7a",
+      valueColor: "#4aba7a",
+      label: t.weeksWithActivity ?? "Active weeks",
+      value: activeWeeks,
+    }, /* PATCH:monthly-summary v1.2 */
     {
       iconSrc: "/icons/ico_medicine.png",
       icon: "💊",
       iconColor: "#0ea5e9",
       label: t.weeksWithMedicine ?? t.medicines,
       value: medicineWeeks,
+    },
+    {
+      iconSrc: "/icons/ico_medicine.png",
+      icon: "💊",
+      iconColor: "#a0b8b6",
+      iconOpacity: 0.35,
+      label: t.weeksWithoutMedicine ?? "Weeks without medicine",
+      value: noMedicineWeeks,
     },
   ];
 
@@ -213,7 +245,7 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
           {t.noData ?? "No data registered."}
         </p>
       ) : (
-        rows.map(({ icon, iconSrc, iconColor, label, sublabel, value, suffix }) => {
+        rows.map(({ icon, iconSrc, iconColor, iconOpacity, label, sublabel, value, suffix, valueColor }) => {
           /* PATCH:monthly-summary-icons v1 */
           const isEmpty = value === "–" || value === 0;
           return (
@@ -244,11 +276,11 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
                       width: 16,
                       height: 16,
                       objectFit: "contain",
-                      opacity: isEmpty ? 0.4 : 1,
+                      opacity: isEmpty ? 0.4 : (iconOpacity ?? 1),
                     }}
                   />
                 ) : (
-                  <span style={{ opacity: isEmpty ? 0.4 : 1 }}>{icon}</span>
+                  <span style={{ opacity: isEmpty ? 0.4 : (iconOpacity ?? 1) }}>{icon}</span>
                 )}
               </span>
               <span
@@ -273,7 +305,7 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
               <span
                 className="text-sm font-bold"
                 style={{
-                  color: isEmpty ? "#7a9a98" : "#b91c1c",
+                  color: isEmpty ? "#7a9a98" : (valueColor ?? "#b91c1c"),
                   fontStyle: isEmpty ? "italic" : "normal",
                   opacity: isEmpty ? 0.7 : 1,
                 }}

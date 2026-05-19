@@ -409,5 +409,8 @@
   "sEditNotImplemented": "Redigering är ännu inte implementerad",
   "sOk": "OK",
   "sEosinophil": "Eosinofiler",
-  "sNo": "Nej"
+  "sNo": "Nej",
+  "weeksWithLowActivity": "Veckor med låg aktivitet",
+  "weeksWithActivity": "Aktiva veckor",
+  "weeksWithoutMedicine": "Veckor utan medicin"
 }

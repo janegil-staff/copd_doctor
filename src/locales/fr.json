@@ -409,5 +409,8 @@
   "sEditNotImplemented": "Modification pas encore disponible",
   "sOk": "OK",
   "sEosinophil": "Éosinophiles",
-  "sNo": "Non"
+  "sNo": "Non",
+  "weeksWithLowActivity": "Semaines à faible activité",
+  "weeksWithActivity": "Semaines actives",
+  "weeksWithoutMedicine": "Semaines sans médicament"
 }

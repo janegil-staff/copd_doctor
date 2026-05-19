@@ -409,5 +409,8 @@
   "sEditNotImplemented": "Bewerken nog niet beschikbaar",
   "sOk": "OK",
   "sEosinophil": "Eosinofielen",
-  "sNo": "Nee"
+  "sNo": "Nee",
+  "weeksWithLowActivity": "Weken met lage activiteit",
+  "weeksWithActivity": "Actieve weken",
+  "weeksWithoutMedicine": "Weken zonder medicatie"
 }

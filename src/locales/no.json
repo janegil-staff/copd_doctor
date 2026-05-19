@@ -422,5 +422,8 @@
   "sEditNotImplemented": "Redigering er ikke implementert ennå",
   "sOk": "OK",
   "sEosinophil": "Eosinofiler",
-  "sNo": "Nei"
+  "sNo": "Nei",
+  "weeksWithLowActivity": "Uker med lav aktivitet",
+  "weeksWithActivity": "Aktive uker",
+  "weeksWithoutMedicine": "Uker uten medisin"
 }
