@@ -8,6 +8,9 @@ import CalendarPanel from "@/components/dashboard/CalendarPanel";
 import DayDetailDrawer from "@/components/dashboard/DayDetailDrawer";
 import Sidebar from "@/components/dashboard/Sidebar";
 import AdviceSection from "./AdviceSection";
+import DiagnosisCard from "@/components/home/DiagnosisCard";
+import TreatmentMedicationsCard from "@/components/home/TreatmentMedicationsCard";
+import RecommendationsCard from "@/components/home/RecommendationsCard";
 
 function parsePatientData() {
   if (typeof window === "undefined")
@@ -346,10 +349,16 @@ export default function Dashboard() {
             maxWidth: 480,
             display: "flex",
             flexDirection: "column",
+            gap: 12,
           }}
           className="lg:max-w-[280px] lg:flex-shrink-0"
         >
           <Sidebar patient={patient} t={t} />
+
+          {/* INFO_CARDS_V1 — under sidebar, above advice */}
+          <DiagnosisCard t={t} />
+          <TreatmentMedicationsCard t={t} />
+          <RecommendationsCard t={t} />
 
           <AdviceSection
             advice={patient.advice ?? []}

@@ -16,7 +16,11 @@ const toKey = (d) =>
 // Monday key for a given date (matches CalendarPanel's `(dow + 6) % 7` logic).
 const mondayKeyOf = (date) => {
   const dow = (date.getDay() + 6) % 7;
-  const mon = new Date(date.getFullYear(), date.getMonth(), date.getDate() - dow);
+  const mon = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() - dow,
+  );
   return toKey(mon);
 };
 
@@ -151,7 +155,7 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
                 : "#BE3830",
       label: t.avgSymptoms,
       value: avgCat ?? "–",
-      suffix: avgCat != null ? "/40" : null, /* PATCH:cat-max-suffix v1 */
+      suffix: avgCat != null ? "/40" : null /* PATCH:cat-max-suffix v1 */,
     },
     {
       icon: "⚠",
@@ -168,7 +172,17 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
       value: seriousWeeks,
     },
     {
-      icon: "🏃",
+      icon: (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="#e05050"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7" />
+        </svg>
+      ),
       iconColor: "#a16200",
       label: t.weeksWithLowActivity ?? "Weeks with low activity",
       value: lowActivityWeeks,
@@ -179,7 +193,7 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
       valueColor: "#4aba7a",
       label: t.weeksWithActivity ?? "Active weeks",
       value: activeWeeks,
-    }, /* PATCH:monthly-summary v1.2 */
+    } /* PATCH:monthly-summary v1.2 */,
     {
       iconSrc: "/icons/ico_medicine.png",
       icon: "💊",
@@ -245,89 +259,93 @@ export default function MonthlySummary({ t, records, viewYear, viewMonth }) {
           {t.noData ?? "No data registered."}
         </p>
       ) : (
-        rows.map(({ icon, iconSrc, iconColor, iconOpacity, label, sublabel, value, suffix, valueColor }) => {
-          /* PATCH:monthly-summary-icons v1 */
-          const isEmpty = value === "–" || value === 0;
-          return (
-            <div
-              key={label}
-              className="flex items-center px-4 py-1.5"
-              style={{ borderBottom: "1px solid rgba(38,142,134,0.06)", gap: 10 }}
-            >
-              <span
+        rows.map(
+          ({
+            icon,
+            iconSrc,
+            iconColor,
+            iconOpacity,
+            label,
+            sublabel,
+            value,
+            suffix,
+            valueColor,
+          }) => {
+            /* PATCH:monthly-summary-icons v1 */
+            const isEmpty = value === "–" || value === 0;
+            return (
+              <div
+                key={label}
+                className="flex items-center px-4 py-1.5"
                 style={{
-                  width: 20,
-                  height: 20,
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 14,
-                  lineHeight: 1,
-                  color: iconColor,
-                }}
-                aria-hidden="true"
-              >
-                {iconSrc ? (
-                  <img
-                    src={iconSrc}
-                    alt=""
-                    style={{
-                      width: 16,
-                      height: 16,
-                      objectFit: "contain",
-                      opacity: isEmpty ? 0.4 : (iconOpacity ?? 1),
-                    }}
-                  />
-                ) : (
-                  <span style={{ opacity: isEmpty ? 0.4 : (iconOpacity ?? 1) }}>{icon}</span>
-                )}
-              </span>
-              <span
-                className="flex-1 text-sm"
-                style={{ color: "#4a7a78" }}
-              >
-                {label}
-                {sublabel && (
-                  <span
-                    style={{
-                      marginLeft: 6,
-                      fontSize: 11,
-                      color: "#7a9a98",
-                      fontWeight: 500,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    {sublabel}
-                  </span>
-                )}
-              </span>
-              <span
-                className="text-sm font-bold"
-                style={{
-                  color: isEmpty ? "#7a9a98" : (valueColor ?? "#b91c1c"),
-                  fontStyle: isEmpty ? "italic" : "normal",
-                  opacity: isEmpty ? 0.7 : 1,
+                  borderBottom: "1px solid rgba(38,142,134,0.06)",
+                  gap: 10,
                 }}
               >
-                {value}
-                {suffix && (
-                  <span
-                    style={{
-                      marginLeft: 2,
-                      fontSize: 11,
-                      fontWeight: 500,
-                      color: "#7a9a98",
-                      opacity: 0.8,
-                    }}
-                  >
-                    {suffix}
-                  </span>
-                )}
-              </span>
-            </div>
-          );
-        })
+                <span
+                  style={{
+                    width: 20,
+                    height: 20,
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 14,
+                    lineHeight: 1,
+                    color: iconColor,
+                  }}
+                  aria-hidden="true"
+                >
+                  {iconSrc ? (
+                    <img
+                      src={iconSrc}
+                      alt=""
+                      style={{
+                        width: 16,
+                        height: 16,
+                        objectFit: "contain",
+                        opacity: isEmpty ? 0.4 : (iconOpacity ?? 1),
+                      }}
+                    />
+                  ) : (
+                    <span
+                      style={{ opacity: isEmpty ? 0.4 : (iconOpacity ?? 1) }}
+                    >
+                      {icon}
+                    </span>
+                  )}
+                </span>
+                <span className="flex-1 text-sm" style={{ color: "#4a7a78" }}>
+                  {label}
+                  {sublabel && (
+                    <span
+                      style={{
+                        marginLeft: 6,
+                        fontSize: 11,
+                        color: "#7a9a98",
+                        fontWeight: 500,
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {sublabel}
+                    </span>
+                  )}
+                </span>
+                <span
+                  className="text-sm font-bold"
+                  style={{
+                    color: isEmpty ? "#7a9a98" : (valueColor ?? "#b91c1c"),
+                    fontStyle: isEmpty ? "italic" : "normal",
+                    opacity: isEmpty ? 0.7 : 1,
+                  }}
+                >
+                  {value}
+                  {suffix && <span style={{ marginLeft: 2 }}>{suffix}</span>}
+                </span>
+              </div>
+            );
+          },
+        )
       )}
     </div>
   );

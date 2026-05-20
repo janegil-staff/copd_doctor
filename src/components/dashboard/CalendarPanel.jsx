@@ -86,10 +86,34 @@ function MedicineIcon() {
       />
     </div>
   );
-}
+}// ─── Exercise icon (bottom-right) ──────────────────────────────────────────
+function ExerciseIcon({ level }) {
+  const isLow = level != null && level <= 2;
 
-// ─── Exercise icon (bottom-right) ──────────────────────────────────────────
-function ExerciseIcon() {
+  if (isLow) {
+    return (
+      <div
+        title="Low physical activity this week"
+        style={{
+          position: "absolute",
+          right: -4,
+          bottom: -5,
+          width: 18,
+          height: 18,
+          zIndex: 10,
+          pointerEvents: "none",
+          filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))",
+        }}
+      >
+        <img
+          src="/icons/ico_runner_red.png"
+          alt=""
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       title="Physical activity this week"
@@ -113,7 +137,6 @@ function ExerciseIcon() {
     </div>
   );
 }
-
 // ─── Satisfaction dice ─────────────────────────────────────────────────────
 function SatDice({ value = 0 }) {
   const color =
@@ -415,7 +438,7 @@ export default function CalendarPanel({
                 {exLevel && <ExacerbationTriangle level={exLevel} />}
                 {record?.medicines?.length > 0 && <MedicineIcon />}
                 {record?.physicalActivity > 0 && <ExerciseIcon />}
-
+        
                 <div
                   role="button"
                   tabIndex={record ? 0 : -1}

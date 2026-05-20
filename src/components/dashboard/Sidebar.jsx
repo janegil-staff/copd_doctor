@@ -75,7 +75,17 @@ function EmptyNote({ text }) {
   );
 }
 
-function Divider({ label, subLabel, onReadMore, readMoreLabel, onEdit, editLabel, extra, disabled }) { /* EDIT_BUTTON_V1 */
+function Divider({
+  label,
+  subLabel,
+  onReadMore,
+  readMoreLabel,
+  onEdit,
+  editLabel,
+  extra,
+  disabled,
+}) {
+  /* EDIT_BUTTON_V1 */
   const headerExtras = !subLabel && (extra || (onReadMore && !disabled));
 
   return (
@@ -1371,9 +1381,7 @@ export default function Sidebar({ patient, t = {} }) {
     ? weightRecords[weightRecords.length - 1]
     : null;
   const prevWeight =
-    weightRecords.length > 1
-      ? weightRecords[weightRecords.length - 2]
-      : null;
+    weightRecords.length > 1 ? weightRecords[weightRecords.length - 2] : null;
   const weightDiff =
     latestWeight && prevWeight ? latestWeight.weight - prevWeight.weight : null;
   const weightDiffStr =
@@ -1510,7 +1518,8 @@ export default function Sidebar({ patient, t = {} }) {
               label={t.sSpirometry ?? "Spirometry"}
               onEdit={() => setShowEditPlaceholder(true)}
               editLabel={t.sEdit ?? "Edit"}
-            />{/* SPIROMETRY_EDIT_V1 */}
+            />
+            {/* SPIROMETRY_EDIT_V1 */}
             {latestSpiro ? (
               <div
                 style={{
@@ -1607,27 +1616,27 @@ export default function Sidebar({ patient, t = {} }) {
                     </strong>
                   </>
                 )}
-              <div style={{ flex: 1, minWidth: 8 }} />
-              {latestSpiro && (
-                <button
-                  onClick={() => setShowSpirometryModal(true)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: A,
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                    flexShrink: 0,
-                    textDecoration: "underline",
-                    letterSpacing: 0.3,
-                  }}
-                >
-                  {readMoreLabel}
-                </button>
-              )}
+                <div style={{ flex: 1, minWidth: 8 }} />
+                {latestSpiro && (
+                  <button
+                    onClick={() => setShowSpirometryModal(true)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: A,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                      textDecoration: "underline",
+                      letterSpacing: 0.3,
+                    }}
+                  >
+                    {readMoreLabel}
+                  </button>
+                )}
               </div>
             ) : (
               <EmptyNote text={noDataText} />
@@ -1639,7 +1648,9 @@ export default function Sidebar({ patient, t = {} }) {
               subLabel={latestSpo2v?.date ?? undefined}
               onEdit={() => setShowEditPlaceholder(true)}
               editLabel={t.sEdit ?? "Edit"}
-              onReadMore={latestSpo2v ? () => setShowSpo2Modal(true) : undefined}
+              onReadMore={
+                latestSpo2v ? () => setShowSpo2Modal(true) : undefined
+              }
               readMoreLabel={readMoreLabel}
               extra={
                 latestSpo2v?.value != null ? (
@@ -1667,7 +1678,9 @@ export default function Sidebar({ patient, t = {} }) {
               subLabel={latestEos?.date ?? undefined}
               onEdit={() => setShowEditPlaceholder(true)}
               editLabel={t.sEdit ?? "Edit"}
-              onReadMore={latestEos ? () => setShowEosinophilModal(true) : undefined}
+              onReadMore={
+                latestEos ? () => setShowEosinophilModal(true) : undefined
+              }
               readMoreLabel={readMoreLabel}
               extra={
                 latestEos?.value != null ? (
@@ -1707,40 +1720,50 @@ export default function Sidebar({ patient, t = {} }) {
                     color={OK}
                   />
                 )}
-                {(smoking.smoking === 1 || smoking.smoking === 3) && smoking.frequency > 0 && (
-                  <Row
-                    label={t.sSmokingAverage ?? "Average"}
-                    value={`${smoking.frequency} ${t.sCigarettesPerDay ?? "cig/day"}`}
-                    color={smoking.smoking === 1 ? DANGER : MU}
-                  />
-                )}
-                {(smoking.smoking === 1 || smoking.smoking === 3) && (() => {
-                  /* PATCH:smoking-section v2 */
-                  // Pack-years: (cig/day ÷ 20) × years smoked.
-                  // Current (1): years = patient.age - startAge.
-                  // Ex (3):      years = endAge - startAge.
-                  const cpd = Number(smoking.frequency) || 0;
-                  const start = Number(smoking.startAge) || 0;
-                  const end = Number(smoking.endAge) || 0;
-                  const currentAge = Number(patient.age) || 0;
-                  let years = 0;
-                  if (smoking.smoking === 3 && end > start) years = end - start;
-                  else if (smoking.smoking === 1 && currentAge > start) years = currentAge - start;
-                  const packYears = (cpd / 20) * years;
-                  const py = Number.isFinite(packYears)
-                    ? Math.round(packYears * 10) / 10
-                    : 0;
-                  const pyColor =
-                    py < 10 ? OK : py < 20 ? WARN : py < 40 ? "#e07a30" : DANGER;
-                  return (
+                {(smoking.smoking === 1 || smoking.smoking === 3) &&
+                  smoking.frequency > 0 && (
                     <Row
-                      label={t.sPackYears ?? "Pack-years"}
-                      value={`${py}`}
-                      color={pyColor}
-                      alwaysShow
+                      label={t.sSmokingAverage ?? "Average"}
+                      value={`${smoking.frequency} ${t.sCigarettesPerDay ?? "cig/day"}`}
+                      color={smoking.smoking === 1 ? DANGER : MU}
                     />
-                  );
-                })()}
+                  )}
+                {(smoking.smoking === 1 || smoking.smoking === 3) &&
+                  (() => {
+                    /* PATCH:smoking-section v2 */
+                    // Pack-years: (cig/day ÷ 20) × years smoked.
+                    // Current (1): years = patient.age - startAge.
+                    // Ex (3):      years = endAge - startAge.
+                    const cpd = Number(smoking.frequency) || 0;
+                    const start = Number(smoking.startAge) || 0;
+                    const end = Number(smoking.endAge) || 0;
+                    const currentAge = Number(patient.age) || 0;
+                    let years = 0;
+                    if (smoking.smoking === 3 && end > start)
+                      years = end - start;
+                    else if (smoking.smoking === 1 && currentAge > start)
+                      years = currentAge - start;
+                    const packYears = (cpd / 20) * years;
+                    const py = Number.isFinite(packYears)
+                      ? Math.round(packYears * 10) / 10
+                      : 0;
+                    const pyColor =
+                      py < 10
+                        ? OK
+                        : py < 20
+                          ? WARN
+                          : py < 40
+                            ? "#e07a30"
+                            : DANGER;
+                    return (
+                      <Row
+                        label={t.sPackYears ?? "Pack-years"}
+                        value={`${py}`}
+                        color={pyColor}
+                        alwaysShow
+                      />
+                    );
+                  })()}
               </>
             ) : (
               <EmptyNote text={noDataText} />
@@ -1801,31 +1824,26 @@ export default function Sidebar({ patient, t = {} }) {
 
                 {/* ── Vaccinations (always visible) ─────────────────────── */}
                 <Divider label={t.sVaccinations ?? "Vaccinations"} />
-                {latestVax ? (
-                  VAX_FIELDS.map(({ key, label }) => (
-                    <Row
-                      key={key}
-                      label={label}
-                      value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
-                      color={latestVax[key] ? OK : MU}
-                      alwaysShow
-                    />
-                  ))
-                ) : (
-                  VAX_FIELDS.map(({ key, label }) => (
-                    <Row
-                      key={key}
-                      label={label}
-                      value={null}
-                      alwaysShow
-                    />
-                  ))
-                )}
+                {latestVax
+                  ? VAX_FIELDS.map(({ key, label }) => (
+                      <Row
+                        key={key}
+                        label={label}
+                        value={latestVax[key] ? "✓" : (t.sNo ?? "No")}
+                        color={latestVax[key] ? OK : MU}
+                        alwaysShow
+                      />
+                    ))
+                  : VAX_FIELDS.map(({ key, label }) => (
+                      <Row key={key} label={label} value={null} alwaysShow />
+                    ))}
 
                 {/* ── GAD-7 (always visible) ───────────────────────────── */}
                 <Divider
                   label={t.sGad7 ?? "GAD-7 · Anxiety"}
-                  onReadMore={latestGad7 ? () => setShowGad7Modal(true) : undefined}
+                  onReadMore={
+                    latestGad7 ? () => setShowGad7Modal(true) : undefined
+                  }
                   readMoreLabel={readMoreLabel}
                 />
                 {latestGad7 ? (
@@ -1858,10 +1876,7 @@ export default function Sidebar({ patient, t = {} }) {
                         flexShrink: 0,
                       }}
                     >
-                      {gad7Score}{" "}
-                      <span style={{ fontSize: 10, fontWeight: 500 }}>
-                        ({gSev.label})
-                      </span>
+                      {gad7Score}
                     </span>
                   </div>
                 ) : (
@@ -1871,7 +1886,9 @@ export default function Sidebar({ patient, t = {} }) {
                 {/* ── PHQ-9 (always visible) ───────────────────────────── */}
                 <Divider
                   label={t.sPhq9 ?? "PHQ-9 · Depression"}
-                  onReadMore={latestPhq9 ? () => setShowPhq9Modal(true) : undefined}
+                  onReadMore={
+                    latestPhq9 ? () => setShowPhq9Modal(true) : undefined
+                  }
                   readMoreLabel={readMoreLabel}
                 />
                 {latestPhq9 ? (
@@ -1896,7 +1913,7 @@ export default function Sidebar({ patient, t = {} }) {
                       {t.sScore ?? "Score"}
                     </span>
                     <Bar value={phq9Score} max={27} color={pSev.color} />
-                    <span
+<span
                       style={{
                         fontSize: 11,
                         fontWeight: 700,
@@ -1904,10 +1921,7 @@ export default function Sidebar({ patient, t = {} }) {
                         flexShrink: 0,
                       }}
                     >
-                      {phq9Score}{" "}
-                      <span style={{ fontSize: 10, fontWeight: 500 }}>
-                        ({pSev.label})
-                      </span>
+                      {phq9Score}
                     </span>
                   </div>
                 ) : (
@@ -1942,7 +1956,9 @@ export default function Sidebar({ patient, t = {} }) {
                 <Divider
                   label={t.sWeight ?? t.weight ?? "Weight"}
                   onReadMore={
-                    weightRecords.length ? () => setShowWeightModal(true) : undefined
+                    weightRecords.length
+                      ? () => setShowWeightModal(true)
+                      : undefined
                   }
                   readMoreLabel={readMoreLabel}
                 />
